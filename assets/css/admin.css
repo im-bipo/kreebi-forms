@@ -1,0 +1,104 @@
+/**
+ * Kreebi Forms - Admin Styles
+ */
+
+/* Modal Overlay */
+.krefrm-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100000;
+  display: none; /* Hidden by default, shown via JS */
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal Container */
+.krefrm-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 680px;
+  max-width: 94vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Modal Header */
+.krefrm-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.krefrm-modal-header h2 {
+  margin: 0;
+}
+
+/* Modal Close Button */
+.krefrm-modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 4px;
+  color: #666;
+}
+
+.krefrm-modal-close:hover {
+  color: #d63638;
+}
+
+/* Modal Body */
+.krefrm-modal-body {
+  padding: 20px;
+}
+
+/* Submissions Page Styles */
+.krefrm-submission-item {
+  margin-bottom: 30px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  background: #fff;
+}
+
+.krefrm-submission-item h2 {
+  margin-top: 0;
+}
+
+.krefrm-submission-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.krefrm-submission-table th,
+.krefrm-submission-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.krefrm-submission-table tr:first-child {
+  background: #f9f9f9;
+}
+
+/* Form Modal Styles */
+.krefrm-json-example-details {
+  margin-top: 12px;
+}
+
+.krefrm-json-example-summary {
+  cursor: pointer;
+  color: #2271b1;
+  font-weight: 600;
+}
+
+.krefrm-json-example-pre {
+  background: #f0f0f1;
+  padding: 12px;
+  margin-top: 8px;
+  overflow-x: auto;
+}
