@@ -4,9 +4,12 @@ Tags: forms, form-builder, submissions, contact-form
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Repository: https://github.com/im-bipo/kreebi-forms
+Donate link: https://github.com/im-bipo/kreebi-forms
+
 
 
 Kreebi Forms makes it simple to build flexible forms using Drag and Drop as well as JSON definition from the WordPress admin.
@@ -47,6 +50,17 @@ The plugin auto-generates a form ID and stores the form definition as post meta.
 = Where are submissions stored? =
 
 Submissions are stored as a custom post type and can be viewed under **Kreebi Forms > Submissions** in the admin.
+
+== Screenshots ==
+
+1. *Forms list* – overview of created forms in the admin.
+2. *Form editor* – drag‑and‑drop/JSON modal for building a form.
+3. *Submissions* – view submitted entries with export options.
+
+== Upgrade Notice ==
+
+= 1.0.1 =
+* Bug fixes and security tweaks.
 
 == Changelog ==
 

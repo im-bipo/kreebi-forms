@@ -24,7 +24,7 @@ class Krefrm_Admin_Menu
             'krefrm_forms',
             array($this, 'render_forms_page'),
             'dashicons-feedback',
-            25
+            90
         );
 
         // Submenu: Forms
@@ -50,13 +50,11 @@ class Krefrm_Admin_Menu
 
     public function render_forms_page()
     {
-        $page = new Krefrm_Admin_Forms_Page();
-        $page->render();
+        echo '<div id="krefrm-admin-root" data-page="forms"></div>';
     }
 
     public function render_submissions_page()
     {
-        $page = new Krefrm_Admin_Submissions_Page();
-        $page->render();
+        echo '<div id="krefrm-admin-root" data-page="submissions"></div>';
     }
 }

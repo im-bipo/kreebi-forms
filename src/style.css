@@ -1,0 +1,116 @@
+/* Kreebi Forms — React Admin Styles */
+
+.krefrm-app {
+  max-width: 1100px;
+}
+
+/* Tab Navigation */
+.krefrm-tabs {
+  display: flex;
+  gap: 0;
+  margin: 16px 0 24px;
+  border-bottom: 1px solid #c3c4c7;
+}
+
+.krefrm-tab {
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #50575e;
+  margin-bottom: -1px;
+  border-radius: 4px 4px 0 0;
+}
+
+.krefrm-tab:hover {
+  color: #2271b1;
+}
+
+.krefrm-tab.active {
+  background: #fff;
+  border-color: #c3c4c7;
+  border-bottom-color: #fff;
+  color: #1d2327;
+  font-weight: 600;
+}
+
+/* Toolbar */
+.krefrm-toolbar {
+  margin-bottom: 16px;
+}
+
+/* Loading */
+.krefrm-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Forms table */
+.krefrm-forms-table code {
+  background: #f0f0f1;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* Modal */
+.krefrm-create-modal .components-modal__content {
+  min-width: 580px;
+}
+
+.krefrm-json-textarea textarea {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace !important;
+  font-size: 13px !important;
+}
+
+.krefrm-modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.krefrm-sample-json {
+  margin-top: 12px;
+}
+
+.krefrm-sample-json summary {
+  cursor: pointer;
+  color: #2271b1;
+  font-weight: 600;
+}
+
+.krefrm-sample-json pre {
+  background: #f0f0f1;
+  padding: 12px;
+  margin-top: 8px;
+  overflow-x: auto;
+  font-size: 12px;
+}
+
+/* Submission cards */
+.krefrm-submission-card {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.krefrm-submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.krefrm-submission-header h3 {
+  margin: 0;
+}
+
+.krefrm-submission-data-table {
+  margin-top: 12px;
+}

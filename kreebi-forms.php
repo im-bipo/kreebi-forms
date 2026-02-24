@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Kreebi Forms
  * Description: Simple form builder storing form definitions and submissions as custom post types.
- * Version:     1.0.0
+ * Version:     1.0.1
  * Author:      Bipin Khatri
  * Author URI:  https://bipo.tech
  * Text Domain: kreebi-forms
@@ -23,6 +23,7 @@ require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-post-types.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-shortcode.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-submission-handler.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-form-sanitizer.php';
+require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-rest-api.php';
 
 // Load admin classes
 require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin-menu.php';

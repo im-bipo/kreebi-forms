@@ -4,10 +4,11 @@ const zip =
   typeof zipLib === "function"
     ? zipLib
     : zipLib && zipLib.default
-      ? zipLib.default
-      : null;
+    ? zipLib.default
+    : null;
 const fs = require("fs");
 const path = require("path");
+const semver = require("semver");
 
 function bundle() {
   return gulp
@@ -16,13 +17,18 @@ function bundle() {
         "**/*",
         "!node_modules/**",
         "!.git/**",
+        "!.gitignore",
         "!dist/**",
+        "!src/**",
         "!*.zip",
         "!**/.DS_Store",
         "!**/Thumbs.db",
         "!gulpfile.js",
         "!package.json",
         "!package-lock.json",
+        "!.prettierrc*",
+        "!.eslintrc*",
+        "!webpack.config.*",
       ],
       {
         dot: true,
@@ -43,6 +49,31 @@ function clean(cb) {
   }
   cb();
 }
+
+function bumpVersion(cb) {
+  const pkgPath = path.join(__dirname, "package.json");
+  const readmePath = path.join(__dirname, "readme.txt");
+  const pluginPath = path.join(__dirname, "kreebi-forms.php");
+
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  const oldVersion = pkg.version;
+  const newVersion = semver.inc(oldVersion, "patch");
+  pkg.version = newVersion;
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n");
+
+  let readme = fs.readFileSync(readmePath, "utf8");
+  readme = readme.replace(/Stable tag: .*/, `Stable tag: ${newVersion}`);
+  fs.writeFileSync(readmePath, readme);
+
+  let plugin = fs.readFileSync(pluginPath, "utf8");
+  plugin = plugin.replace(/(Version:\s*)([\d\.]+)/, `$1${newVersion}`);
+  fs.writeFileSync(pluginPath, plugin);
+
+  console.log(`Bumped version from ${oldVersion} to ${newVersion}`);
+  cb();
+}
+
+exports.bump = bumpVersion;
 
 exports.clean = clean;
 exports.bundle = bundle;

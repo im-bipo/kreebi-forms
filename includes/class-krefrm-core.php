@@ -30,6 +30,9 @@ final class Krefrm_Plugin
         // Handle frontend submissions
         new Krefrm_Submission_Handler();
 
+        // REST API (always loaded for admin React app)
+        new Krefrm_Rest_Api();
+
         // Initialize admin if in admin area
         if (is_admin()) {
             new Krefrm_Admin();

@@ -56,7 +56,10 @@ class Krefrm_Form_Editor
     public function save_metabox($post_id)
     {
         // Verify nonce
-        if (! isset($_POST['krefrm_form_editor_nonce']) || ! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['krefrm_form_editor_nonce'])), 'krefrm_form_editor_nonce')) {
+        if (! isset($_POST['krefrm_form_editor_nonce'])) {
+            return;
+        }
+        if (! wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['krefrm_form_editor_nonce'])), 'krefrm_form_editor_nonce')) {
             return;
         }
 
@@ -70,18 +73,25 @@ class Krefrm_Form_Editor
             return;
         }
 
-        // Get the JSON input.
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via wp_kses_post after unslash and UTF-8 check.
-        $json_input = isset($_POST['krefrm_form_json_editor']) ? wp_unslash($_POST['krefrm_form_json_editor']) : '';
-        $raw_json = is_string($json_input) ? wp_check_invalid_utf8($json_input) : '';
-        $raw_json = wp_kses_post($raw_json);
+        // Get and sanitize the JSON input
+        if (! isset($_POST['krefrm_form_json_editor'])) {
+            return;
+        }
 
-        if (empty($raw_json)) {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized via wp_check_invalid_utf8 and json_decode validation below.
+        $json_input = wp_unslash($_POST['krefrm_form_json_editor']);
+        if (! is_string($json_input)) {
+            return;
+        }
+
+        // Check for valid UTF-8
+        $json_input = wp_check_invalid_utf8($json_input);
+        if (empty($json_input)) {
             return;
         }
 
         // Decode and validate JSON
-        $decoded = json_decode($raw_json, true);
+        $decoded = json_decode($json_input, true);
         if (! is_array($decoded)) {
             wp_die(esc_html__('Invalid JSON. Please check the syntax.', 'kreebi-forms'));
         }
