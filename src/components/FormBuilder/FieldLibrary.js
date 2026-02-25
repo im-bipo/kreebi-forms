@@ -6,6 +6,7 @@
  *  - Clicked via "Add" to append to the current step.
  */
 
+import { useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
 import { useDraggable } from "@dnd-kit/core";
@@ -45,11 +46,22 @@ function DraggableFieldType({ fieldType, onAdd }) {
 }
 
 export default function FieldLibrary({ onAdd }) {
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
   return (
-    <div className="krefrm-field-library">
+    <div
+      className={`krefrm-field-library ${isCollapsed ? "is-collapsed" : ""}`}
+    >
       <h3 className="krefrm-field-library__title">
         {__("Fields", "kreebi-forms")}
       </h3>
+      <button
+        type="button"
+        className="krefrm-field-library__collapse"
+        onClick={() => setIsCollapsed((prev) => !prev)}
+      >
+        {isCollapsed ? __("Show", "kreebi-forms") : __("Hide", "kreebi-forms")}
+      </button>
       <div className="krefrm-field-library__list">
         {FIELD_TYPES.map((ft) => (
           <DraggableFieldType key={ft.type} fieldType={ft} onAdd={onAdd} />

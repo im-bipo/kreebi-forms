@@ -19,6 +19,7 @@ export default function EditFormModal({ form, onSave, onClose }) {
       name: form.title,
       description: form.description,
       steps: form.steps,
+      styleTemplate: form.styleTemplate,
     }),
     [form],
   );

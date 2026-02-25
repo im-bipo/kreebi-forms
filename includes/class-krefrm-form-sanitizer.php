@@ -14,13 +14,22 @@ class Krefrm_Form_Sanitizer
 {
     private $allowed_types = array('text', 'email', 'password', 'number');
 
+    private $allowed_style_templates = array('kreebi_style_1', 'kreebi_style_2', 'blank_dev');
+
     public function sanitize($data)
     {
+        // Sanitize styleTemplate (form-level setting)
+        $style_template = 'kreebi_style_1'; // default
+        if (! empty($data['styleTemplate']) && in_array($data['styleTemplate'], $this->allowed_style_templates, true)) {
+            $style_template = $data['styleTemplate'];
+        }
+
         $sanitized = array(
-            'name'        => isset($data['name']) ? sanitize_text_field($data['name']) : '',
-            'description' => isset($data['description']) ? sanitize_textarea_field($data['description']) : '',
-            'id'          => isset($data['id']) ? sanitize_text_field($data['id']) : '',
-            'steps'       => array(),
+            'name'          => isset($data['name']) ? sanitize_text_field($data['name']) : '',
+            'description'   => isset($data['description']) ? sanitize_textarea_field($data['description']) : '',
+            'id'            => isset($data['id']) ? sanitize_text_field($data['id']) : '',
+            'styleTemplate' => $style_template,
+            'steps'         => array(),
         );
 
         // New multi-step format
@@ -99,6 +108,18 @@ class Krefrm_Form_Sanitizer
         }
 
         $sanitized_field['wrapper'] = $wrapper;
+
+        // Layout (colSpan for grid width)
+        $col_span = 12; // default full width
+        if (! empty($field['layout']) && is_array($field['layout'])) {
+            if (isset($field['layout']['colSpan'])) {
+                $span = absint($field['layout']['colSpan']);
+                if (in_array($span, array(4, 6, 8, 12), true)) {
+                    $col_span = $span;
+                }
+            }
+        }
+        $sanitized_field['layout'] = array('colSpan' => $col_span);
 
         return $sanitized_field;
     }

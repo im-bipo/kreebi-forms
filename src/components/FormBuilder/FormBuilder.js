@@ -22,9 +22,8 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  closestCenter,
+  rectIntersection,
 } from "@dnd-kit/core";
-import { arrayMove } from "@dnd-kit/sortable";
 
 import useFormBuilder from "./useFormBuilder";
 import FieldLibrary from "./FieldLibrary";
@@ -32,6 +31,7 @@ import FormPreview from "./FormPreview";
 import SettingsPanel from "./SettingsPanel";
 import JsonEditor from "./JsonEditor";
 import DragOverlayCard from "./DragOverlayCard";
+import FormSettings from "./FormSettings";
 
 export default function FormBuilder({
   initialData = {},
@@ -40,8 +40,9 @@ export default function FormBuilder({
   saveLabel,
 }) {
   const builder = useFormBuilder(initialData);
-  const [view, setView] = useState("visual"); // "visual" | "json"
+  const [view, setView] = useState("visual"); // "visual" | "json" | "settings"
   const [activeDrag, setActiveDrag] = useState(null);
+  const [insertIndex, setInsertIndex] = useState(null);
 
   // Require a small move before activating drag (avoids accidental drag on click)
   const sensors = useSensors(
@@ -54,37 +55,116 @@ export default function FormBuilder({
 
   const handleDragStart = useCallback((event) => {
     setActiveDrag(event.active);
+    setInsertIndex(null);
   }, []);
+
+  const handleDragOver = useCallback(
+    (event) => {
+      const { active, over } = event;
+      if (!over) {
+        setInsertIndex(null);
+        return;
+      }
+
+      const step = builder.steps[builder.currentStepIndex];
+      const fields = step?.fields || [];
+
+      if (over.id === "form-preview-droppable") {
+        setInsertIndex(fields.length);
+        return;
+      }
+
+      const overIndex = fields.findIndex((f) => f._uid === over.id);
+      if (overIndex === -1) {
+        setInsertIndex(fields.length);
+        return;
+      }
+
+      const overRect = over.rect;
+      const activeRect =
+        active.rect.current?.translated || active.rect.current?.initial;
+
+      if (!overRect || !activeRect) {
+        setInsertIndex(overIndex);
+        return;
+      }
+
+      const activeCenterX = activeRect.left + activeRect.width / 2;
+      const activeCenterY = activeRect.top + activeRect.height / 2;
+      const overCenterX = overRect.left + overRect.width / 2;
+      const overCenterY = overRect.top + overRect.height / 2;
+
+      const sameRow =
+        Math.abs(activeCenterY - overCenterY) < overRect.height / 2;
+      const shouldInsertAfter = sameRow
+        ? activeCenterX > overCenterX
+        : activeCenterY > overCenterY;
+
+      setInsertIndex(overIndex + (shouldInsertAfter ? 1 : 0));
+    },
+    [builder.steps, builder.currentStepIndex],
+  );
 
   const handleDragEnd = useCallback(
     (event) => {
       setActiveDrag(null);
       const { active, over } = event;
+      const step = builder.steps[builder.currentStepIndex];
+      const fields = step?.fields || [];
 
-      if (!over) return;
+      if (!over) {
+        setInsertIndex(null);
+        return;
+      }
 
       const activeData = active.data.current;
+      const targetIndex =
+        typeof insertIndex === "number"
+          ? insertIndex
+          : fields.findIndex((f) => f._uid === over.id);
 
       // --- Dropped from the library onto the preview ---
       if (activeData?.origin === "library") {
-        // Dropped on the droppable container or on a field inside it
-        builder.addField({ ...activeData.fieldDefaults });
+        const safeIndex =
+          typeof targetIndex === "number" && targetIndex >= 0
+            ? targetIndex
+            : fields.length;
+        builder.insertFieldAt(
+          { ...activeData.fieldDefaults },
+          builder.currentStepIndex,
+          safeIndex,
+        );
+        setInsertIndex(null);
         return;
       }
 
       // --- Reordering existing fields ---
       if (active.id !== over.id) {
-        const step = builder.steps[builder.currentStepIndex];
         if (!step) return;
         const oldIndex = step.fields.findIndex((f) => f._uid === active.id);
-        const newIndex = step.fields.findIndex((f) => f._uid === over.id);
+        const newIndex =
+          typeof targetIndex === "number" && targetIndex >= 0
+            ? targetIndex
+            : step.fields.findIndex((f) => f._uid === over.id);
+
         if (oldIndex !== -1 && newIndex !== -1) {
-          builder.reorderFields(builder.currentStepIndex, oldIndex, newIndex);
+          builder.moveFieldToIndex(
+            builder.currentStepIndex,
+            oldIndex,
+            newIndex,
+          );
         }
       }
+
+      setInsertIndex(null);
     },
-    [builder],
+    [builder, insertIndex],
   );
+
+  const handleDragCancel = useCallback(() => {
+    setActiveDrag(null);
+    setInsertIndex(null);
+  }, []);
 
   /* ─── Save ─── */
 
@@ -135,6 +215,15 @@ export default function FormBuilder({
           >
             {__("JSON View", "kreebi-forms")}
           </button>
+          <button
+            type="button"
+            className={`krefrm-builder__toggle-btn ${
+              view === "settings" ? "is-active" : ""
+            }`}
+            onClick={() => setView("settings")}
+          >
+            {__("Form Settings", "kreebi-forms")}
+          </button>
         </div>
 
         <div className="krefrm-builder__topbar-actions">
@@ -168,14 +257,25 @@ export default function FormBuilder({
       </div>
 
       {/* ─── View body ─── */}
-      {view === "json" ? (
+      {view === "json" && (
         <JsonEditor getJson={builder.getJson} onApply={builder.setFromJson} />
-      ) : (
+      )}
+
+      {view === "settings" && (
+        <FormSettings
+          styleTemplate={builder.styleTemplate}
+          onChangeStyleTemplate={builder.setStyleTemplate}
+        />
+      )}
+
+      {view === "visual" && (
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={rectIntersection}
           onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
+          onDragCancel={handleDragCancel}
         >
           <div className="krefrm-builder__columns">
             <FieldLibrary onAdd={(defaults) => builder.addField(defaults)} />
@@ -184,9 +284,11 @@ export default function FormBuilder({
               steps={builder.steps}
               currentStepIndex={builder.currentStepIndex}
               selection={builder.selection}
+              insertIndex={insertIndex}
               onSelectField={selectField}
               onSelectStep={selectStep}
               onRemoveField={builder.removeField}
+              onMoveFieldBy={builder.moveFieldBy}
               onPrevStep={() =>
                 builder.setCurrentStepIndex(
                   Math.max(0, builder.currentStepIndex - 1),
@@ -213,7 +315,7 @@ export default function FormBuilder({
             />
           </div>
 
-          <DragOverlay>
+          <DragOverlay dropAnimation={null} adjustScale={false}>
             {activeDrag ? (
               <DragOverlayCard
                 field={

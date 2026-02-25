@@ -40,13 +40,14 @@ export function stripUids(steps) {
 /**
  * Build the full form JSON object from builder state.
  */
-export function buildFormJson(name, description, steps) {
+export function buildFormJson(name, description, steps, styleTemplate) {
   const cleanSteps = stripUids(steps);
+  const base = { name, description, styleTemplate };
   // If only 1 step with no name, flatten to the legacy format
   if (cleanSteps.length === 1 && !cleanSteps[0].name) {
-    return { name, description, fields: cleanSteps[0].fields };
+    return { ...base, fields: cleanSteps[0].fields };
   }
-  return { name, description, steps: cleanSteps };
+  return { ...base, steps: cleanSteps };
 }
 
 /**
@@ -56,6 +57,7 @@ export function buildFormJson(name, description, steps) {
 export function parseFormJson(json) {
   const name = json.name || "";
   const description = json.description || "";
+  const styleTemplate = json.styleTemplate || "kreebi_style_1";
   let steps = [];
 
   if (Array.isArray(json.steps) && json.steps.length) {
@@ -66,7 +68,7 @@ export function parseFormJson(json) {
     steps = [{ name: "", fields: [] }];
   }
 
-  return { name, description, steps: ensureUids(steps) };
+  return { name, description, styleTemplate, steps: ensureUids(steps) };
 }
 
 export default function useFormBuilder(initial = {}) {
@@ -74,6 +76,7 @@ export default function useFormBuilder(initial = {}) {
 
   const [formName, setFormName] = useState(parsed.name);
   const [formDesc, setFormDesc] = useState(parsed.description);
+  const [styleTemplate, setStyleTemplate] = useState(parsed.styleTemplate);
   const [steps, setSteps] = useState(parsed.steps);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
@@ -168,6 +171,29 @@ export default function useFormBuilder(initial = {}) {
     );
   }, []);
 
+  const moveFieldToIndex = useCallback((stepIdx, fromIndex, toIndex) => {
+    setSteps((prev) =>
+      prev.map((s, si) => {
+        if (si !== stepIdx) return s;
+        const fields = [...s.fields];
+        if (fromIndex < 0 || fromIndex >= fields.length) return s;
+
+        const clampedTo = Math.max(0, Math.min(toIndex, fields.length));
+        const [moved] = fields.splice(fromIndex, 1);
+        const insertAt = fromIndex < clampedTo ? clampedTo - 1 : clampedTo;
+        fields.splice(insertAt, 0, moved);
+        return { ...s, fields };
+      }),
+    );
+  }, []);
+
+  const moveFieldBy = useCallback(
+    (stepIdx, fieldIdx, delta) => {
+      moveFieldToIndex(stepIdx, fieldIdx, fieldIdx + delta);
+    },
+    [moveFieldToIndex],
+  );
+
   const insertFieldAt = useCallback(
     (fieldDefaults, stepIdx, insertIndex) => {
       const idx = stepIdx ?? currentStepIndex;
@@ -187,13 +213,14 @@ export default function useFormBuilder(initial = {}) {
   /* ─── JSON sync ─── */
 
   const getJson = useCallback(() => {
-    return buildFormJson(formName, formDesc, steps);
-  }, [formName, formDesc, steps]);
+    return buildFormJson(formName, formDesc, steps, styleTemplate);
+  }, [formName, formDesc, steps, styleTemplate]);
 
   const setFromJson = useCallback((json) => {
     const p = parseFormJson(json);
     setFormName(p.name);
     setFormDesc(p.description);
+    setStyleTemplate(p.styleTemplate);
     setSteps(p.steps);
     setCurrentStepIndex(0);
     setSelection(null);
@@ -205,6 +232,8 @@ export default function useFormBuilder(initial = {}) {
     setFormName,
     formDesc,
     setFormDesc,
+    styleTemplate,
+    setStyleTemplate,
 
     // Steps
     steps,
@@ -219,6 +248,8 @@ export default function useFormBuilder(initial = {}) {
     updateField,
     removeField,
     reorderFields,
+    moveFieldToIndex,
+    moveFieldBy,
     insertFieldAt,
 
     // Selection

@@ -15,6 +15,34 @@ class Krefrm_Shortcode
 {
     private $allowed_types = array('text', 'email', 'password', 'number');
 
+    /**
+     * Map styleTemplate values to the CSS classes injected at render time.
+     * These are merged with any developer-provided wrapper classes.
+     */
+    private $style_class_map = array(
+        'kreebi_style_1' => array(
+            'form'    => 'krefrm-ui-style-1-form',
+            'field'   => 'krefrm-ui-style-1-field',
+            'label'   => 'krefrm-ui-style-1-label',
+            'input'   => 'krefrm-ui-style-1-input',
+            'btn'     => 'krefrm-ui-style-1-btn',
+        ),
+        'kreebi_style_2' => array(
+            'form'    => 'krefrm-ui-style-2-form',
+            'field'   => 'krefrm-ui-style-2-field',
+            'label'   => 'krefrm-ui-style-2-label',
+            'input'   => 'krefrm-ui-style-2-input',
+            'btn'     => 'krefrm-ui-style-2-btn',
+        ),
+        'blank_dev' => array(
+            'form'    => '',
+            'field'   => '',
+            'label'   => '',
+            'input'   => '',
+            'btn'     => '',
+        ),
+    );
+
     public function __construct()
     {
         add_action('init', array($this, 'register'));
@@ -52,8 +80,14 @@ class Krefrm_Shortcode
             return '';
         }
 
+        $this->enqueue_frontend_assets();
+
         $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
         $form_id   = $form_post->post_name;
+
+        // Resolve style template
+        $style_template = isset($form_data['styleTemplate']) ? $form_data['styleTemplate'] : 'kreebi_style_1';
+        $style_classes  = isset($this->style_class_map[$style_template]) ? $this->style_class_map[$style_template] : $this->style_class_map['blank_dev'];
 
         // Normalise to steps format (handles both legacy fields and new steps)
         $steps = $this->normalise_steps($form_data);
@@ -67,6 +101,9 @@ class Krefrm_Shortcode
 
         $action     = esc_url(admin_url('admin-post.php'));
         $form_class = 'krefrm-frontend-form' . ($is_multistep ? ' krefrm-multistep-form' : '');
+        if (! empty($style_classes['form'])) {
+            $form_class .= ' ' . $style_classes['form'];
+        }
 
         $html  = '<form class="' . esc_attr($form_class) . '" method="post" action="' . $action . '"';
         if ($is_multistep) {
@@ -104,10 +141,12 @@ class Krefrm_Shortcode
                 }
             }
 
-            // --- Fields ---
+            // --- Fields in a 12-column grid row ---
+            $html .= '<div class="krefrm-fields-grid">';
             foreach ($fields as $field_index => $f) {
-                $html .= $this->render_field($f, $form_id, $step_index, $field_index);
+                $html .= $this->render_field($f, $form_id, $step_index, $field_index, $style_classes);
             }
+            $html .= '</div>';
 
             // --- Navigation buttons ---
             if ($is_multistep) {
@@ -119,16 +158,20 @@ class Krefrm_Shortcode
                     $html .= '<button type="button" class="krefrm-next-btn">' . esc_html__('Next', 'kreebi-forms') . '</button>';
                 }
                 if ($is_last) {
-                    $html .= '<button type="submit">' . esc_html__('Submit', 'kreebi-forms') . '</button>';
+                    $btn_class = ! empty($style_classes['btn']) ? ' class="' . esc_attr($style_classes['btn']) . '"' : '';
+                    $html .= '<button type="submit"' . $btn_class . '>' . esc_html__('Submit', 'kreebi-forms') . '</button>';
                 }
                 $html .= '</div>';
                 $html .= '</div>'; // close .krefrm-step
             }
         }
 
-        // Single-step submit button
+        // Single-step: wrap fields in grid + submit
         if (! $is_multistep) {
-            $html .= '<p><button type="submit">' . esc_html__('Submit', 'kreebi-forms') . '</button></p>';
+            // re-render fields in grid (single step has only one set of fields)
+            // Note: fields were already rendered above inside the step loop.
+            $btn_class = ! empty($style_classes['btn']) ? ' class="' . esc_attr($style_classes['btn']) . '"' : '';
+            $html .= '<p><button type="submit"' . $btn_class . '>' . esc_html__('Submit', 'kreebi-forms') . '</button></p>';
         }
 
         $html .= '</form>';
@@ -141,12 +184,29 @@ class Krefrm_Shortcode
         return $html;
     }
 
+    /**
+     * Enqueue frontend CSS for form rendering.
+     */
+    private function enqueue_frontend_assets()
+    {
+        $css_path = KREFRM_PLUGIN_DIR . 'assets/css/admin.css';
+        $version  = file_exists($css_path) ? filemtime($css_path) : '1.0.2';
+
+        wp_enqueue_style(
+            'krefrm-frontend',
+            KREFRM_PLUGIN_URL . 'assets/css/admin.css',
+            array(),
+            $version
+        );
+    }
+
     /* ─── Helpers ─── */
 
     /**
-     * Render a single field with auto-generated ID, label[for], and optional wrapper attributes.
+     * Render a single field with auto-generated ID, label[for], optional wrapper attributes,
+     * grid column span, and injected style-template classes.
      */
-    private function render_field($f, $form_id, $step_index, $field_index)
+    private function render_field($f, $form_id, $step_index, $field_index, $style_classes = array())
     {
         $name        = isset($f['name']) ? $f['name'] : 'field_' . $field_index;
         $key         = sanitize_key(preg_replace('/\s+/', '_', strtolower($name)));
@@ -158,11 +218,23 @@ class Krefrm_Shortcode
         $required    = ! empty($f['required']);
         $wrapper     = isset($f['wrapper']) ? $f['wrapper'] : array();
 
+        // Layout — column span (default 12 = full width)
+        $col_span = 12;
+        if (! empty($f['layout']['colSpan'])) {
+            $span = absint($f['layout']['colSpan']);
+            if (in_array($span, array(4, 6, 8, 12), true)) {
+                $col_span = $span;
+            }
+        }
+
         // Auto-generated unique input id
         $input_id = 'krefrm_' . sanitize_key($form_id) . '_s' . $step_index . '_f' . $field_index;
 
-        // Wrapper div attributes
-        $wrapper_classes = 'krefrm-field';
+        // Build wrapper classes: grid span + style template + developer classes
+        $wrapper_classes = 'krefrm-field krefrm-col-' . $col_span;
+        if (! empty($style_classes['field'])) {
+            $wrapper_classes .= ' ' . $style_classes['field'];
+        }
         if (! empty($wrapper['class'])) {
             $wrapper_classes .= ' ' . esc_attr($wrapper['class']);
         }
@@ -171,9 +243,15 @@ class Krefrm_Shortcode
             $wrapper_id_attr = ' id="' . esc_attr($wrapper['id']) . '"';
         }
 
+        // Label classes
+        $label_class = ! empty($style_classes['label']) ? ' class="' . esc_attr($style_classes['label']) . '"' : '';
+
+        // Input classes
+        $input_class = ! empty($style_classes['input']) ? ' class="' . esc_attr($style_classes['input']) . '"' : '';
+
         $html  = '<div class="' . $wrapper_classes . '"' . $wrapper_id_attr . '>';
-        $html .= '<label for="' . esc_attr($input_id) . '">' . esc_html($name) . '</label>';
-        $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"';
+        $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
+        $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"' . $input_class;
         if ($required) {
             $html .= ' required';
         }

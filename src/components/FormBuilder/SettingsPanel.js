@@ -12,6 +12,7 @@ import {
   SelectControl,
   ToggleControl,
   Button,
+  ButtonGroup,
 } from "@wordpress/components";
 import FIELD_TYPES from "./fieldTypes";
 
@@ -19,6 +20,13 @@ const TYPE_OPTIONS = FIELD_TYPES.map((ft) => ({
   label: ft.label,
   value: ft.type,
 }));
+
+const WIDTH_OPTIONS = [
+  { label: __("Full", "kreebi-forms"), value: 12 },
+  { label: __("2/3", "kreebi-forms"), value: 8 },
+  { label: __("1/2", "kreebi-forms"), value: 6 },
+  { label: __("1/3", "kreebi-forms"), value: 4 },
+];
 
 export default function SettingsPanel({
   selection,
@@ -110,6 +118,29 @@ export default function SettingsPanel({
           checked={!!field.required}
           onChange={(val) => update({ required: val })}
         />
+
+        <hr />
+        <h4 style={{ margin: "8px 0 4px" }}>{__("Width", "kreebi-forms")}</h4>
+        <ButtonGroup className="krefrm-width-buttons">
+          {WIDTH_OPTIONS.map((opt) => (
+            <Button
+              key={opt.value}
+              variant={
+                (field.layout?.colSpan || 12) === opt.value
+                  ? "primary"
+                  : "secondary"
+              }
+              isSmall
+              onClick={() =>
+                update({
+                  layout: { ...(field.layout || {}), colSpan: opt.value },
+                })
+              }
+            >
+              {opt.label}
+            </Button>
+          ))}
+        </ButtonGroup>
 
         <hr />
         <h4 style={{ margin: "8px 0 4px" }}>{__("Wrapper", "kreebi-forms")}</h4>

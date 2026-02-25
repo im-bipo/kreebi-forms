@@ -1,7 +1,9 @@
 /* Kreebi Forms — React Admin Styles */
 
 .krefrm-app {
-  max-width: 1200px;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
 /* Tab Navigation */
@@ -119,6 +121,16 @@
    Form Builder
    ============================================================ */
 
+.krefrm-builder {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 16px 16px;
+}
+
+.krefrm-builder * {
+  box-sizing: border-box;
+}
+
 /* ─── Top bar (toggle + actions) ─── */
 .krefrm-builder__topbar {
   display: flex;
@@ -166,6 +178,7 @@
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  flex-wrap: wrap;
 }
 
 .krefrm-builder__name-input,
@@ -188,9 +201,13 @@
 /* ─── Three-column layout ─── */
 .krefrm-builder__columns {
   display: grid;
-  grid-template-columns: 200px 1fr 280px;
+  grid-template-columns: 280px minmax(0, 1fr) 340px;
   gap: 16px;
-  min-height: 460px;
+  min-height: 540px;
+  height: calc(100vh - 280px);
+  max-height: 760px;
+  align-items: stretch;
+  overflow: hidden;
 }
 
 /* ─── Field Library (left sidebar) ─── */
@@ -199,29 +216,51 @@
   border: 1px solid #dcdcde;
   border-radius: 4px;
   padding: 12px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
 .krefrm-field-library__title {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
   font-size: 13px;
   text-transform: uppercase;
   color: #757575;
   letter-spacing: 0.5px;
 }
 
+.krefrm-field-library__collapse {
+  align-self: flex-start;
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: #50575e;
+  cursor: pointer;
+  margin-bottom: 8px;
+  display: none;
+}
+
 .krefrm-field-library__list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.krefrm-field-library.is-collapsed .krefrm-field-library__list {
+  display: none;
 }
 
 .krefrm-field-type {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 10px;
-  background: #f6f7f7;
-  border: 1px solid #dcdcde;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
   border-radius: 4px;
   cursor: grab;
   user-select: none;
@@ -275,6 +314,7 @@
   padding: 16px;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
 .krefrm-form-preview__fields {
@@ -282,13 +322,18 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
-  border: 2px dashed transparent;
+  padding: 16px;
+  border: 2px dashed #e7e7e7;
   border-radius: 4px;
   transition:
     border-color 0.15s,
     background 0.15s;
-  min-height: 200px;
+  min-height: 240px;
+  position: relative;
+  overflow: auto;
+  overflow-x: hidden;
+  background: #fafafa;
+  align-content: start;
 }
 
 .krefrm-form-preview__fields.is-drag-over {
@@ -305,6 +350,51 @@
   font-size: 14px;
   text-align: center;
   padding: 40px 20px;
+  grid-column: 1 / -1;
+}
+
+.krefrm-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.krefrm-empty-state__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eef2f6;
+  color: #3c434a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.krefrm-empty-state__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.krefrm-empty-state__subtitle {
+  font-size: 13px;
+  color: #6b6f73;
+}
+
+.krefrm-drop-placeholder {
+  grid-column: 1 / -1;
+  height: 2px;
+  background: #2271b1;
+  border-radius: 2px;
+  box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.12);
+  margin: 2px 0;
+}
+
+.krefrm-grid-item {
+  display: contents;
 }
 
 /* ─── Step Navigation Bar ─── */
@@ -361,6 +451,9 @@
     border-color 0.15s,
     box-shadow 0.15s;
   cursor: default;
+  width: 100%;
+  min-width: 0;
+  min-height: 64px;
 }
 
 .krefrm-field-card:hover {
@@ -419,16 +512,57 @@
   font-size: 13px;
   background: #f6f7f7;
   color: #757575;
+  pointer-events: none;
 }
 
 .krefrm-field-card__remove {
   flex-shrink: 0;
   opacity: 0;
-  transition: opacity 0.15s;
+  transition:
+    opacity 0.15s,
+    color 0.15s;
+  padding: 2px !important;
 }
 
 .krefrm-field-card:hover .krefrm-field-card__remove {
   opacity: 1;
+}
+
+.krefrm-field-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.krefrm-field-card__reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.krefrm-icon-btn {
+  border: 1px solid #dcdcde;
+  background: #fff;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  font-size: 11px;
+  color: #50575e;
+  cursor: pointer;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.krefrm-icon-btn:hover:not(:disabled) {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.krefrm-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 /* ─── Settings Panel (right sidebar) ─── */
@@ -438,6 +572,7 @@
   border-radius: 4px;
   padding: 16px;
   overflow-y: auto;
+  min-height: 0;
 }
 
 .krefrm-settings-panel__title {
@@ -451,6 +586,7 @@
   font-size: 13px;
   text-align: center;
   padding: 30px 10px;
+  line-height: 1.5;
 }
 
 /* ─── JSON Editor ─── */
@@ -459,6 +595,8 @@
   border: 1px solid #dcdcde;
   border-radius: 4px;
   padding: 16px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 
 .krefrm-json-editor__actions {
@@ -489,4 +627,114 @@
   padding: 24px;
   width: 100%;
   max-width: 1200px;
+}
+
+/* ============================================================
+   Grid Preview (12-column grid in visual editor)
+   ============================================================ */
+
+.krefrm-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+  grid-auto-rows: minmax(64px, auto);
+}
+
+.krefrm-preview-grid.is-drag-over {
+  border-color: #2271b1;
+  background: #f0f6fc;
+}
+
+/* ─── Responsive layout ─── */
+@media (max-width: 1200px) {
+  .krefrm-builder__columns {
+    grid-template-areas:
+      "library preview"
+      "settings settings";
+    grid-template-columns: 240px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) 320px;
+    height: calc(100vh - 300px);
+  }
+
+  .krefrm-field-library {
+    grid-area: library;
+  }
+
+  .krefrm-form-preview {
+    grid-area: preview;
+  }
+
+  .krefrm-settings-panel {
+    grid-area: settings;
+  }
+}
+
+@media (max-width: 960px) {
+  .krefrm-builder__columns {
+    grid-template-areas:
+      "library"
+      "preview"
+      "settings";
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(320px, 1fr) 320px;
+    height: auto;
+    max-height: none;
+  }
+
+  .krefrm-field-library__collapse {
+    display: inline-flex;
+  }
+}
+
+/* ─── Width badge on field cards ─── */
+.krefrm-field-card__width-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 600;
+  color: #2271b1;
+  background: #e7f0f8;
+  padding: 1px 6px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  line-height: 1.4;
+}
+
+/* ─── Width ButtonGroup in SettingsPanel ─── */
+.krefrm-width-buttons {
+  margin-top: 6px;
+}
+
+.krefrm-width-buttons .components-button-group {
+  display: flex;
+  width: 100%;
+}
+
+.krefrm-width-buttons .components-button-group .components-button {
+  flex: 1;
+  justify-content: center;
+}
+
+/* ============================================================
+   Form Settings view
+   ============================================================ */
+
+.krefrm-form-settings {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.krefrm-form-settings h3 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: #1d2327;
+}
+
+.krefrm-form-settings .components-base-control {
+  margin-bottom: 16px;
 }
