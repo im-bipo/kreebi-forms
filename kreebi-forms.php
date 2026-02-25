@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Kreebi Forms
  * Description: Simple form builder storing form definitions and submissions as custom post types.
- * Version:     1.0.1
+ * Version:     1.0.2
  * Author:      Bipin Khatri
  * Author URI:  https://bipo.tech
  * Text Domain: kreebi-forms
