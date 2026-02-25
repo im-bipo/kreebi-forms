@@ -4,7 +4,6 @@ import apiFetch from "@wordpress/api-fetch";
 import {
   Button,
   Notice,
-  Modal,
   TextareaControl,
   Spinner,
 } from "@wordpress/components";
@@ -14,7 +13,7 @@ export default function FormsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [showCreatePage, setShowCreatePage] = useState(false);
   const [jsonInput, setJsonInput] = useState("");
   const [creating, setCreating] = useState(false);
 
@@ -49,7 +48,7 @@ export default function FormsPage() {
         data: parsed,
       });
       setSuccess(__("Form created successfully!", "kreebi-forms"));
-      setShowModal(false);
+      setShowCreatePage(false);
       setJsonInput("");
       fetchForms();
     } catch (err) {
@@ -141,6 +140,71 @@ export default function FormsPage() {
     );
   }
 
+  if (showCreatePage) {
+    return (
+      <div>
+        {error && (
+          <Notice status="error" isDismissible onDismiss={() => setError("")}>
+            {error}
+          </Notice>
+        )}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <h2>{__("Create New Form", "kreebi-forms")}</h2>
+          <Button variant="secondary" onClick={() => setShowCreatePage(false)}>
+            {__("← Back to Forms", "kreebi-forms")}
+          </Button>
+        </div>
+        <div
+          style={{
+            maxWidth: "800px",
+            background: "#fff",
+            padding: "20px",
+            border: "1px solid #ddd",
+            borderRadius: "4px",
+          }}
+        >
+          <TextareaControl
+            label={__("Paste your form JSON below:", "kreebi-forms")}
+            value={jsonInput}
+            onChange={setJsonInput}
+            rows={16}
+            className="krefrm-json-textarea"
+          />
+          <details className="krefrm-sample-json" style={{ marginTop: "15px" }}>
+            <summary>{__("View sample JSON", "kreebi-forms")}</summary>
+            <pre>{sampleJson}</pre>
+          </details>
+          <div style={{ marginTop: "20px" }}>
+            <Button
+              variant="primary"
+              onClick={handleCreate}
+              isBusy={creating}
+              disabled={creating}
+            >
+              {creating
+                ? __("Creating…", "kreebi-forms")
+                : __("Create Form", "kreebi-forms")}
+            </Button>
+            <Button
+              variant="tertiary"
+              onClick={() => setShowCreatePage(false)}
+              style={{ marginLeft: "10px" }}
+            >
+              {__("Cancel", "kreebi-forms")}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
       {error && (
@@ -155,7 +219,7 @@ export default function FormsPage() {
       )}
 
       <div className="krefrm-toolbar">
-        <Button variant="primary" onClick={() => setShowModal(true)}>
+        <Button variant="primary" onClick={() => setShowCreatePage(true)}>
           {__("Create New Form", "kreebi-forms")}
         </Button>
       </div>
@@ -210,72 +274,62 @@ export default function FormsPage() {
         </table>
       )}
 
-      {/* Create Modal */}
-      {showModal && (
-        <Modal
-          title={__("Create New Form", "kreebi-forms")}
-          onRequestClose={() => setShowModal(false)}
-          className="krefrm-create-modal"
-        >
-          <TextareaControl
-            label={__("Paste your form JSON below:", "kreebi-forms")}
-            value={jsonInput}
-            onChange={setJsonInput}
-            rows={16}
-            className="krefrm-json-textarea"
-          />
-          <details className="krefrm-sample-json">
-            <summary>{__("View sample JSON", "kreebi-forms")}</summary>
-            <pre>{sampleJson}</pre>
-          </details>
-          <div className="krefrm-modal-actions">
-            <Button
-              variant="primary"
-              onClick={handleCreate}
-              isBusy={creating}
-              disabled={creating}
-            >
-              {creating
-                ? __("Creating…", "kreebi-forms")
-                : __("Create Form", "kreebi-forms")}
-            </Button>
-            <Button variant="tertiary" onClick={() => setShowModal(false)}>
-              {__("Cancel", "kreebi-forms")}
-            </Button>
-          </div>
-        </Modal>
-      )}
-
-      {/* Edit Modal */}
+      {/* Edit via modal */}
       {editForm && (
-        <Modal
-          title={__("Edit Form", "kreebi-forms") + ": " + editForm.title}
-          onRequestClose={() => setEditForm(null)}
-          className="krefrm-create-modal"
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99999,
+          }}
         >
-          <TextareaControl
-            label={__("Edit form JSON:", "kreebi-forms")}
-            value={editJson}
-            onChange={setEditJson}
-            rows={16}
-            className="krefrm-json-textarea"
-          />
-          <div className="krefrm-modal-actions">
-            <Button
-              variant="primary"
-              onClick={handleUpdate}
-              isBusy={saving}
-              disabled={saving}
-            >
-              {saving
-                ? __("Saving…", "kreebi-forms")
-                : __("Save Changes", "kreebi-forms")}
-            </Button>
-            <Button variant="tertiary" onClick={() => setEditForm(null)}>
-              {__("Cancel", "kreebi-forms")}
-            </Button>
+          <div
+            style={{
+              backgroundColor: "#fff",
+              padding: "30px",
+              borderRadius: "8px",
+              maxWidth: "700px",
+              width: "90%",
+              maxHeight: "90vh",
+              overflowY: "auto",
+            }}
+          >
+            <h2>{__("Edit Form", "kreebi-forms") + ": " + editForm.title}</h2>
+            <TextareaControl
+              label={__("Edit form JSON:", "kreebi-forms")}
+              value={editJson}
+              onChange={setEditJson}
+              rows={16}
+              className="krefrm-json-textarea"
+            />
+            <div style={{ marginTop: "20px" }}>
+              <Button
+                variant="primary"
+                onClick={handleUpdate}
+                isBusy={saving}
+                disabled={saving}
+              >
+                {saving
+                  ? __("Saving…", "kreebi-forms")
+                  : __("Save Changes", "kreebi-forms")}
+              </Button>
+              <Button
+                variant="tertiary"
+                onClick={() => setEditForm(null)}
+                style={{ marginLeft: "10px" }}
+              >
+                {__("Cancel", "kreebi-forms")}
+              </Button>
+            </div>
           </div>
-        </Modal>
+        </div>
       )}
     </div>
   );
