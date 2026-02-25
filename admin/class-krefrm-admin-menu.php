@@ -22,39 +22,41 @@ class Krefrm_Admin_Menu
             __('Kreebi Forms', 'kreebi-forms'),
             'manage_options',
             'krefrm_forms',
-            array($this, 'render_forms_page'),
+            array($this, 'render_page'),
             'dashicons-feedback',
             90
         );
 
-        // Submenu: Forms
+        // Submenu: All Forms
         add_submenu_page(
             'krefrm_forms',
-            __('Forms', 'kreebi-forms'),
-            __('Forms', 'kreebi-forms'),
+            __('All Forms', 'kreebi-forms'),
+            __('All Forms', 'kreebi-forms'),
             'manage_options',
-            'krefrm_forms',
-            array($this, 'render_forms_page')
+            admin_url('admin.php?page=krefrm_forms') . '#forms'
         );
 
-        // Submenu: Submissions
+        // Submenu: Create New Form
         add_submenu_page(
             'krefrm_forms',
-            __('Submissions', 'kreebi-forms'),
-            __('Submissions', 'kreebi-forms'),
+            __('Create New Form', 'kreebi-forms'),
+            __('Create New Form', 'kreebi-forms'),
             'manage_options',
-            'krefrm_submissions',
-            array($this, 'render_submissions_page')
+            admin_url('admin.php?page=krefrm_forms') . '#forms/create'
+        );
+
+        // Submenu: All Submissions
+        add_submenu_page(
+            'krefrm_forms',
+            __('All Submissions', 'kreebi-forms'),
+            __('All Submissions', 'kreebi-forms'),
+            'manage_options',
+            admin_url('admin.php?page=krefrm_forms') . '#submission'
         );
     }
 
-    public function render_forms_page()
+    public function render_page()
     {
-        echo '<div id="krefrm-admin-root" data-page="forms"></div>';
-    }
-
-    public function render_submissions_page()
-    {
-        echo '<div id="krefrm-admin-root" data-page="submissions"></div>';
+        echo '<div id="krefrm-admin-root"></div>';
     }
 }

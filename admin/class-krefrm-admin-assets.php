@@ -58,6 +58,37 @@ class Krefrm_Admin_Assets
                 )) . ';',
                 'before'
             );
+
+            wp_add_inline_script(
+                'krefrm-admin',
+                '(function() {
+                    function syncKrefrmMenu() {
+                        var hash = window.location.hash.replace(/^#\/?/, "");
+                        var items = document.querySelectorAll("#adminmenu a[href*=\"krefrm_forms\"]");
+                        items.forEach(function(a) {
+                            var li = a.parentElement;
+                            var itemHash = (a.href.split("#")[1] || "").replace(/^\//, "");
+                            var isActive = false;
+                            if (itemHash === "forms/create") {
+                                isActive = (hash === "forms/create");
+                            } else if (itemHash === "submission") {
+                                isActive = (hash === "submission");
+                            } else if (itemHash === "forms") {
+                                isActive = (hash !== "forms/create" && hash !== "submission");
+                            }
+                            if (isActive) {
+                                li.classList.add("current");
+                                a.classList.add("current");
+                            } else {
+                                li.classList.remove("current");
+                                a.classList.remove("current");
+                            }
+                        });
+                    }
+                    document.addEventListener("DOMContentLoaded", syncKrefrmMenu);
+                    window.addEventListener("hashchange", syncKrefrmMenu);
+                })();'
+            );
         } else {
             // Fallback to old admin CSS/JS if build doesn't exist
             wp_enqueue_style(

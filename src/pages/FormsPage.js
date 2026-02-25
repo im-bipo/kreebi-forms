@@ -8,14 +8,15 @@ import {
   Spinner,
 } from "@wordpress/components";
 
-export default function FormsPage() {
+export default function FormsPage({ route = "forms", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [showCreatePage, setShowCreatePage] = useState(false);
   const [jsonInput, setJsonInput] = useState("");
   const [creating, setCreating] = useState(false);
+
+  const showCreatePage = route === "forms/create";
 
   // Edit state
   const [editForm, setEditForm] = useState(null);
@@ -48,7 +49,7 @@ export default function FormsPage() {
         data: parsed,
       });
       setSuccess(__("Form created successfully!", "kreebi-forms"));
-      setShowCreatePage(false);
+      navigate("forms");
       setJsonInput("");
       fetchForms();
     } catch (err) {
@@ -157,7 +158,7 @@ export default function FormsPage() {
           }}
         >
           <h2>{__("Create New Form", "kreebi-forms")}</h2>
-          <Button variant="secondary" onClick={() => setShowCreatePage(false)}>
+          <Button variant="secondary" onClick={() => navigate("forms")}>
             {__("← Back to Forms", "kreebi-forms")}
           </Button>
         </div>
@@ -194,7 +195,7 @@ export default function FormsPage() {
             </Button>
             <Button
               variant="tertiary"
-              onClick={() => setShowCreatePage(false)}
+              onClick={() => navigate("forms")}
               style={{ marginLeft: "10px" }}
             >
               {__("Cancel", "kreebi-forms")}
@@ -218,11 +219,7 @@ export default function FormsPage() {
         </Notice>
       )}
 
-      <div className="krefrm-toolbar">
-        <Button variant="primary" onClick={() => setShowCreatePage(true)}>
-          {__("Create New Form", "kreebi-forms")}
-        </Button>
-      </div>
+      <div className="krefrm-toolbar"></div>
 
       {forms.length === 0 ? (
         <p>{__("No forms yet. Create your first form!", "kreebi-forms")}</p>
