@@ -225,8 +225,23 @@ class Krefrm_Rest_Api
     private function prepare_form($post)
     {
         $form_data = get_post_meta($post->ID, '_krefrm_form_data', true);
-        $fields    = isset($form_data['fields']) ? $form_data['fields'] : array();
         $form_id   = isset($form_data['id']) ? $form_data['id'] : $post->post_name;
+
+        // Normalise to steps; also build a flat fields list for backward compat.
+        $steps      = array();
+        $all_fields = array();
+
+        if (! empty($form_data['steps']) && is_array($form_data['steps'])) {
+            $steps = $form_data['steps'];
+            foreach ($steps as $step) {
+                if (! empty($step['fields']) && is_array($step['fields'])) {
+                    $all_fields = array_merge($all_fields, $step['fields']);
+                }
+            }
+        } elseif (! empty($form_data['fields']) && is_array($form_data['fields'])) {
+            $all_fields = $form_data['fields'];
+            $steps      = array(array('name' => '', 'fields' => $all_fields));
+        }
 
         return array(
             'post_id'     => $post->ID,
@@ -234,8 +249,9 @@ class Krefrm_Rest_Api
             'title'       => $post->post_title,
             'description' => $post->post_content,
             'shortcode'   => sprintf('[kreebi_form id="%s"]', esc_attr($form_id)),
-            'fields'      => $fields,
-            'field_count' => count($fields),
+            'steps'       => $steps,
+            'fields'      => $all_fields,
+            'field_count' => count($all_fields),
             'date'        => get_the_date('Y-m-d', $post),
             'edit_url'    => get_edit_post_link($post->ID, 'raw'),
         );

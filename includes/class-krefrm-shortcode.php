@@ -6,6 +6,10 @@ if (! defined('ABSPATH')) {
 
 /**
  * Shortcode Handler
+ *
+ * Supports single-step and multi-step forms.
+ * - 1 step  → rendered as a normal form.
+ * - 2+ steps → rendered step-by-step with Next / Previous navigation.
  */
 class Krefrm_Shortcode
 {
@@ -49,36 +53,199 @@ class Krefrm_Shortcode
         }
 
         $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
-        $fields    = isset($form_data['fields']) ? $form_data['fields'] : array();
+        $form_id   = $form_post->post_name;
 
-        $action  = esc_url(admin_url('admin-post.php'));
-        $form_id = $form_post->post_name;
+        // Normalise to steps format (handles both legacy fields and new steps)
+        $steps = $this->normalise_steps($form_data);
 
-        $html  = '<form class="krefrm-frontend-form" method="post" action="' . $action . '">';
+        if (empty($steps)) {
+            return '';
+        }
+
+        $is_multistep = count($steps) > 1;
+        $total_steps  = count($steps);
+
+        $action     = esc_url(admin_url('admin-post.php'));
+        $form_class = 'krefrm-frontend-form' . ($is_multistep ? ' krefrm-multistep-form' : '');
+
+        $html  = '<form class="' . esc_attr($form_class) . '" method="post" action="' . $action . '"';
+        if ($is_multistep) {
+            $html .= ' data-krefrm-steps="' . esc_attr($total_steps) . '"';
+        }
+        $html .= '>';
         $html .= '<input type="hidden" name="action" value="krefrm_submit">';
         $html .= '<input type="hidden" name="krefrm_form_id" value="' . esc_attr($form_id) . '">';
         $html .= wp_nonce_field('krefrm_frontend_submit', 'krefrm_frontend_submit', true, false);
 
-        foreach ($fields as $i => $f) {
-            $name        = isset($f['name']) ? $f['name'] : 'field_' . $i;
-            $key         = sanitize_key(preg_replace('/\s+/', '_', strtolower($name)));
-            $type        = isset($f['type']) ? $f['type'] : 'text';
-            // Validate field type against allowed types for security
-            if (! in_array($type, $this->allowed_types, true)) {
-                $type = 'text';
-            }
-            $placeholder = isset($f['placeholder']) ? $f['placeholder'] : '';
+        foreach ($steps as $step_index => $step) {
+            $step_name = isset($step['name']) ? $step['name'] : '';
+            $fields    = isset($step['fields']) ? $step['fields'] : array();
+            $is_first  = $step_index === 0;
+            $is_last   = $step_index === $total_steps - 1;
 
-            $html .= '<p class="krefrm-field">';
-            $html .= '<label>' . esc_html($name) . '<br/>';
-            $html .= '<input type="' . esc_attr($type) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '" />';
-            $html .= '</label>';
-            $html .= '</p>';
+            // --- Multi-step wrapper open ---
+            if ($is_multistep) {
+                $step_style = $is_first ? '' : ' style="display:none;"';
+                $step_class = 'krefrm-step' . ($is_first ? ' krefrm-step-active' : '');
+                $html .= '<div class="' . esc_attr($step_class) . '" data-krefrm-step="' . esc_attr($step_index) . '"' . $step_style . '>';
+
+                // Progress indicator
+                $html .= '<div class="krefrm-step-progress">';
+                $html .= '<span class="krefrm-step-indicator">' . sprintf(
+                    /* translators: 1: current step number, 2: total steps */
+                    esc_html__('Step %1$d of %2$d', 'kreebi-forms'),
+                    $step_index + 1,
+                    $total_steps
+                ) . '</span>';
+                $html .= '</div>';
+
+                if (! empty($step_name)) {
+                    $html .= '<h3 class="krefrm-step-title">' . esc_html($step_name) . '</h3>';
+                }
+            }
+
+            // --- Fields ---
+            foreach ($fields as $field_index => $f) {
+                $html .= $this->render_field($f, $form_id, $step_index, $field_index);
+            }
+
+            // --- Navigation buttons ---
+            if ($is_multistep) {
+                $html .= '<div class="krefrm-step-nav">';
+                if (! $is_first) {
+                    $html .= '<button type="button" class="krefrm-prev-btn">' . esc_html__('Previous', 'kreebi-forms') . '</button>';
+                }
+                if (! $is_last) {
+                    $html .= '<button type="button" class="krefrm-next-btn">' . esc_html__('Next', 'kreebi-forms') . '</button>';
+                }
+                if ($is_last) {
+                    $html .= '<button type="submit">' . esc_html__('Submit', 'kreebi-forms') . '</button>';
+                }
+                $html .= '</div>';
+                $html .= '</div>'; // close .krefrm-step
+            }
         }
 
-        $html .= '<p><button type="submit">' . esc_html__('Submit', 'kreebi-forms') . '</button></p>';
+        // Single-step submit button
+        if (! $is_multistep) {
+            $html .= '<p><button type="submit">' . esc_html__('Submit', 'kreebi-forms') . '</button></p>';
+        }
+
         $html .= '</form>';
 
+        // Inline JS for multi-step navigation (added once per page)
+        if ($is_multistep) {
+            $html .= $this->get_multistep_script();
+        }
+
         return $html;
+    }
+
+    /* ─── Helpers ─── */
+
+    /**
+     * Render a single field with auto-generated ID, label[for], and optional wrapper attributes.
+     */
+    private function render_field($f, $form_id, $step_index, $field_index)
+    {
+        $name        = isset($f['name']) ? $f['name'] : 'field_' . $field_index;
+        $key         = sanitize_key(preg_replace('/\s+/', '_', strtolower($name)));
+        $type        = isset($f['type']) ? $f['type'] : 'text';
+        if (! in_array($type, $this->allowed_types, true)) {
+            $type = 'text';
+        }
+        $placeholder = isset($f['placeholder']) ? $f['placeholder'] : '';
+        $required    = ! empty($f['required']);
+        $wrapper     = isset($f['wrapper']) ? $f['wrapper'] : array();
+
+        // Auto-generated unique input id
+        $input_id = 'krefrm_' . sanitize_key($form_id) . '_s' . $step_index . '_f' . $field_index;
+
+        // Wrapper div attributes
+        $wrapper_classes = 'krefrm-field';
+        if (! empty($wrapper['class'])) {
+            $wrapper_classes .= ' ' . esc_attr($wrapper['class']);
+        }
+        $wrapper_id_attr = '';
+        if (! empty($wrapper['id'])) {
+            $wrapper_id_attr = ' id="' . esc_attr($wrapper['id']) . '"';
+        }
+
+        $html  = '<div class="' . $wrapper_classes . '"' . $wrapper_id_attr . '>';
+        $html .= '<label for="' . esc_attr($input_id) . '">' . esc_html($name) . '</label>';
+        $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"';
+        if ($required) {
+            $html .= ' required';
+        }
+        $html .= ' />';
+        $html .= '</div>';
+
+        return $html;
+    }
+
+    /**
+     * Normalise form data into an array of steps.
+     */
+    private function normalise_steps($form_data)
+    {
+        if (! is_array($form_data)) {
+            return array();
+        }
+
+        // New steps format
+        if (! empty($form_data['steps']) && is_array($form_data['steps'])) {
+            return $form_data['steps'];
+        }
+
+        // Legacy flat fields array → single step
+        if (! empty($form_data['fields']) && is_array($form_data['fields'])) {
+            return array(
+                array(
+                    'name'   => '',
+                    'fields' => $form_data['fields'],
+                ),
+            );
+        }
+
+        return array();
+    }
+
+    /**
+     * Inline JS for multi-step navigation (printed once per page).
+     */
+    private function get_multistep_script()
+    {
+        static $added = false;
+        if ($added) {
+            return '';
+        }
+        $added = true;
+
+        return '<script>
+(function(){
+  document.addEventListener("click",function(e){
+    var btn=e.target;
+    if(!btn.classList.contains("krefrm-next-btn")&&!btn.classList.contains("krefrm-prev-btn"))return;
+    var step=btn.closest(".krefrm-step");
+    if(!step)return;
+    var form=step.closest(".krefrm-multistep-form");
+    if(!form)return;
+    if(btn.classList.contains("krefrm-next-btn")){
+      var inputs=step.querySelectorAll("input[required]");
+      for(var i=0;i<inputs.length;i++){
+        if(!inputs[i].checkValidity()){inputs[i].reportValidity();return;}
+      }
+    }
+    var steps=form.querySelectorAll(".krefrm-step");
+    var cur=parseInt(step.getAttribute("data-krefrm-step"),10);
+    var nxt=btn.classList.contains("krefrm-next-btn")?cur+1:cur-1;
+    if(nxt<0||nxt>=steps.length)return;
+    step.style.display="none";
+    step.classList.remove("krefrm-step-active");
+    steps[nxt].style.display="";
+    steps[nxt].classList.add("krefrm-step-active");
+  });
+})();
+</script>';
     }
 }

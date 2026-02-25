@@ -12,7 +12,7 @@ import { Button, TextareaControl } from "@wordpress/components";
  */
 export default function EditFormModal({ form, onSave, onClose }) {
   const initialJson = JSON.stringify(
-    { name: form.title, description: form.description, fields: form.fields },
+    { name: form.title, description: form.description, steps: form.steps },
     null,
     2,
   );

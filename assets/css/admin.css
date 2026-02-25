@@ -47,3 +47,59 @@
   margin-top: 8px;
   overflow-x: auto;
 }
+
+/* ─── Frontend Multi-Step Form Styles ─── */
+
+.krefrm-frontend-form .krefrm-field {
+  margin-bottom: 14px;
+}
+
+.krefrm-frontend-form .krefrm-field label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.krefrm-frontend-form .krefrm-field input {
+  width: 100%;
+  padding: 8px 10px;
+  box-sizing: border-box;
+}
+
+/* Step progress indicator */
+.krefrm-step-progress {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+.krefrm-step-title {
+  margin: 0 0 16px;
+}
+
+/* Navigation buttons */
+.krefrm-step-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 14px;
+  border-top: 1px solid #ddd;
+}
+
+.krefrm-step-nav button {
+  padding: 8px 20px;
+  cursor: pointer;
+}
+
+.krefrm-prev-btn {
+  background: #f0f0f1;
+  border: 1px solid #c3c4c7;
+  color: #1d2327;
+}
+
+.krefrm-next-btn,
+.krefrm-step-nav button[type="submit"] {
+  background: #2271b1;
+  border: 1px solid #2271b1;
+  color: #fff;
+}

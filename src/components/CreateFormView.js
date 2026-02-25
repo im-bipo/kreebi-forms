@@ -6,9 +6,34 @@ const SAMPLE_JSON = JSON.stringify(
   {
     name: "Contact Form",
     description: "A simple contact form",
-    fields: [
-      { name: "Full Name", type: "text", placeholder: "Enter your name" },
-      { name: "Email Address", type: "email", placeholder: "you@example.com" },
+    steps: [
+      {
+        name: "Step 1",
+        fields: [
+          {
+            name: "Full Name",
+            type: "text",
+            placeholder: "Enter your name",
+            required: true,
+            wrapper: { class: "custom-class", id: "name-wrapper" },
+          },
+          {
+            name: "Email Address",
+            type: "email",
+            placeholder: "you@example.com",
+          },
+        ],
+      },
+      {
+        name: "Step 2",
+        fields: [
+          {
+            name: "Phone Number",
+            type: "number",
+            placeholder: "Enter your number",
+          },
+        ],
+      },
     ],
   },
   null,
