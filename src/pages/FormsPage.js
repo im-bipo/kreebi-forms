@@ -102,7 +102,12 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
         </Notice>
       )}
 
-      <FormsTable forms={forms} onEdit={setEditForm} onDelete={handleDelete} />
+      <FormsTable
+        forms={forms}
+        onEdit={setEditForm}
+        onDelete={handleDelete}
+        onCreateNew={() => navigate("forms/create")}
+      />
 
       {editForm && (
         <EditFormModal

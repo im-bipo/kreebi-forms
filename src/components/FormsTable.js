@@ -8,10 +8,18 @@ import { Button } from "@wordpress/components";
  *  forms        {Array}    array of form objects from the REST API
  *  onEdit       {Function} called with a form object when Edit is clicked
  *  onDelete     {Function} called with post_id when Delete is clicked
+ *  onCreateNew  {Function} called when the user wants to create a new form
  */
-export default function FormsTable({ forms, onEdit, onDelete }) {
+export default function FormsTable({ forms, onEdit, onDelete, onCreateNew }) {
   if (forms.length === 0) {
-    return <p>{__("No forms yet. Create your first form!", "kreebi-forms")}</p>;
+    return (
+      <div>
+        <p>{__("No forms yet. Create your first form!", "kreebi-forms")}</p>
+        <Button variant="primary" onClick={onCreateNew}>
+          {__("Create now", "kreebi-forms")}
+        </Button>
+      </div>
+    );
   }
 
   return (
