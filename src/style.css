@@ -1,9 +1,8 @@
 /* Kreebi Forms — React Admin Styles */
 
 .krefrm-app {
-  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 16px;
+  padding-right: 16px;
 }
 
 /* Tab Navigation */
@@ -122,9 +121,7 @@
    ============================================================ */
 
 .krefrm-builder {
-  max-width: 1320px;
   margin: 0 auto;
-  padding: 0 16px 16px;
 }
 
 .krefrm-builder * {
