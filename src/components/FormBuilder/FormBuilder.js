@@ -22,7 +22,7 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-  rectIntersection,
+  closestCenter,
 } from "@dnd-kit/core";
 
 import useFormBuilder from "./useFormBuilder";
@@ -89,17 +89,11 @@ export default function FormBuilder({
         return;
       }
 
-      const activeCenterX = activeRect.left + activeRect.width / 2;
+      // For single-column layout, only consider vertical (Y-axis) positioning
       const activeCenterY = activeRect.top + activeRect.height / 2;
-      const overCenterX = overRect.left + overRect.width / 2;
       const overCenterY = overRect.top + overRect.height / 2;
 
-      const sameRow =
-        Math.abs(activeCenterY - overCenterY) < overRect.height / 2;
-      const shouldInsertAfter = sameRow
-        ? activeCenterX > overCenterX
-        : activeCenterY > overCenterY;
-
+      const shouldInsertAfter = activeCenterY > overCenterY;
       setInsertIndex(overIndex + (shouldInsertAfter ? 1 : 0));
     },
     [builder.steps, builder.currentStepIndex],
@@ -271,7 +265,7 @@ export default function FormBuilder({
       {view === "visual" && (
         <DndContext
           sensors={sensors}
-          collisionDetection={rectIntersection}
+          collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}

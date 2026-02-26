@@ -15,7 +15,6 @@ const FIELD_TYPES = [
       placeholder: "",
       required: false,
       wrapper: { class: "", id: "" },
-      layout: { colSpan: 12 },
     },
   },
   {
@@ -28,7 +27,6 @@ const FIELD_TYPES = [
       placeholder: "",
       required: false,
       wrapper: { class: "", id: "" },
-      layout: { colSpan: 12 },
     },
   },
   {
@@ -41,7 +39,6 @@ const FIELD_TYPES = [
       placeholder: "",
       required: false,
       wrapper: { class: "", id: "" },
-      layout: { colSpan: 12 },
     },
   },
   {
@@ -54,7 +51,6 @@ const FIELD_TYPES = [
       placeholder: "",
       required: false,
       wrapper: { class: "", id: "" },
-      layout: { colSpan: 12 },
     },
   },
 ];

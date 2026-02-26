@@ -8,7 +8,10 @@
  */
 
 import { __ } from "@wordpress/i18n";
-import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { useDroppable } from "@dnd-kit/core";
 import SortableFieldCard from "./SortableFieldCard";
 import StepNavigation from "./StepNavigation";
@@ -66,16 +69,18 @@ export default function FormPreview({
             </div>
           </div>
         ) : (
-          <SortableContext items={fieldIds} strategy={rectSortingStrategy}>
+          <SortableContext
+            items={fieldIds}
+            strategy={verticalListSortingStrategy}
+          >
             {fields.map((field, idx) => (
-              <div key={field._uid} className="krefrm-grid-item">
+              <div key={field._uid} className="krefrm-field-item">
                 {insertIndex === idx && (
                   <div className="krefrm-drop-placeholder" />
                 )}
                 <SortableFieldCard
                   field={field}
                   fieldIndex={idx}
-                  colSpan={field.layout?.colSpan || 12}
                   isSelected={
                     selection?.type === "field" &&
                     selection?.stepIndex === currentStepIndex &&

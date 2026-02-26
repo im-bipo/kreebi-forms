@@ -347,7 +347,6 @@
   font-size: 14px;
   text-align: center;
   padding: 40px 20px;
-  grid-column: 1 / -1;
 }
 
 .krefrm-empty-state {
@@ -382,7 +381,6 @@
 }
 
 .krefrm-drop-placeholder {
-  grid-column: 1 / -1;
   height: 2px;
   background: #2271b1;
   border-radius: 2px;
@@ -390,8 +388,8 @@
   margin: 2px 0;
 }
 
-.krefrm-grid-item {
-  display: contents;
+.krefrm-field-item {
+  display: block;
 }
 
 /* ─── Step Navigation Bar ─── */
@@ -627,19 +625,22 @@
 }
 
 /* ============================================================
-   Grid Preview (12-column grid in visual editor)
-   ============================================================ */
+/* ─── Grid Preview (Single-column vertical layout) ─── */
 
 .krefrm-preview-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 12px;
-  grid-auto-rows: minmax(64px, auto);
 }
 
 .krefrm-preview-grid.is-drag-over {
   border-color: #2271b1;
   background: #f0f6fc;
+}
+
+/* Single field item in vertical list */
+.krefrm-field-item {
+  width: 100%;
 }
 
 /* ─── Responsive layout ─── */
@@ -681,21 +682,6 @@
   .krefrm-field-library__collapse {
     display: inline-flex;
   }
-}
-
-/* ─── Width badge on field cards ─── */
-.krefrm-field-card__width-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 600;
-  color: #2271b1;
-  background: #e7f0f8;
-  padding: 1px 6px;
-  border-radius: 3px;
-  flex-shrink: 0;
-  line-height: 1.4;
 }
 
 /* ─── Width ButtonGroup in SettingsPanel ─── */

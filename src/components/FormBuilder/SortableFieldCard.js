@@ -13,7 +13,6 @@ import { CSS } from "@dnd-kit/utilities";
 export default function SortableFieldCard({
   field,
   fieldIndex,
-  colSpan = 12,
   isSelected,
   onSelect,
   onRemove,
@@ -41,17 +40,7 @@ export default function SortableFieldCard({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    gridColumn: `span ${colSpan}`,
   };
-
-  const widthLabel =
-    colSpan === 12
-      ? "Full"
-      : colSpan === 8
-      ? "2/3"
-      : colSpan === 6
-      ? "1/2"
-      : "1/3";
 
   return (
     <div
@@ -80,9 +69,6 @@ export default function SortableFieldCard({
         <label className="krefrm-field-card__label">
           {field.name || __("(untitled)", "kreebi-forms")}
           {field.required && <span className="krefrm-required-star"> *</span>}
-          {colSpan < 12 && (
-            <span className="krefrm-field-card__width-badge">{widthLabel}</span>
-          )}
         </label>
         <input
           type={field.type || "text"}
