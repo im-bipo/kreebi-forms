@@ -120,10 +120,7 @@ function LivePreview({ templateId }) {
 
 export default function StyleTemplatePage() {
   const [activeTemplate, setActiveTemplate] = useState("kreebi_style_1");
-  const [pendingTemplate, setPendingTemplate] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
   const upgradeUrl = "admin.php?page=krefrm_forms#upgrade-to-pro";
 
   /* Load current setting on mount */
@@ -135,41 +132,26 @@ export default function StyleTemplatePage() {
       .then((data) => {
         const tpl = data?.styleTemplate || "kreebi_style_1";
         setActiveTemplate(tpl);
-        setPendingTemplate(tpl);
       })
-      .catch(() => setPendingTemplate("kreebi_style_1"))
+      .catch(() => setActiveTemplate("kreebi_style_1"))
       .finally(() => setLoading(false));
   }, []);
-
-  const handleSave = () => {
-    if (!pendingTemplate || pendingTemplate === activeTemplate) return;
-    setSaving(true);
-    fetch(`${restUrl}/settings`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-WP-Nonce": nonce,
-      },
-      body: JSON.stringify({ styleTemplate: pendingTemplate }),
-    })
-      .then((r) => r.json())
-      .then(() => {
-        setActiveTemplate(pendingTemplate);
-        setSaved(true);
-        setTimeout(() => setSaved(false), 2500);
-      })
-      .finally(() => setSaving(false));
-  };
-
-  const previewTemplate = pendingTemplate || activeTemplate;
-  const isDirty = pendingTemplate !== activeTemplate;
 
   const handleCardClick = (tpl) => {
     if (tpl.isPremium) {
       window.location.href = upgradeUrl;
       return;
     }
-    setPendingTemplate(tpl.id);
+    // Auto-save on click
+    setActiveTemplate(tpl.id);
+    fetch(`${restUrl}/settings`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-WP-Nonce": nonce,
+      },
+      body: JSON.stringify({ styleTemplate: tpl.id }),
+    });
   };
 
   if (loading) {
@@ -190,35 +172,17 @@ export default function StyleTemplatePage() {
           </h2>
           <p className="krefrm-stl-page__subtitle">
             {__(
-              "Choose a global style applied to all your forms — no per-form overrides needed.",
+              "Choose a template to apply globally to all forms.",
               "kreebi-forms",
             )}
           </p>
-        </div>
-
-        <div className="krefrm-stl-page__actions">
-          {saved && (
-            <span className="krefrm-stl-page__saved-notice">
-              {__("✓ Saved", "kreebi-forms")}
-            </span>
-          )}
-          <Button
-            variant="primary"
-            onClick={handleSave}
-            disabled={!isDirty || saving}
-            isBusy={saving}
-          >
-            {saving
-              ? __("Saving…", "kreebi-forms")
-              : __("Save Template", "kreebi-forms")}
-          </Button>
         </div>
       </div>
 
       {/* Template Cards */}
       <div className="krefrm-stl-cards">
         {TEMPLATES.map((tpl) => {
-          const isSelected = pendingTemplate === tpl.id;
+          const isSelected = activeTemplate === tpl.id;
           const isPremiumCard = Boolean(tpl.isPremium);
           return (
             <button
@@ -293,13 +257,13 @@ export default function StyleTemplatePage() {
         </h3>
         <p className="krefrm-stl-preview-section__subtitle">
           {__(
-            "This is how your forms will look on the frontend with the selected template.",
+            "See how your forms will look with the selected template.",
             "kreebi-forms",
           )}
         </p>
 
         <div className="krefrm-stl-preview-wrap">
-          <LivePreview templateId={previewTemplate} />
+          <LivePreview templateId={activeTemplate} />
         </div>
       </div>
     </div>

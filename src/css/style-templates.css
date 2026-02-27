@@ -9,81 +9,67 @@
 }
 
 .krefrm-stl-page__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  display: block;
   margin-bottom: 24px;
-  background: #fff;
-  border: 0;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 }
 
 .krefrm-stl-page__title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 650;
+  font-size: 24px;
+  font-weight: 700;
   color: #1d2327;
   line-height: 1.2;
 }
 
 .krefrm-stl-page__subtitle {
-  margin: 6px 0 0;
-  font-size: 14px;
+  margin: 8px 0 0;
+  font-size: 15px;
   color: #646970;
+  font-weight: 400;
 }
 
 .krefrm-stl-page__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
+  display: none;
 }
 
 .krefrm-stl-page__saved-notice {
-  font-size: 13px;
-  font-weight: 600;
-  color: #00a32a;
+  display: none;
 }
 
 /* ─── Template Cards row ─── */
 
 .krefrm-stl-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
-  margin-bottom: 24px;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 30px;
 }
 
 .krefrm-stl-card {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 16px;
+  gap: 12px;
+  padding: 14px;
   background: #fff;
-  border: 2px solid #e0e0e2;
-  border-radius: 14px;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
   cursor: pointer;
   text-align: left;
   transition:
-    border-color 0.15s,
-    box-shadow 0.15s,
-    transform 0.15s;
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
 }
 
 .krefrm-stl-card:hover {
-  border-color: #a7caef;
-  box-shadow: 0 4px 14px rgba(34, 113, 177, 0.1);
+  border-color: #2271b1;
+  box-shadow: 0 4px 12px rgba(34, 113, 177, 0.12);
 }
 
 .krefrm-stl-card.is-selected {
   border-color: #2271b1;
-  box-shadow:
-    0 0 0 2px rgba(34, 113, 177, 0.14),
-    0 8px 20px rgba(34, 113, 177, 0.08);
+  background: #f8fafc;
+  box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.1);
 }
 
 .krefrm-stl-card__pro-badge {
@@ -97,34 +83,34 @@
 .krefrm-stl-card__body {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .krefrm-stl-card__name {
   font-size: 15px;
-  font-weight: 650;
+  font-weight: 600;
   color: #1d2327;
 }
 
 .krefrm-stl-card__desc {
   font-size: 13px;
-  color: #646970;
-  line-height: 1.45;
+  color: #666;
+  line-height: 1.4;
 }
 
 .krefrm-stl-card__check {
   position: absolute;
-  top: 12px;
-  right: 14px;
-  width: 22px;
-  height: 22px;
+  top: 10px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
   background: #2271b1;
   color: #fff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -132,28 +118,29 @@
 
 .krefrm-stl-card__thumb {
   border-radius: 8px;
-  padding: 14px;
+  padding: 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-height: 100px;
+  gap: 8px;
+  min-height: 90px;
+  background: #f9f9f9;
 }
 
 .krefrm-stl-thumb__premium-lock {
-  width: 60px;
-  height: 60px;
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px;
+  padding: 10px;
   border-radius: 50%;
   background: #fff;
   border: 2px solid #2271b1;
 }
 
 .krefrm-stl-thumb__premium-lock svg {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   fill: none;
   stroke: #2271b1;
   stroke-width: 2;
@@ -162,8 +149,8 @@
 /* Thumbnail – Premium */
 
 .krefrm-stl-preview--premium.krefrm-stl-card__thumb {
-  background: #f6f7f7;
-  border: 1px dashed #c3c4c7;
+  background: #f0f0f0;
+  border: 1px dashed #ccc;
   align-items: center;
   justify-content: center;
 }
@@ -175,13 +162,14 @@
 .krefrm-stl-thumb__field {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 4px;
 }
 
 .krefrm-stl-thumb__label {
-  height: 8px;
-  width: 45%;
-  border-radius: 4px;
+  height: 6px;
+  width: 40%;
+  border-radius: 3px;
+  background: #ddd;
 }
 
 .krefrm-stl-thumb__input {
@@ -273,32 +261,28 @@
 /* ─── Live Preview Section ─── */
 
 .krefrm-stl-preview-section {
-  background: #fff;
-  border: 0;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  margin-top: 32px;
 }
 
 .krefrm-stl-preview-section__title {
   margin: 0 0 4px;
-  font-size: 17px;
-  font-weight: 650;
+  font-size: 18px;
+  font-weight: 700;
   color: #1d2327;
 }
 
 .krefrm-stl-preview-section__subtitle {
-  margin: 0 0 20px;
+  margin: 0 0 16px;
   font-size: 14px;
-  color: #646970;
+  color: #666;
 }
 
 .krefrm-stl-preview-wrap {
-  background: #f9fafc;
-  border: 1px solid #e0e0e2;
-  border-radius: 10px;
-  padding: 28px;
-  max-width: 760px;
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 100%;
 }
 
 /* ─── Live preview host (uses the same classes as frontend render) ─── */
