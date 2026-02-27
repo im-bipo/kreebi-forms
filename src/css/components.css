@@ -1,0 +1,159 @@
+/* ============================================================
+   Shared Components
+   ============================================================ */
+
+/* ─── Pro Badge ─── */
+
+.krefrm-pro-badge {
+  background: #2271b1;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  margin-left: 4px;
+  text-transform: uppercase;
+}
+
+/* secondary variant for dark backgrounds */
+.krefrm-pro-badge--secondary {
+  background: #ffffff;
+  color: #2271b1;
+  border: 1px solid #2271b1;
+}
+
+/* ─── Copy Button ─── */
+
+.krefrm-copy-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(34, 113, 177, 0.12);
+  background: transparent;
+  color: #2271b1;
+  min-width: auto;
+  text-align: center;
+  vertical-align: middle;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    transform 120ms ease,
+    box-shadow 200ms ease;
+}
+
+.krefrm-copy-btn__icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+  stroke: currentColor;
+  fill: none;
+}
+
+.krefrm-copy-btn:hover {
+  background: rgba(34, 113, 177, 0.06);
+  color: #174f6d;
+  border-color: rgba(34, 113, 177, 0.18);
+}
+
+.krefrm-copy-btn.is-copied {
+  background: #2271b1;
+  color: #ffffff;
+  border-color: #2271b1;
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 8px 20px rgba(34, 113, 177, 0.12);
+  animation: krefrm-copy-pulse 0.5s ease-out;
+}
+
+.krefrm-copy-btn.is-copied .krefrm-copy-btn__icon {
+  transform: rotate(8deg) scale(1.06);
+  transition: transform 160ms ease;
+}
+
+@keyframes krefrm-copy-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 113, 177, 0.18);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(34, 113, 177, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 113, 177, 0);
+  }
+}
+
+/* ─── Template Picker Modal ─── */
+
+.krefrm-picker-modal .components-modal__content {
+  min-width: 520px;
+  max-width: 620px;
+}
+
+.krefrm-picker-subtitle {
+  margin: 0 0 16px;
+  color: #50575e;
+  font-size: 14px;
+}
+
+.krefrm-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.krefrm-picker-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #f9fafc;
+  border: 1px solid rgba(34, 113, 177, 0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.krefrm-picker-card:hover {
+  border-color: #2271b1;
+  box-shadow: 0 4px 14px rgba(34, 113, 177, 0.1);
+}
+
+.krefrm-picker-card__icon {
+  font-size: 24px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid rgba(34, 113, 177, 0.08);
+  flex-shrink: 0;
+}
+
+.krefrm-picker-card__label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.krefrm-picker-divider {
+  border-top: 1px dotted rgba(34, 34, 34, 0.08);
+  margin: 12px 0;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .krefrm-picker-modal .components-modal__content {
+    min-width: 0;
+  }
+
+  .krefrm-picker-grid {
+    grid-template-columns: 1fr;
+  }
+}

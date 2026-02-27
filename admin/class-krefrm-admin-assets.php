@@ -75,6 +75,8 @@ class Krefrm_Admin_Assets
                     'restUrl'   => esc_url_raw(rest_url('kreebi-forms/v1')),
                     'nonce'     => wp_create_nonce('wp_rest'),
                     'pluginUrl' => KREFRM_PLUGIN_URL,
+                    'siteTitle' => get_bloginfo('name'),
+                    'adminEmail' => get_option('admin_email'),
                 )) . ';',
                 'before'
             );

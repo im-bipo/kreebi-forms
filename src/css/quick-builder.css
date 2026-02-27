@@ -1,0 +1,282 @@
+/* ============================================================
+   Quick Builder
+   ============================================================ */
+
+.krefrm-qb {
+  max-width: 640px;
+  margin: 40px auto;
+}
+
+.krefrm-qb__header {
+  margin-bottom: 20px;
+}
+
+.krefrm-qb__header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.krefrm-qb__header p {
+  margin: 6px 0 0;
+  color: #646970;
+  font-size: 14px;
+}
+
+.krefrm-qb__section {
+  background: #fff;
+  border: 1px solid rgba(34, 113, 177, 0.12);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.krefrm-qb__section-title {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.krefrm-qb__empty {
+  color: #646970;
+  font-size: 13px;
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* ─── Field list ─── */
+
+.krefrm-qb__fields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.krefrm-qb-field {
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  background: #f9fafc;
+  transition: border-color 0.15s;
+}
+
+.krefrm-qb-field.is-open {
+  border-color: rgba(34, 113, 177, 0.3);
+}
+
+.krefrm-qb-field[draggable="true"] {
+  cursor: default;
+}
+
+/* Collapsed row */
+
+.krefrm-qb-field__row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  min-height: 48px;
+}
+
+.krefrm-qb-field__handle {
+  cursor: grab;
+  font-size: 18px;
+  color: #a7aaad;
+  user-select: none;
+  line-height: 1;
+  flex-shrink: 0;
+  letter-spacing: 1px;
+}
+
+.krefrm-qb-field__handle:hover {
+  color: #50575e;
+}
+
+.krefrm-qb-field__info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.krefrm-qb-field__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2327;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.krefrm-qb-field__placeholder {
+  font-size: 12px;
+  color: #646970;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.krefrm-qb-field__toggle,
+.krefrm-qb-field__delete {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: #50575e;
+  transition:
+    border-color 0.15s,
+    color 0.15s;
+}
+
+.krefrm-qb-field__toggle:hover {
+  border-color: #2271b1;
+  color: #2271b1;
+}
+
+.krefrm-qb-field__delete:hover {
+  border-color: #d63638;
+  color: #d63638;
+}
+
+/* Expanded editor */
+
+.krefrm-qb-field__editor {
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-top: 1px solid #e0e0e0;
+  animation: krefrm-accordion-in 0.3s ease-out forwards;
+  overflow: hidden;
+}
+
+.krefrm-qb-field__editor.is-closing {
+  animation: krefrm-accordion-out 0.3s ease-in forwards;
+}
+
+@keyframes krefrm-accordion-in {
+  from {
+    opacity: 0;
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 1000px;
+  }
+}
+
+@keyframes krefrm-accordion-out {
+  from {
+    opacity: 1;
+    max-height: 1000px;
+  }
+  to {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+
+/* ─── Add field accordion ─── */
+
+.krefrm-qb__add-section {
+  margin-top: 12px;
+}
+
+.krefrm-qb__add-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: none;
+  border: 1px dashed #c3c4c7;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2271b1;
+  transition:
+    border-color 0.15s,
+    background 0.15s;
+}
+
+.krefrm-qb__add-toggle:hover {
+  border-color: #2271b1;
+  background: rgba(34, 113, 177, 0.04);
+}
+
+.krefrm-qb__add-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.krefrm-qb__add-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #1d2327;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.krefrm-qb__add-item:hover {
+  border-color: #2271b1;
+  box-shadow: 0 2px 8px rgba(34, 113, 177, 0.08);
+}
+
+.krefrm-qb__add-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f8ff;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #2271b1;
+  flex-shrink: 0;
+}
+
+/* ─── Footer ─── */
+
+.krefrm-qb__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0 8px;
+}
+
+/* Quick Builder inputs */
+
+.krefrm-qb input,
+.krefrm-qb textarea,
+.krefrm-qb select,
+.krefrm-qb .components-text-control__input,
+.krefrm-qb .components-textarea-control__input {
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  padding: 8px;
+  background: #ffffff;
+  color: #1d2327;
+  box-sizing: border-box;
+}

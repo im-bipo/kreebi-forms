@@ -1,0 +1,231 @@
+/* ============================================================
+   Upgrade Page
+   ============================================================ */
+
+.krefrm-upgrade-page {
+  padding: 28px 20px 40px;
+}
+
+.krefrm-upgrade-container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.krefrm-upgrade-hero {
+  background: linear-gradient(145deg, #1d2327 0%, #2c3338 100%);
+  border-radius: 12px;
+  padding: 44px 28px;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.krefrm-upgrade-logo-light {
+  width: 220px;
+  max-width: 80%;
+  display: block;
+  margin: 0 auto 14px;
+}
+
+.krefrm-upgrade-badge {
+  display: inline-block;
+  margin: 0 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #1d2327;
+  background: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.krefrm-upgrade-hero h2 {
+  margin: 40px 0px 0px 0px;
+  font-size: 36px;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.krefrm-upgrade-subtitle {
+  font-size: 16px;
+  color: #dcdcde;
+  margin: 14px auto;
+  max-width: 700px;
+}
+
+.krefrm-upgrade-price-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.krefrm-upgrade-old-price {
+  font-size: 20px;
+  color: #c3c4c7;
+  text-decoration: line-through;
+}
+
+.krefrm-upgrade-price {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+  color: #fff;
+}
+
+.krefrm-upgrade-hero .components-button {
+  min-height: 46px;
+  padding: 0 18px;
+  font-weight: 600;
+}
+
+.krefrm-upgrade-compare-wrap {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 18px;
+}
+
+.krefrm-upgrade-compare-wrap h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #1d2327;
+}
+
+.krefrm-upgrade-compare-wrap > p {
+  margin: 6px 0 14px;
+  font-size: 14px;
+  color: #50575e;
+}
+
+.krefrm-upgrade-compare-table-wrap {
+  overflow-x: auto;
+}
+
+.krefrm-upgrade-compare-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.krefrm-upgrade-compare-table th,
+.krefrm-upgrade-compare-table td {
+  border: 1px solid #e0e0e0;
+  padding: 11px 12px;
+  text-align: center;
+}
+
+.krefrm-upgrade-compare-table th:first-child,
+.krefrm-upgrade-compare-table td:first-child {
+  text-align: left;
+}
+
+.krefrm-upgrade-compare-table thead th {
+  background: #f6f7f7;
+  color: #1d2327;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.krefrm-upgrade-compare-table tbody td {
+  font-size: 14px;
+  color: #50575e;
+}
+
+.krefrm-upgrade-mark {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.krefrm-upgrade-mark.is-yes {
+  color: #fff;
+  background: #00a32a;
+}
+
+.krefrm-upgrade-mark.is-no {
+  color: #fff;
+  background: #d63638;
+}
+
+.krefrm-upgrade-feature-meanings {
+  margin-top: 16px;
+}
+
+.krefrm-upgrade-feature-meanings h4 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  color: #1d2327;
+}
+
+.krefrm-upgrade-meaning-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.krefrm-upgrade-meaning-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 12px;
+  background: #f9f9f9;
+}
+
+.krefrm-upgrade-meaning-card h5 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  color: #1d2327;
+}
+
+.krefrm-upgrade-meaning-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #50575e;
+}
+
+.krefrm-upgrade-brand-strip {
+  border: 1px solid #dcdcde;
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #fff;
+}
+
+.krefrm-upgrade-logo {
+  width: 170px;
+  max-width: 50%;
+  height: auto;
+}
+
+.krefrm-upgrade-brand-strip p {
+  margin: 0;
+  color: #50575e;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 782px) {
+  .krefrm-upgrade-hero h2 {
+    font-size: 30px;
+  }
+
+  .krefrm-upgrade-meaning-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .krefrm-upgrade-brand-strip {
+    flex-direction: column;
+    text-align: center;
+  }
+}

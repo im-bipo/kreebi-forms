@@ -89,7 +89,76 @@ class Krefrm_Submission_Handler
         update_post_meta($post_id, '_krefrm_form_id_value', $form_id);
         update_post_meta($post_id, '_krefrm_data', $submitted);
 
+        // Trigger all active integrations
+        $this->trigger_integrations($form_post, $submitted);
+
         wp_safe_redirect(add_query_arg('krefrm_submitted', '1', wp_get_referer() ?: home_url()));
         exit;
+    }
+
+    /**
+     * Trigger all active integrations for a form submission.
+     *
+     * @param WP_Post $form_post The form post object.
+     * @param array   $submitted The submitted field data.
+     */
+    private function trigger_integrations($form_post, $submitted)
+    {
+        // Get integration settings
+        $settings = get_option('krefrm_settings', array());
+        $integrations = isset($settings['integrations']) && is_array($settings['integrations'])
+            ? $settings['integrations']
+            : array();
+
+        // Email notification is enabled by default unless explicitly turned off.
+        if (! array_key_exists('email-notification', $integrations)) {
+            $integrations['email-notification'] = true;
+        }
+
+        // Email Notification
+        if (! empty($integrations['email-notification'])) {
+            $this->trigger_email_notification($form_post, $submitted, $settings);
+        }
+
+        // Hook for other integrations
+        do_action('krefrm_trigger_integrations', $form_post, $submitted, $integrations, $settings);
+    }
+
+    /**
+     * Send email notification for form submission.
+     *
+     * @param WP_Post $form_post The form post object.
+     * @param array   $submitted The submitted field data.
+     * @param array   $settings  The plugin settings.
+     */
+    private function trigger_email_notification($form_post, $submitted, $settings)
+    {
+        $email_settings = isset($settings['emailNotification']) ? $settings['emailNotification'] : array();
+
+        // Get defaults
+        $recipient_email = ! empty($email_settings['recipientEmail']) ? $email_settings['recipientEmail'] : get_option('admin_email');
+        $sender_name = ! empty($email_settings['senderName']) ? $email_settings['senderName'] : get_bloginfo('name');
+        $subject = ! empty($email_settings['subject']) ? $email_settings['subject'] : sprintf('Notification | %s', get_bloginfo('name'));
+        $body_template = ! empty($email_settings['bodyTemplate']) ? $email_settings['bodyTemplate'] : "You have received a new form submission.\n\nSubmitted Data:\n{fields}";
+
+
+        // Replace placeholders
+        $form_name = esc_html($form_post->post_title);
+        $subject = str_replace('{form_name}', $form_name, $subject);
+
+        // Format fields for email
+        $fields_html = '';
+        foreach ($submitted as $field_name => $field_value) {
+            $fields_html .= sprintf("%s: %s\n", esc_html($field_name), esc_html($field_value));
+        }
+        $body = str_replace('{fields}', trim($fields_html), $body_template);
+
+        // Send email
+        $headers = array(
+            'From: ' . $sender_name . ' <' . get_option('admin_email') . '>',
+            'Content-Type: text/plain; charset=UTF-8',
+        );
+
+        wp_mail($recipient_email, $subject, $body, $headers);
     }
 }

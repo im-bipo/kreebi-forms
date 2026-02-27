@@ -25,6 +25,7 @@ export default function FormPreview({
   onSelectStep,
   onRemoveField,
   onMoveFieldBy,
+  onUpdateStep,
 }) {
   const step = steps[currentStepIndex];
   const fields = step?.fields || [];
@@ -42,6 +43,7 @@ export default function FormPreview({
         steps={steps}
         currentStepIndex={currentStepIndex}
         onSelectStep={onSelectStep}
+        onUpdateStep={onUpdateStep}
       />
 
       <div

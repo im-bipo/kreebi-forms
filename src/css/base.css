@@ -1,0 +1,63 @@
+/* ============================================================
+   Base / App
+   ============================================================ */
+
+.krefrm-app {
+  margin: 0 auto;
+  padding-right: 16px;
+}
+
+/* Loading */
+.krefrm-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+/* Toolbar */
+.krefrm-toolbar {
+  margin-bottom: 16px;
+}
+
+/* Forms table utilities */
+.krefrm-forms-table code {
+  background: #f0f0f1;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+/* Modal */
+.krefrm-create-modal .components-modal__content {
+  min-width: 580px;
+}
+
+.krefrm-json-textarea textarea {
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace !important;
+  font-size: 13px !important;
+}
+
+.krefrm-modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.krefrm-sample-json {
+  margin-top: 12px;
+}
+
+.krefrm-sample-json summary {
+  cursor: pointer;
+  color: #2271b1;
+  font-weight: 600;
+}
+
+.krefrm-sample-json pre {
+  background: #f0f0f1;
+  padding: 12px;
+  margin-top: 8px;
+  overflow-x: auto;
+  font-size: 12px;
+}

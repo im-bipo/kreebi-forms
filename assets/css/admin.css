@@ -2,6 +2,59 @@
  * Kreebi Forms - Admin Styles
  */
 
+/* ============================================================
+   AGGRESSIVE THEME CSS OVERRIDE - HIGHEST SPECIFICITY
+   ============================================================ */
+
+#krefrm-forms-container {
+  all: revert !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+#krefrm-forms-container,
+#krefrm-forms-container * {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  text-decoration: none !important;
+  transform: none !important;
+  filter: none !important;
+  backdrop-filter: none !important;
+}
+
+#krefrm-forms-container input,
+#krefrm-forms-container button,
+#krefrm-forms-container label,
+#krefrm-forms-container textarea,
+#krefrm-forms-container select {
+  all: revert !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+#krefrm-forms-container input::placeholder {
+  opacity: 1 !important;
+}
+
+#krefrm-forms-container input::-webkit-outer-spin-button,
+#krefrm-forms-container input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+#krefrm-forms-container input[type="number"] {
+  -moz-appearance: textfield !important;
+}
+
 /* Submissions Page Styles */
 .krefrm-submission-item {
   margin-bottom: 30px;
@@ -108,26 +161,15 @@
    Frontend 12-Column Grid
    ============================================================ */
 
-.krefrm-fields-grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 14px;
+.krefrm-fields-flex {
+  display: flex;
+  flex-wrap: wrap;
 }
 
-.krefrm-col-12 {
-  grid-column: span 12;
-}
-
-.krefrm-col-6 {
-  grid-column: span 6;
-}
-
-.krefrm-col-8 {
-  grid-column: span 8;
-}
-
-.krefrm-col-4 {
-  grid-column: span 4;
+/* each field is full-width by default */
+.krefrm-field {
+  flex: 0 0 100%;
+  max-width: 100%;
 }
 
 /* Responsive: stack all to full-width on small screens */
@@ -143,10 +185,31 @@
    Style Template: kreebi_style_1  (Polished / Rounded)
    ============================================================ */
 
+.krefrm-frontend-form.krefrm-ui-style-1-form,
+.krefrm-frontend-form.krefrm-ui-style-2-form {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.krefrm-frontend-form.krefrm-ui-style-1-form input,
+.krefrm-frontend-form.krefrm-ui-style-2-form input,
+.krefrm-frontend-form.krefrm-ui-style-1-form button,
+.krefrm-frontend-form.krefrm-ui-style-2-form button,
+.krefrm-frontend-form.krefrm-ui-style-1-form label,
+.krefrm-frontend-form.krefrm-ui-style-2-form label {
+  margin: 0;
+  font: inherit;
+  line-height: normal;
+  box-shadow: none;
+}
+
 .krefrm-ui-style-1-form {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  max-width: 720px;
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+  max-width: 720px !important;
 }
 
 .krefrm-ui-style-1-field {
@@ -162,16 +225,19 @@
 }
 
 .krefrm-ui-style-1-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid #c3c4c7;
-  border-radius: 6px;
-  font-size: 14px;
-  background: #fff;
+  width: 100% !important;
+  padding: 10px 14px !important;
+  border: 1px solid #c3c4c7 !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+  background: #fff !important;
   transition:
     border-color 0.2s,
     box-shadow 0.2s;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
+  color: #1d2327 !important;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .krefrm-ui-style-1-input:focus {
@@ -184,15 +250,18 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 24px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #fff;
-  background: #2271b1;
-  border: none;
-  border-radius: 6px;
+  padding: 10px 24px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  background: #2271b1 !important;
+  border: none !important;
+  border-radius: 6px !important;
   cursor: pointer;
   transition: background 0.2s;
+  text-transform: none !important;
+  line-height: 1.3 !important;
+  text-decoration: none !important;
 }
 
 .krefrm-ui-style-1-btn:hover {
@@ -205,8 +274,8 @@
 
 .krefrm-ui-style-2-form {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-  max-width: 720px;
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+  max-width: 720px !important;
 }
 
 .krefrm-ui-style-2-field {
@@ -228,13 +297,16 @@
 }
 
 .krefrm-ui-style-2-input {
-  width: 100%;
-  padding: 8px 10px;
-  border: 1px solid #bbb;
-  border-radius: 3px;
-  font-size: 14px;
-  background: #fff;
-  box-sizing: border-box;
+  width: 100% !important;
+  padding: 8px 10px !important;
+  border: 1px solid #bbb !important;
+  border-radius: 3px !important;
+  font-size: 14px !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+  color: #1d2327 !important;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 .krefrm-ui-style-2-input:focus {
@@ -246,17 +318,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 24px;
-  font-size: 13px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #fff;
-  background: #333;
-  border: none;
-  border-radius: 3px;
+  padding: 10px 24px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: #fff !important;
+  background: #333 !important;
+  border: none !important;
+  border-radius: 3px !important;
   cursor: pointer;
   transition: background 0.2s;
+  line-height: 1.3 !important;
+  text-decoration: none !important;
 }
 
 .krefrm-ui-style-2-btn:hover {

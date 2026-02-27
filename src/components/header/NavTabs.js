@@ -15,6 +15,7 @@ export default function NavTabs({ route, navigate }) {
 
   const isFormsActive = route.startsWith("forms");
   const isSubmissionsActive = route === "submission";
+  const isIntegrationsActive = route.startsWith("integrations");
 
   return (
     <nav className="krefrm-tabs">
@@ -37,6 +38,16 @@ export default function NavTabs({ route, navigate }) {
         }}
       >
         {__("Submissions", "kreebi-forms")}
+      </a>
+      <a
+        href="#integrations"
+        className={`krefrm-tab ${isIntegrationsActive ? "active" : ""}`}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate("integrations");
+        }}
+      >
+        {__("Integrations", "kreebi-forms")}
       </a>
     </nav>
   );

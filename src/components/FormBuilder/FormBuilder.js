@@ -14,6 +14,7 @@
  */
 
 import { useState, useCallback } from "@wordpress/element";
+import { useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
 import {
@@ -31,7 +32,7 @@ import FormPreview from "./FormPreview";
 import SettingsPanel from "./SettingsPanel";
 import JsonEditor from "./JsonEditor";
 import DragOverlayCard from "./DragOverlayCard";
-import FormSettings from "./FormSettings";
+import QuickBuilder from "../QuickBuilder"; // used as additional view
 
 export default function FormBuilder({
   initialData = {},
@@ -40,7 +41,7 @@ export default function FormBuilder({
   saveLabel,
 }) {
   const builder = useFormBuilder(initialData);
-  const [view, setView] = useState("visual"); // "visual" | "json" | "settings"
+  const [view, setView] = useState("visual"); // "quick" | "visual" | "json" | "settings"
   const [activeDrag, setActiveDrag] = useState(null);
   const [insertIndex, setInsertIndex] = useState(null);
 
@@ -50,6 +51,21 @@ export default function FormBuilder({
       activationConstraint: { distance: 5 },
     }),
   );
+
+  /* Auto-select first field when none selected */
+  useEffect(() => {
+    if (view !== "visual") return;
+    const step = builder.steps[builder.currentStepIndex];
+    const hasFields = Array.isArray(step?.fields) && step.fields.length > 0;
+    const hasSelection = !!builder.selection;
+    if (hasFields && !hasSelection) {
+      builder.setSelection({
+        type: "field",
+        stepIndex: builder.currentStepIndex,
+        fieldIndex: 0,
+      });
+    }
+  }, [view, builder.steps, builder.currentStepIndex, builder.selection]);
 
   /* ─── Drag handlers ─── */
 
@@ -189,77 +205,85 @@ export default function FormBuilder({
   return (
     <div className="krefrm-builder">
       {/* ─── Top bar ─── */}
-      <div className="krefrm-builder__topbar">
-        <div className="krefrm-builder__toggle">
-          <button
-            type="button"
-            className={`krefrm-builder__toggle-btn ${
-              view === "visual" ? "is-active" : ""
-            }`}
-            onClick={() => setView("visual")}
-          >
-            {__("Visual Editor", "kreebi-forms")}
-          </button>
-          <button
-            type="button"
-            className={`krefrm-builder__toggle-btn ${
-              view === "json" ? "is-active" : ""
-            }`}
-            onClick={() => setView("json")}
-          >
-            {__("JSON View", "kreebi-forms")}
-          </button>
-          <button
-            type="button"
-            className={`krefrm-builder__toggle-btn ${
-              view === "settings" ? "is-active" : ""
-            }`}
-            onClick={() => setView("settings")}
-          >
-            {__("Form Settings", "kreebi-forms")}
-          </button>
-        </div>
+      {view !== "quick" && (
+        <div className="krefrm-builder__topbar">
+          <div className="krefrm-builder__toggle">
+            <button
+              type="button"
+              className={`krefrm-builder__toggle-btn ${
+                view === "quick" ? "is-active" : ""
+              }`}
+              onClick={() => setView("quick")}
+            >
+              {__("Quick Editor", "kreebi-forms")}
+            </button>
+            <button
+              type="button"
+              className={`krefrm-builder__toggle-btn ${
+                view === "visual" ? "is-active" : ""
+              }`}
+              onClick={() => setView("visual")}
+            >
+              {__("Visual Editor", "kreebi-forms")}
+            </button>
+            <button
+              type="button"
+              className={`krefrm-builder__toggle-btn ${
+                view === "json" ? "is-active" : ""
+              }`}
+              onClick={() => setView("json")}
+            >
+              {__("JSON View", "kreebi-forms")}
+            </button>
+          </div>
 
-        <div className="krefrm-builder__topbar-actions">
-          {onCancel && (
-            <Button variant="tertiary" onClick={onCancel}>
-              {__("Cancel", "kreebi-forms")}
+          <div className="krefrm-builder__topbar-actions">
+            {onCancel && (
+              <Button variant="tertiary" onClick={onCancel}>
+                {__("Cancel", "kreebi-forms")}
+              </Button>
+            )}
+            <Button variant="primary" onClick={handleSave}>
+              {saveLabel || __("Save Form", "kreebi-forms")}
             </Button>
-          )}
-          <Button variant="primary" onClick={handleSave}>
-            {saveLabel || __("Save Form", "kreebi-forms")}
-          </Button>
+          </div>
         </div>
-      </div>
-
-      {/* ─── Form name / desc ─── */}
-      <div className="krefrm-builder__meta">
-        <input
-          type="text"
-          className="krefrm-builder__name-input"
-          placeholder={__("Form Name", "kreebi-forms")}
-          value={builder.formName}
-          onChange={(e) => builder.setFormName(e.target.value)}
-        />
-        <input
-          type="text"
-          className="krefrm-builder__desc-input"
-          placeholder={__("Description (optional)", "kreebi-forms")}
-          value={builder.formDesc}
-          onChange={(e) => builder.setFormDesc(e.target.value)}
-        />
-      </div>
-
-      {/* ─── View body ─── */}
-      {view === "json" && (
-        <JsonEditor getJson={builder.getJson} onApply={builder.setFromJson} />
       )}
 
-      {view === "settings" && (
-        <FormSettings
-          styleTemplate={builder.styleTemplate}
-          onChangeStyleTemplate={builder.setStyleTemplate}
+      {/* ─── Form name / desc (visual only) ─── */}
+      {view === "visual" && (
+        <div className="krefrm-builder__meta">
+          <input
+            type="text"
+            className="krefrm-builder__name-input"
+            placeholder={__("Form Name", "kreebi-forms")}
+            value={builder.formName}
+            onChange={(e) => builder.setFormName(e.target.value)}
+          />
+          <input
+            type="text"
+            className="krefrm-builder__desc-input"
+            placeholder={__("Description (optional)", "kreebi-forms")}
+            value={builder.formDesc}
+            onChange={(e) => builder.setFormDesc(e.target.value)}
+          />
+        </div>
+      )}
+
+      {/* ─── View body ─── */}
+      {view === "quick" && (
+        <QuickBuilder
+          initialData={builder.getJson()}
+          onSave={(json) => builder.setFromJson(json)}
+          onAdvanced={(json) => {
+            builder.setFromJson(json);
+            setView("visual");
+          }}
         />
+      )}
+
+      {view === "json" && (
+        <JsonEditor getJson={builder.getJson} onApply={builder.setFromJson} />
       )}
 
       {view === "visual" && (
@@ -281,6 +305,7 @@ export default function FormBuilder({
               insertIndex={insertIndex}
               onSelectField={selectField}
               onSelectStep={selectStep}
+              onUpdateStep={builder.updateStep}
               onRemoveField={builder.removeField}
               onMoveFieldBy={builder.moveFieldBy}
             />

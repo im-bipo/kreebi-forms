@@ -85,8 +85,8 @@ class Krefrm_Shortcode
         $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
         $form_id   = $form_post->post_name;
 
-        // Resolve style template
-        $style_template = isset($form_data['styleTemplate']) ? $form_data['styleTemplate'] : 'kreebi_style_1';
+        // Resolve style template — global option overrides any per-form value
+        $style_template = get_option('krefrm_style_template', 'kreebi_style_1');
         $style_classes  = isset($this->style_class_map[$style_template]) ? $this->style_class_map[$style_template] : $this->style_class_map['blank_dev'];
 
         // Normalise to steps format (handles both legacy fields and new steps)
@@ -141,8 +141,8 @@ class Krefrm_Shortcode
                 }
             }
 
-            // --- Fields in a 12-column grid row ---
-            $html .= '<div class="krefrm-fields-grid">';
+            // --- Fields wrapper (flex row) ---
+            $html .= '<div class="krefrm-fields-flex">';
             foreach ($fields as $field_index => $f) {
                 $html .= $this->render_field($f, $form_id, $step_index, $field_index, $style_classes);
             }
@@ -181,7 +181,235 @@ class Krefrm_Shortcode
             $html .= $this->get_multistep_script();
         }
 
-        return $html;
+        // Wrap form in iframe with embedded CSS
+        return $this->wrap_form_in_iframe($html);
+    }
+
+    /**
+     * Wrap form HTML in iframe for complete CSS isolation.
+     */
+    private function wrap_form_in_iframe($form_html)
+    {
+        // Generate unique iframe ID
+        $iframe_id = 'krefrm-form-' . wp_generate_uuid4();
+
+        // Get embedded styles
+        $styles = $this->get_iframe_styles();
+
+        // Escape form HTML for embedding in iframe
+        $escaped_form = esc_attr($form_html);
+
+        // Create iframe wrapper with embedded HTML
+        $iframe_html = '
+<script id="' . esc_attr($iframe_id) . '-setup">
+(function() {
+  var formHTML = ' . wp_json_encode($form_html) . ';
+  var iframe = document.createElement("iframe");
+  iframe.id = "' . esc_attr($iframe_id) . '";
+  iframe.style.border = "none";
+  iframe.style.width = "100%";
+  iframe.style.minHeight = "400px";
+  iframe.style.background = "transparent";
+  iframe.setAttribute("sandbox", "allow-same-origin allow-forms allow-popups");
+  iframe.setAttribute("title", "Kreebi Form");
+  
+  var container = document.getElementById("' . esc_attr($iframe_id) . '-container");
+  if (!container) {
+    var scripts = document.getElementsByTagName("script");
+    var currentScript = document.getElementById("' . esc_attr($iframe_id) . '-setup");
+    currentScript.parentNode.insertBefore(iframe, currentScript);
+  } else {
+    container.appendChild(iframe);
+  }
+  
+  var styles = ' . wp_json_encode($styles) . ';
+  
+  iframe.onload = function() {
+    var doc = iframe.contentDocument || iframe.contentWindow.document;
+    var html = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>" + styles + "</style></head><body>" + formHTML + "</body></html>";
+    doc.open();
+    doc.write(html);
+    doc.close();
+    
+    // Auto-resize iframe
+    setTimeout(function() {
+      try {
+        var height = doc.documentElement.scrollHeight || doc.body.scrollHeight;
+        iframe.style.height = (height + 40) + "px";
+      } catch(e) {}
+    }, 100);
+  };
+  
+  // Trigger onload
+  iframe.src = "about:blank";
+})();
+</script>
+<div id="' . esc_attr($iframe_id) . '-container"></div>
+        ';
+
+        return $iframe_html;
+    }
+
+    /**
+     * Get embedded CSS for iframe isolation (all templates).
+     */
+    private function get_iframe_styles()
+    {
+        return <<<'CSS'
+        html, body {
+          margin: 0;
+          padding: 20px;
+          background: transparent;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
+        
+        * {
+          all: revert;
+          box-sizing: border-box;
+        }
+        
+        form { display: block; }
+        input, button, label, textarea, select { all: revert; box-sizing: border-box; }
+        button { cursor: pointer; }
+        
+        /* ─── Style 1 — Polished / Rounded ─── */
+        .krefrm-ui-style-1-form {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+          max-width: 720px !important;
+        }
+        
+        .krefrm-ui-style-1-field {
+          margin-bottom: 14px !important;
+        }
+        
+        .krefrm-ui-style-1-label {
+          display: block !important;
+          font-size: 14px !important;
+          font-weight: 600 !important;
+          color: #1d2327 !important;
+          margin-bottom: 6px !important;
+        }
+        
+        .krefrm-ui-style-1-input {
+          width: 100% !important;
+          padding: 10px 14px !important;
+          border: 1px solid #c3c4c7 !important;
+          border-radius: 6px !important;
+          font-size: 14px !important;
+          background: #fff !important;
+          box-sizing: border-box !important;
+          color: #1d2327 !important;
+          appearance: none !important;
+          -webkit-appearance: none !important;
+          transition: border-color 0.2s, box-shadow 0.2s !important;
+        }
+        
+        .krefrm-ui-style-1-input:focus {
+          border-color: #2271b1 !important;
+          box-shadow: 0 0 0 1px #2271b1 !important;
+          outline: none !important;
+        }
+        
+        .krefrm-ui-style-1-btn {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 10px 24px !important;
+          font-size: 14px !important;
+          font-weight: 600 !important;
+          color: #fff !important;
+          background: #2271b1 !important;
+          border: none !important;
+          border-radius: 6px !important;
+          cursor: pointer !important;
+          transition: background 0.2s !important;
+          text-transform: none !important;
+          line-height: 1.3 !important;
+          text-decoration: none !important;
+        }
+        
+        .krefrm-ui-style-1-btn:hover {
+          background: #135e96 !important;
+        }
+        
+        /* ─── Style 2 — Flat / Bordered ─── */
+        .krefrm-ui-style-2-form {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+          max-width: 720px !important;
+        }
+        
+        .krefrm-ui-style-2-field {
+          margin-bottom: 14px !important;
+          padding: 10px 12px !important;
+          border: 1px solid #e0e0e0 !important;
+          border-radius: 3px !important;
+          background: #fafafa !important;
+        }
+        
+        .krefrm-ui-style-2-label {
+          display: block !important;
+          font-size: 13px !important;
+          font-weight: 700 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          color: #444 !important;
+          margin-bottom: 6px !important;
+        }
+        
+        .krefrm-ui-style-2-input {
+          width: 100% !important;
+          padding: 8px 10px !important;
+          border: 1px solid #bbb !important;
+          border-radius: 3px !important;
+          font-size: 14px !important;
+          background: #fff !important;
+          box-sizing: border-box !important;
+          color: #1d2327 !important;
+          appearance: none !important;
+          -webkit-appearance: none !important;
+        }
+        
+        .krefrm-ui-style-2-input:focus {
+          border-color: #333 !important;
+          outline: none !important;
+        }
+        
+        .krefrm-ui-style-2-btn {
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          padding: 10px 24px !important;
+          font-size: 13px !important;
+          font-weight: 700 !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.5px !important;
+          color: #fff !important;
+          background: #333 !important;
+          border: none !important;
+          border-radius: 3px !important;
+          cursor: pointer !important;
+          transition: background 0.2s !important;
+          line-height: 1.3 !important;
+          text-decoration: none !important;
+        }
+        
+        .krefrm-ui-style-2-btn:hover {
+          background: #555 !important;
+        }
+        
+        .krefrm-fields-flex {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+        }
+        
+        .krefrm-required-star {
+          color: #d63638;
+        }
+        
+        p { margin: 0; }
+        p button { margin-top: 10px; }
+CSS;
     }
 
     /**
@@ -213,20 +441,11 @@ class Krefrm_Shortcode
         $placeholder = isset($f['placeholder']) ? $f['placeholder'] : '';
         $required    = ! empty($f['required']);
 
-        // Layout — column span (default 12 = full width)
-        $col_span = 12;
-        if (! empty($f['layout']['colSpan'])) {
-            $span = absint($f['layout']['colSpan']);
-            if (in_array($span, array(4, 6, 8, 12), true)) {
-                $col_span = $span;
-            }
-        }
-
         // Auto-generated unique input id
         $input_id = 'krefrm_' . sanitize_key($form_id) . '_s' . $step_index . '_f' . $field_index;
 
-        // Build wrapper classes: grid span + style template
-        $wrapper_classes = 'krefrm-field krefrm-col-' . $col_span;
+        // Build wrapper classes: just field + any style template
+        $wrapper_classes = 'krefrm-field';
         if (! empty($style_classes['field'])) {
             $wrapper_classes .= ' ' . $style_classes['field'];
         }

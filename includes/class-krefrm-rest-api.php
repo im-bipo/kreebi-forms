@@ -59,6 +59,20 @@ class Krefrm_Rest_Api
             ),
         ));
 
+        // Global settings endpoint
+        register_rest_route(self::NAMESPACE, '/settings', array(
+            array(
+                'methods'             => 'GET',
+                'callback'            => array($this, 'get_settings'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+            array(
+                'methods'             => 'POST',
+                'callback'            => array($this, 'update_settings'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+        ));
+
         register_rest_route(self::NAMESPACE, '/submissions/(?P<id>\d+)', array(
             array(
                 'methods'             => 'DELETE',
@@ -218,6 +232,69 @@ class Krefrm_Rest_Api
         return rest_ensure_response(array('deleted' => true));
     }
 
+    /* ─── Global Settings ─── */
+
+    public function get_settings()
+    {
+        return rest_ensure_response(array(
+            'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
+            'integrations' => isset(get_option('krefrm_settings', array())['integrations']) ? get_option('krefrm_settings', array())['integrations'] : array(),
+            'emailNotification' => isset(get_option('krefrm_settings', array())['emailNotification']) ? get_option('krefrm_settings', array())['emailNotification'] : array(),
+        ));
+    }
+
+    public function update_settings($request)
+    {
+        $body = $request->get_json_params();
+
+
+        // Handle style template
+        if (isset($body['styleTemplate'])) {
+            $allowed = array('kreebi_style_1', 'kreebi_style_2', 'blank_dev');
+            $template = sanitize_text_field($body['styleTemplate']);
+
+            if (! in_array($template, $allowed, true)) {
+                return new WP_Error('invalid_template', __('Invalid style template.', 'kreebi-forms'), array('status' => 400));
+            }
+
+            update_option('krefrm_style_template', $template);
+        }
+
+        // Handle integrations and other settings
+        $settings = get_option('krefrm_settings', array());
+        if (!is_array($settings)) {
+            $settings = array();
+        }
+
+
+        if (isset($body['integrations'])) {
+            $integrations = $body['integrations'];
+            if (is_array($integrations)) {
+                // Keep booleans as-is, don't sanitize
+                $settings['integrations'] = $integrations;
+            }
+        }
+
+        if (isset($body['emailNotification'])) {
+            $email_settings = $body['emailNotification'];
+            if (is_array($email_settings)) {
+                $sanitized = array();
+                foreach ($email_settings as $key => $value) {
+                    $sanitized[sanitize_key($key)] = sanitize_text_field($value);
+                }
+                $settings['emailNotification'] = $sanitized;
+            }
+        }
+
+        update_option('krefrm_settings', $settings);
+
+        return rest_ensure_response(array(
+            'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
+            'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
+            'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
+        ));
+    }
+
     /* ─── Helpers ─── */
 
     private function prepare_form($post)
@@ -260,11 +337,14 @@ class Krefrm_Rest_Api
     {
         $form_id   = get_post_meta($post->ID, '_krefrm_form_id', true);
         $form_post = $form_id ? get_post($form_id) : null;
+        $form_data = $form_post ? get_post_meta($form_post->ID, '_krefrm_form_data', true) : array();
+        $form_uuid = isset($form_data['id']) ? $form_data['id'] : ($form_post ? $form_post->post_name : '');
         $data      = get_post_meta($post->ID, '_krefrm_data', true);
 
         return array(
             'id'        => $post->ID,
             'title'     => $post->post_title,
+            'form_id'   => $form_uuid,
             'form_name' => $form_post ? $form_post->post_title : '—',
             'date'      => get_the_date('F j, Y g:i a', $post),
             'data'      => is_array($data) ? $data : array(),

@@ -13,6 +13,7 @@ import {
   ToggleControl,
   Button,
 } from "@wordpress/components";
+import ProTag from "../ProTag";
 import FIELD_TYPES from "./fieldTypes";
 
 const TYPE_OPTIONS = FIELD_TYPES.map((ft) => ({
@@ -38,34 +39,13 @@ export default function SettingsPanel({
     );
   }
 
-  /* ─── Step settings ─── */
+  /* Step settings removed — step editing is handled inline in the preview */
   if (selection.type === "step") {
-    const step = steps[selection.stepIndex];
-    if (!step) return null;
-
     return (
       <div className="krefrm-settings-panel">
-        <h3 className="krefrm-settings-panel__title">
-          {__("Step Settings", "kreebi-forms")}
-        </h3>
-
-        <TextControl
-          label={__("Step Name", "kreebi-forms")}
-          value={step.name || ""}
-          onChange={(val) => onUpdateStep(selection.stepIndex, { name: val })}
-        />
-
-        {steps.length > 1 && (
-          <Button
-            variant="secondary"
-            isDestructive
-            isSmall
-            onClick={() => onRemoveStep(selection.stepIndex)}
-            style={{ marginTop: 12 }}
-          >
-            {__("Delete Step", "kreebi-forms")}
-          </Button>
-        )}
+        <div className="krefrm-settings-panel__empty">
+          {__("Select a step or field to edit its settings.", "kreebi-forms")}
+        </div>
       </div>
     );
   }
@@ -108,7 +88,17 @@ export default function SettingsPanel({
           checked={!!field.required}
           onChange={(val) => update({ required: val })}
         />
-
+        <div style={{ marginTop: 16 }}>
+          <Button
+            variant="secondary"
+            isDestructive
+            onClick={() =>
+              onRemoveField(selection.stepIndex, selection.fieldIndex)
+            }
+          >
+            {__("Remove Field", "kreebi-forms")}
+          </Button>
+        </div>
         <hr />
         <div
           style={{
@@ -127,26 +117,13 @@ export default function SettingsPanel({
           </p>
           <Button
             variant="primary"
-            isSmall
             onClick={() => {
               window.location.href =
                 "admin.php?page=krefrm_forms#upgrade-to-pro";
             }}
           >
-            {__("Upgrade to Pro", "kreebi-forms")}
-          </Button>
-        </div>
-
-        <div style={{ marginTop: 16 }}>
-          <Button
-            variant="secondary"
-            isDestructive
-            isSmall
-            onClick={() =>
-              onRemoveField(selection.stepIndex, selection.fieldIndex)
-            }
-          >
-            {__("Remove Field", "kreebi-forms")}
+            {__("Upgrade to Pro", "kreebi-forms")}{" "}
+            <ProTag variant="secondary" />
           </Button>
         </div>
       </div>
