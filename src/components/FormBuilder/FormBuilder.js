@@ -283,20 +283,6 @@ export default function FormBuilder({
               onSelectStep={selectStep}
               onRemoveField={builder.removeField}
               onMoveFieldBy={builder.moveFieldBy}
-              onPrevStep={() =>
-                builder.setCurrentStepIndex(
-                  Math.max(0, builder.currentStepIndex - 1),
-                )
-              }
-              onNextStep={() =>
-                builder.setCurrentStepIndex(
-                  Math.min(
-                    builder.steps.length - 1,
-                    builder.currentStepIndex + 1,
-                  ),
-                )
-              }
-              onAddStep={builder.addStep}
             />
 
             <SettingsPanel

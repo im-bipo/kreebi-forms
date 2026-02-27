@@ -10,19 +10,20 @@ import { Button } from "@wordpress/components";
 export default function StepNavigation({
   steps,
   currentStepIndex,
-  onPrev,
-  onNext,
-  onAddStep,
   onSelectStep,
 }) {
   const step = steps[currentStepIndex];
-  const isFirst = currentStepIndex === 0;
-  const isLast = currentStepIndex === steps.length - 1;
 
   return (
     <div className="krefrm-step-nav-bar">
-      <Button variant="secondary" isSmall disabled={isFirst} onClick={onPrev}>
-        {__("← Previous", "kreebi-forms")}
+      <Button
+        variant="secondary"
+        isSmall
+        onClick={() => {
+          window.location.href = "admin.php?page=krefrm_forms#upgrade-to-pro";
+        }}
+      >
+        {__("← Previous (Pro)", "kreebi-forms")}
       </Button>
 
       <button
@@ -37,15 +38,15 @@ export default function StepNavigation({
         </span>
       </button>
 
-      {isLast ? (
-        <Button variant="primary" isSmall onClick={onAddStep}>
-          {__("+ Add Step", "kreebi-forms")}
-        </Button>
-      ) : (
-        <Button variant="secondary" isSmall onClick={onNext}>
-          {__("Next →", "kreebi-forms")}
-        </Button>
-      )}
+      <Button
+        variant="primary"
+        isSmall
+        onClick={() => {
+          window.location.href = "admin.php?page=krefrm_forms#upgrade-to-pro";
+        }}
+      >
+        {__("+ Add Step (Pro)", "kreebi-forms")}
+      </Button>
     </div>
   );
 }

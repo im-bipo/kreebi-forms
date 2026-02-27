@@ -202,10 +202,6 @@ class Krefrm_Shortcode
 
     /* ─── Helpers ─── */
 
-    /**
-     * Render a single field with auto-generated ID, label[for], optional wrapper attributes,
-     * grid column span, and injected style-template classes.
-     */
     private function render_field($f, $form_id, $step_index, $field_index, $style_classes = array())
     {
         $name        = isset($f['name']) ? $f['name'] : 'field_' . $field_index;
@@ -216,7 +212,6 @@ class Krefrm_Shortcode
         }
         $placeholder = isset($f['placeholder']) ? $f['placeholder'] : '';
         $required    = ! empty($f['required']);
-        $wrapper     = isset($f['wrapper']) ? $f['wrapper'] : array();
 
         // Layout — column span (default 12 = full width)
         $col_span = 12;
@@ -230,17 +225,10 @@ class Krefrm_Shortcode
         // Auto-generated unique input id
         $input_id = 'krefrm_' . sanitize_key($form_id) . '_s' . $step_index . '_f' . $field_index;
 
-        // Build wrapper classes: grid span + style template + developer classes
+        // Build wrapper classes: grid span + style template
         $wrapper_classes = 'krefrm-field krefrm-col-' . $col_span;
         if (! empty($style_classes['field'])) {
             $wrapper_classes .= ' ' . $style_classes['field'];
-        }
-        if (! empty($wrapper['class'])) {
-            $wrapper_classes .= ' ' . esc_attr($wrapper['class']);
-        }
-        $wrapper_id_attr = '';
-        if (! empty($wrapper['id'])) {
-            $wrapper_id_attr = ' id="' . esc_attr($wrapper['id']) . '"';
         }
 
         // Label classes
@@ -249,7 +237,7 @@ class Krefrm_Shortcode
         // Input classes
         $input_class = ! empty($style_classes['input']) ? ' class="' . esc_attr($style_classes['input']) . '"' : '';
 
-        $html  = '<div class="' . $wrapper_classes . '"' . $wrapper_id_attr . '>';
+        $html  = '<div class="' . $wrapper_classes . '">';
         $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
         $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"' . $input_class;
         if ($required) {

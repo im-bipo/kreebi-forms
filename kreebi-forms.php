@@ -14,6 +14,9 @@
 if (! defined('ABSPATH')) {
     exit;
 }
+if (defined('KREFRMPRO_VERSION') || class_exists('KreebiFormsPro\\Plugin')) {
+    return;
+}
 
 define('KREFRM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('KREFRM_PLUGIN_URL', plugin_dir_url(__FILE__));

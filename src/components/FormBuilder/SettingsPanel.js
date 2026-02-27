@@ -2,7 +2,7 @@
  * SettingsPanel – right sidebar that changes based on selection.
  *
  *  - Step selected  → step name editor + delete step button.
- *  - Field selected → field name, type, placeholder, required, wrapper class/id.
+ *  - Field selected → field name, type, placeholder, required.
  *  - Nothing selected → helper text.
  */
 
@@ -78,8 +78,6 @@ export default function SettingsPanel({
     const update = (patch) =>
       onUpdateField(selection.stepIndex, selection.fieldIndex, patch);
 
-    const wrapper = field.wrapper || { class: "", id: "" };
-
     return (
       <div className="krefrm-settings-panel">
         <h3 className="krefrm-settings-panel__title">
@@ -112,27 +110,32 @@ export default function SettingsPanel({
         />
 
         <hr />
-        <h4 style={{ margin: "8px 0 4px" }}>{__("Wrapper", "kreebi-forms")}</h4>
-
-        <TextControl
-          label={__("CSS Class(es)", "kreebi-forms")}
-          value={wrapper.class || ""}
-          onChange={(val) => update({ wrapper: { ...wrapper, class: val } })}
-          help={__(
-            "Space-separated CSS classes for the wrapper div.",
-            "kreebi-forms",
-          )}
-        />
-
-        <TextControl
-          label={__("ID", "kreebi-forms")}
-          value={wrapper.id || ""}
-          onChange={(val) => update({ wrapper: { ...wrapper, id: val } })}
-          help={__(
-            "Custom ID for the wrapper div (not the input).",
-            "kreebi-forms",
-          )}
-        />
+        <div
+          style={{
+            padding: "16px",
+            backgroundColor: "#f5f5f5",
+            borderRadius: "4px",
+            textAlign: "center",
+            marginTop: "12px",
+          }}
+        >
+          <p style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>
+            {__("Custom CSS & ID", "kreebi-forms")}
+          </p>
+          <p style={{ margin: "0 0 12px 0", fontSize: "13px", color: "#666" }}>
+            {__("This feature requires Kreebi Forms Pro", "kreebi-forms")}
+          </p>
+          <Button
+            variant="primary"
+            isSmall
+            onClick={() => {
+              window.location.href =
+                "admin.php?page=krefrm_forms#upgrade-to-pro";
+            }}
+          >
+            {__("Upgrade to Pro", "kreebi-forms")}
+          </Button>
+        </div>
 
         <div style={{ marginTop: 16 }}>
           <Button

@@ -93,22 +93,6 @@ class Krefrm_Form_Sanitizer
             'required'    => ! empty($field['required']),
         );
 
-        // Sanitize optional wrapper attributes (class / id)
-        $wrapper = array('class' => '', 'id' => '');
-
-        if (! empty($field['wrapper']) && is_array($field['wrapper'])) {
-            if (! empty($field['wrapper']['class'])) {
-                $classes           = explode(' ', $field['wrapper']['class']);
-                $sanitized_classes = array_map('sanitize_html_class', $classes);
-                $wrapper['class']  = implode(' ', array_filter($sanitized_classes));
-            }
-            if (! empty($field['wrapper']['id'])) {
-                $wrapper['id'] = sanitize_html_class($field['wrapper']['id']);
-            }
-        }
-
-        $sanitized_field['wrapper'] = $wrapper;
-
         // Layout (colSpan for grid width)
         $col_span = 12; // default full width
         if (! empty($field['layout']) && is_array($field['layout'])) {
