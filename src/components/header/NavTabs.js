@@ -8,6 +8,11 @@ import { __ } from "@wordpress/i18n";
  *  navigate {Function} hash navigation helper
  */
 export default function NavTabs({ route, navigate }) {
+  // Don't show tabs on upgrade page
+  if (route === "upgrade-to-pro") {
+    return null;
+  }
+
   const isFormsActive = route.startsWith("forms");
   const isSubmissionsActive = route === "submission";
 

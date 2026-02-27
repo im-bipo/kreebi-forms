@@ -49,12 +49,32 @@ class Krefrm_Admin_Assets
                 $page = 'submissions';
             }
 
+            // Add optional CSS to highlight upgrade link as a button
+            $upgrade_css = "
+                #toplevel_page_krefrm_forms .wp-submenu li a[href*='#upgrade-to-pro'] {
+                    display: inline-block;
+                    width: 80%;
+
+                    background: #2271b1;
+                    color: #fff !important;
+                    padding: 6px 12px;
+                    border-radius: 4px;
+                    margin: 4px;
+                    font-weight: 600;
+                }
+                #toplevel_page_krefrm_forms .wp-submenu li a[href*='#upgrade-to-pro']:hover {
+                    background: #1a5d96;
+                }
+            ";
+            wp_add_inline_style('krefrm-admin', $upgrade_css);
+
             wp_add_inline_script(
                 'krefrm-admin',
                 'window.krefrmAdmin = ' . wp_json_encode(array(
-                    'page'    => $page,
-                    'restUrl' => esc_url_raw(rest_url('kreebi-forms/v1')),
-                    'nonce'   => wp_create_nonce('wp_rest'),
+                    'page'      => $page,
+                    'restUrl'   => esc_url_raw(rest_url('kreebi-forms/v1')),
+                    'nonce'     => wp_create_nonce('wp_rest'),
+                    'pluginUrl' => KREFRM_PLUGIN_URL,
                 )) . ';',
                 'before'
             );
@@ -73,8 +93,11 @@ class Krefrm_Admin_Assets
                                 isActive = (hash === "forms/create");
                             } else if (itemHash === "submission") {
                                 isActive = (hash === "submission");
+                            } else if (itemHash === "upgrade-to-pro") {
+                                isActive = (hash === "upgrade-to-pro");
                             } else if (itemHash === "forms") {
-                                isActive = (hash !== "forms/create" && hash !== "submission");
+                                // default to forms if nothing else matches
+                                isActive = (hash !== "forms/create" && hash !== "submission" && hash !== "upgrade-to-pro");
                             }
                             if (isActive) {
                                 li.classList.add("current");

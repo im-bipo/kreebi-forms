@@ -1,12 +1,14 @@
 import { useState, useEffect } from "@wordpress/element";
 import FormsPage from "./pages/FormsPage";
 import SubmissionsPage from "./pages/SubmissionsPage";
+import UpgradePage from "./pages/UpgradePage";
 import PageHeader from "./components/header/PageHeader";
 import NavTabs from "./components/header/NavTabs";
 import "./style.css";
 
 function getHashRoute() {
   const hash = window.location.hash.replace(/^#\/?/, "");
+  if (hash === "upgrade-to-pro") return "upgrade-to-pro";
   if (hash.startsWith("forms")) return hash;
   if (hash === "submission") return "submission";
   return "forms";
@@ -35,6 +37,7 @@ export default function App() {
           <FormsPage route={route} navigate={navigate} />
         )}
         {route === "submission" && <SubmissionsPage />}
+        {route === "upgrade-to-pro" && <UpgradePage />}
       </div>
     </div>
   );

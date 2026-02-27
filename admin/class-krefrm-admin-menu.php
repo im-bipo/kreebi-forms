@@ -36,14 +36,6 @@ class Krefrm_Admin_Menu
             admin_url('admin.php?page=krefrm_forms') . '#forms'
         );
 
-        // Submenu: Create New Form
-        add_submenu_page(
-            'krefrm_forms',
-            __('Create New Form', 'kreebi-forms'),
-            __('Create New Form', 'kreebi-forms'),
-            'manage_options',
-            admin_url('admin.php?page=krefrm_forms') . '#forms/create'
-        );
 
         // Submenu: All Submissions
         add_submenu_page(
@@ -52,6 +44,15 @@ class Krefrm_Admin_Menu
             __('All Submissions', 'kreebi-forms'),
             'manage_options',
             admin_url('admin.php?page=krefrm_forms') . '#submission'
+        );
+
+        // Submenu: Upgrade to Pro (calls attention)
+        add_submenu_page(
+            'krefrm_forms',
+            __('Upgrade to Pro', 'kreebi-forms'),
+            __('Upgrade to Pro', 'kreebi-forms'),
+            'manage_options',
+            admin_url('admin.php?page=krefrm_forms') . '#upgrade-to-pro'
         );
     }
 
