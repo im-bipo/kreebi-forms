@@ -178,10 +178,9 @@ export default function useFormBuilder(initial = {}) {
         const fields = [...s.fields];
         if (fromIndex < 0 || fromIndex >= fields.length) return s;
 
-        const clampedTo = Math.max(0, Math.min(toIndex, fields.length));
+        const clampedTo = Math.max(0, Math.min(toIndex, fields.length - 1));
         const [moved] = fields.splice(fromIndex, 1);
-        const insertAt = fromIndex < clampedTo ? clampedTo - 1 : clampedTo;
-        fields.splice(insertAt, 0, moved);
+        fields.splice(clampedTo, 0, moved);
         return { ...s, fields };
       }),
     );

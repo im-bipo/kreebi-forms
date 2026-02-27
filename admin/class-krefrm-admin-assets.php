@@ -95,11 +95,15 @@ class Krefrm_Admin_Assets
                                 isActive = (hash === "forms/create");
                             } else if (itemHash === "submission") {
                                 isActive = (hash === "submission");
+                            } else if (itemHash === "style-templates") {
+                                isActive = (hash === "style-templates");
+                            } else if (itemHash.startsWith("integrations")) {
+                                isActive = (hash.startsWith("integrations"));
                             } else if (itemHash === "upgrade-to-pro") {
                                 isActive = (hash === "upgrade-to-pro");
                             } else if (itemHash === "forms") {
                                 // default to forms if nothing else matches
-                                isActive = (hash !== "forms/create" && hash !== "submission" && hash !== "upgrade-to-pro");
+                                isActive = (hash !== "forms/create" && hash !== "submission" && hash !== "style-templates" && !hash.startsWith("integrations") && hash !== "upgrade-to-pro");
                             }
                             if (isActive) {
                                 li.classList.add("current");
