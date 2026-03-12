@@ -41,5 +41,11 @@ require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin.php';
 // Load core
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-core.php';
 
+// Load activation handler
+require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-activation.php';
+
+// Register activation hook
+register_activation_hook(__FILE__, array('Krefrm_Activation', 'activate'));
+
 // Initialize plugin
 Krefrm_Plugin::instance();
