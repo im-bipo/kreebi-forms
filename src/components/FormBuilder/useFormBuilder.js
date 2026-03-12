@@ -40,9 +40,18 @@ export function stripUids(steps) {
 /**
  * Build the full form JSON object from builder state.
  */
-export function buildFormJson(name, description, steps, styleTemplate) {
+export function buildFormJson(
+  name,
+  description,
+  steps,
+  styleTemplate,
+  formIntegrations,
+) {
   const cleanSteps = stripUids(steps);
   const base = { name, description, styleTemplate };
+  if (formIntegrations && Object.keys(formIntegrations).length > 0) {
+    base.formIntegrations = formIntegrations;
+  }
   // If only 1 step with no name, flatten to the legacy format
   if (cleanSteps.length === 1 && !cleanSteps[0].name) {
     return { ...base, fields: cleanSteps[0].fields };
@@ -58,6 +67,7 @@ export function parseFormJson(json) {
   const name = json.name || "";
   const description = json.description || "";
   const styleTemplate = json.styleTemplate || "kreebi_style_1";
+  const formIntegrations = json.formIntegrations || {};
   let steps = [];
 
   if (Array.isArray(json.steps) && json.steps.length) {
@@ -68,7 +78,13 @@ export function parseFormJson(json) {
     steps = [{ name: "", fields: [] }];
   }
 
-  return { name, description, styleTemplate, steps: ensureUids(steps) };
+  return {
+    name,
+    description,
+    styleTemplate,
+    formIntegrations,
+    steps: ensureUids(steps),
+  };
 }
 
 export default function useFormBuilder(initial = {}) {
@@ -77,6 +93,9 @@ export default function useFormBuilder(initial = {}) {
   const [formName, setFormName] = useState(parsed.name);
   const [formDesc, setFormDesc] = useState(parsed.description);
   const [styleTemplate, setStyleTemplate] = useState(parsed.styleTemplate);
+  const [formIntegrations, setFormIntegrations] = useState(
+    parsed.formIntegrations,
+  );
   const [steps, setSteps] = useState(parsed.steps);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
 
@@ -212,17 +231,29 @@ export default function useFormBuilder(initial = {}) {
   /* ─── JSON sync ─── */
 
   const getJson = useCallback(() => {
-    return buildFormJson(formName, formDesc, steps, styleTemplate);
-  }, [formName, formDesc, steps, styleTemplate]);
+    return buildFormJson(
+      formName,
+      formDesc,
+      steps,
+      styleTemplate,
+      formIntegrations,
+    );
+  }, [formName, formDesc, steps, styleTemplate, formIntegrations]);
 
   const setFromJson = useCallback((json) => {
     const p = parseFormJson(json);
     setFormName(p.name);
     setFormDesc(p.description);
     setStyleTemplate(p.styleTemplate);
+    setFormIntegrations(p.formIntegrations);
     setSteps(p.steps);
     setCurrentStepIndex(0);
     setSelection(null);
+  }, []);
+
+  /** Update form-level settings for a single integration. */
+  const setFormIntegration = useCallback((integrationId, settings) => {
+    setFormIntegrations((prev) => ({ ...prev, [integrationId]: settings }));
   }, []);
 
   return {
@@ -258,5 +289,9 @@ export default function useFormBuilder(initial = {}) {
     // JSON
     getJson,
     setFromJson,
+
+    // Form-level integration settings
+    formIntegrations,
+    setFormIntegration,
   };
 }

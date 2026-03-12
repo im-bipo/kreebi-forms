@@ -25,12 +25,18 @@ class Krefrm_Form_Sanitizer
         }
 
         $sanitized = array(
-            'name'          => isset($data['name']) ? sanitize_text_field($data['name']) : '',
-            'description'   => isset($data['description']) ? sanitize_textarea_field($data['description']) : '',
-            'id'            => isset($data['id']) ? sanitize_text_field($data['id']) : '',
-            'styleTemplate' => $style_template,
-            'steps'         => array(),
+            'name'             => isset($data['name']) ? sanitize_text_field($data['name']) : '',
+            'description'      => isset($data['description']) ? sanitize_textarea_field($data['description']) : '',
+            'id'               => isset($data['id']) ? sanitize_text_field($data['id']) : '',
+            'styleTemplate'    => $style_template,
+            'steps'            => array(),
+            'formIntegrations' => array(),
         );
+
+        // Form-level integration overrides
+        if (! empty($data['formIntegrations']) && is_array($data['formIntegrations'])) {
+            $sanitized['formIntegrations'] = $this->sanitize_form_integrations($data['formIntegrations']);
+        }
 
         // New multi-step format
         if (! empty($data['steps']) && is_array($data['steps'])) {
@@ -106,5 +112,49 @@ class Krefrm_Form_Sanitizer
         $sanitized_field['layout'] = array('colSpan' => $col_span);
 
         return $sanitized_field;
+    }
+
+    /**
+     * Sanitize per-form integration settings.
+     *
+     * Structure: { integrationId: { _useGlobal: bool, ...overrides } }
+     */
+    public function sanitize_form_integrations($data)
+    {
+        if (! is_array($data)) {
+            return array();
+        }
+
+        $sanitized = array();
+
+        foreach ($data as $integration_id => $settings) {
+            $integration_id = sanitize_key($integration_id);
+            if (! is_array($settings)) {
+                continue;
+            }
+
+            $clean = array();
+
+            if (isset($settings['_useGlobal'])) {
+                $clean['_useGlobal'] = (bool) $settings['_useGlobal'];
+            }
+
+            // Email notification overrides
+            if ($integration_id === 'email-notification') {
+                $text_fields = array('recipientEmail', 'senderName', 'subject');
+                foreach ($text_fields as $key) {
+                    if (isset($settings[$key])) {
+                        $clean[$key] = sanitize_text_field($settings[$key]);
+                    }
+                }
+                if (isset($settings['bodyTemplate'])) {
+                    $clean['bodyTemplate'] = sanitize_textarea_field($settings['bodyTemplate']);
+                }
+            }
+
+            $sanitized[$integration_id] = $clean;
+        }
+
+        return $sanitized;
     }
 }

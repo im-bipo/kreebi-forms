@@ -27,6 +27,7 @@ export default function SubmissionsPage() {
   const [success, setSuccess] = useState("");
   const [selectedForm, setSelectedForm] = useState(() => getFormIdFromHash());
   const [viewMode, setViewMode] = useState("table"); // default to table view
+  const [selectedSubmissions, setSelectedSubmissions] = useState([]); // for bulk actions
 
   const fetchSubmissions = useCallback(async () => {
     setLoading(true);
@@ -77,8 +78,53 @@ export default function SubmissionsPage() {
       });
       setSuccess(__("Submission deleted.", "kreebi-forms"));
       fetchSubmissions();
+      setSelectedSubmissions([]); // clear selection after delete
     } catch (err) {
       setError(err.message || __("Failed to delete.", "kreebi-forms"));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedSubmissions.length === 0) return;
+    if (
+      !window.confirm(
+        __("Delete selected submissions?", "kreebi-forms"),
+      )
+    ) {
+      return;
+    }
+    try {
+      // Delete all selected submissions
+      await Promise.all(
+        selectedSubmissions.map((id) =>
+          apiFetch({
+            path: `/kreebi-forms/v1/submissions/${id}`,
+            method: "DELETE",
+          }),
+        ),
+      );
+      setSuccess(
+        __("Selected submissions deleted.", "kreebi-forms"),
+      );
+      fetchSubmissions();
+      setSelectedSubmissions([]); // clear selection after delete
+    } catch (err) {
+      setError(err.message || __("Failed to delete.", "kreebi-forms"));
+    }
+  };
+
+  const handleSelectSubmission = (id) => {
+    setSelectedSubmissions((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
+    );
+  };
+
+  const handleSelectAll = (formSubmissions) => {
+    const allIds = formSubmissions.map((sub) => sub.id);
+    if (selectedSubmissions.length === allIds.length) {
+      setSelectedSubmissions([]);
+    } else {
+      setSelectedSubmissions(allIds);
     }
   };
 

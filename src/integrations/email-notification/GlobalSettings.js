@@ -1,7 +1,8 @@
 /**
- * EmailNotificationPage – settings for the Email Notification integration.
+ * Email Notification – global settings page.
  *
- * Accessed via: #integrations/email-notification
+ * Accessible via: #integrations/email-notification
+ * These settings apply to every form unless a form overrides them.
  */
 
 import { useState, useEffect } from "@wordpress/element";
@@ -20,7 +21,7 @@ Submitted Data:
 ---
 This is an automated email. Please do not reply.`;
 
-export default function EmailNotificationPage({ navigate }) {
+export default function EmailNotificationGlobalSettings({ navigate }) {
   const [settings, setSettings] = useState({
     recipientEmail: adminEmail || "",
     senderName: siteTitle || "",
@@ -33,7 +34,6 @@ export default function EmailNotificationPage({ navigate }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  /* Load saved settings */
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
       headers: { "X-WP-Nonce": nonce },
@@ -47,7 +47,6 @@ export default function EmailNotificationPage({ navigate }) {
       .finally(() => setLoading(false));
   }, []);
 
-  /* Persist settings */
   const handleSave = () => {
     setSaving(true);
     fetch(`${restUrl}/settings`, {
@@ -78,7 +77,6 @@ export default function EmailNotificationPage({ navigate }) {
 
   return (
     <div className="krefrm-integration-settings">
-      {/* Back link + header */}
       <div className="krefrm-integration-settings__header">
         <Button
           variant="tertiary"
@@ -113,13 +111,12 @@ export default function EmailNotificationPage({ navigate }) {
 
         <p className="krefrm-integration-settings__subtitle">
           {__(
-            "Configure how email notifications are sent when a form is submitted.",
+            "These are the default settings used for all forms. Individual forms can override these settings.",
             "kreebi-forms",
           )}
         </p>
       </div>
 
-      {/* Settings fields */}
       <div className="krefrm-integration-settings__body">
         <div className="krefrm-integration-settings__field">
           <TextControl

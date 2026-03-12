@@ -173,6 +173,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
               description: data.description || "",
               styleTemplate: data.styleTemplate || "kreebi_style_1",
               steps: data.steps || [],
+              formIntegrations: data.formIntegrations || {},
             };
             setEditFormData(formBuilderData);
           }

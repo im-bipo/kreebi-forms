@@ -33,12 +33,19 @@ import SettingsPanel from "./SettingsPanel";
 import JsonEditor from "./JsonEditor";
 import DragOverlayCard from "./DragOverlayCard";
 import QuickBuilder from "../QuickBuilder"; // used as additional view
+import { getIntegration } from "../../integrations/registry";
 
+/**
+ * @param {Object}  props.enabledIntegrations       Map of integrationId → boolean
+ * @param {Object}  props.globalIntegrationSettings  Map of settingsKey → settings object
+ */
 export default function FormBuilder({
   initialData = {},
   onSave,
   onCancel,
   saveLabel,
+  enabledIntegrations = {},
+  globalIntegrationSettings = {},
 }) {
   const builder = useFormBuilder(initialData);
   const [view, setView] = useState("visual"); // "quick" | "visual" | "json" | "settings"
@@ -200,6 +207,29 @@ export default function FormBuilder({
     });
   }, [builder]);
 
+  /* ─── Integration tab helpers ─── */
+
+  /**
+   * Returns tabs for enabled integrations to be shown after the core tabs.
+   * Each tab is { id, label, viewKey } where viewKey is the value to set `view` to.
+   */
+  const integrationTabs = Object.entries(enabledIntegrations)
+    .filter(([, isOn]) => isOn)
+    .reduce((acc, [id]) => {
+      const integration = getIntegration(id);
+      if (!integration) return acc;
+      const { config } = integration;
+
+      if (config.usesJsonEditorTab) {
+        // JSON View maps to the existing "json" view slot
+        acc.push({ id, label: config.tabLabel, viewKey: "json" });
+      } else if (integration.FormTab) {
+        // Standard integration settings panel
+        acc.push({ id, label: config.tabLabel, viewKey: `intg:${id}` });
+      }
+      return acc;
+    }, []);
+
   /* ─── Render ─── */
 
   return (
@@ -226,15 +256,20 @@ export default function FormBuilder({
             >
               {__("Visual Editor", "kreebi-forms")}
             </button>
-            <button
-              type="button"
-              className={`krefrm-builder__toggle-btn ${
-                view === "json" ? "is-active" : ""
-              }`}
-              onClick={() => setView("json")}
-            >
-              {__("JSON View", "kreebi-forms")}
-            </button>
+
+            {/* Integration tabs (JSON View, Email Notification, etc.) */}
+            {integrationTabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                className={`krefrm-builder__toggle-btn ${
+                  view === tab.viewKey ? "is-active" : ""
+                }`}
+                onClick={() => setView(tab.viewKey)}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           <div className="krefrm-builder__topbar-actions">
@@ -285,6 +320,30 @@ export default function FormBuilder({
       {view === "json" && (
         <JsonEditor getJson={builder.getJson} onApply={builder.setFromJson} />
       )}
+
+      {/* Integration settings panels */}
+      {view.startsWith("intg:") &&
+        (() => {
+          const integrationId = view.replace("intg:", "");
+          const integration = getIntegration(integrationId);
+          if (!integration?.FormTab) return null;
+          const { FormTab, config } = integration;
+          const formSettings = builder.formIntegrations[integrationId] || {};
+          const globalSettings = config.settingsKey
+            ? globalIntegrationSettings[config.settingsKey] || {}
+            : {};
+          return (
+            <div className="krefrm-intg-panel">
+              <FormTab
+                globalSettings={globalSettings}
+                formSettings={formSettings}
+                onChange={(updated) =>
+                  builder.setFormIntegration(integrationId, updated)
+                }
+              />
+            </div>
+          );
+        })()}
 
       {view === "visual" && (
         <DndContext

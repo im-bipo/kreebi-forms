@@ -279,8 +279,15 @@ class Krefrm_Rest_Api
             $email_settings = $body['emailNotification'];
             if (is_array($email_settings)) {
                 $sanitized = array();
-                foreach ($email_settings as $key => $value) {
-                    $sanitized[sanitize_key($key)] = sanitize_text_field($value);
+                $text_fields = array('recipientEmail', 'senderName', 'subject');
+                foreach ($text_fields as $key) {
+                    if (isset($email_settings[$key])) {
+                        $sanitized[$key] = sanitize_text_field($email_settings[$key]);
+                    }
+                }
+                // Body template can contain newlines – use textarea sanitizer
+                if (isset($email_settings['bodyTemplate'])) {
+                    $sanitized['bodyTemplate'] = sanitize_textarea_field($email_settings['bodyTemplate']);
                 }
                 $settings['emailNotification'] = $sanitized;
             }
@@ -319,17 +326,20 @@ class Krefrm_Rest_Api
         }
 
         return array(
-            'post_id'        => $post->ID,
-            'form_id'        => $form_id,
-            'title'          => $post->post_title,
-            'description'    => $post->post_content,
-            'shortcode'      => sprintf('[kreebi_form id="%s"]', esc_attr($form_id)),
-            'styleTemplate'  => isset($form_data['styleTemplate']) ? $form_data['styleTemplate'] : 'kreebi_style_1',
-            'steps'          => $steps,
-            'fields'         => $all_fields,
-            'field_count'    => count($all_fields),
-            'date'           => get_the_date('Y-m-d', $post),
-            'edit_url'       => get_edit_post_link($post->ID, 'raw'),
+            'post_id'          => $post->ID,
+            'form_id'          => $form_id,
+            'title'            => $post->post_title,
+            'description'      => $post->post_content,
+            'shortcode'        => sprintf('[kreebi_form id="%s"]', esc_attr($form_id)),
+            'styleTemplate'    => isset($form_data['styleTemplate']) ? $form_data['styleTemplate'] : 'kreebi_style_1',
+            'steps'            => $steps,
+            'fields'           => $all_fields,
+            'field_count'      => count($all_fields),
+            'date'             => get_the_date('Y-m-d', $post),
+            'edit_url'         => get_edit_post_link($post->ID, 'raw'),
+            'formIntegrations' => isset($form_data['formIntegrations']) && is_array($form_data['formIntegrations'])
+                ? $form_data['formIntegrations']
+                : (object) array(),
         );
     }
 
