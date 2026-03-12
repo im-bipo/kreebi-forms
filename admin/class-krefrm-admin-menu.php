@@ -17,13 +17,16 @@ class Krefrm_Admin_Menu
     public function register_menu()
     {
         // Top-level: Kreebi Forms
+        // build URL relative to the plugin root (not the admin subdirectory)
+        $icon_url = plugin_dir_url(dirname(__FILE__, 2)) . '/kreebi-forms/assets/photos/kreebi-forms.svg';
+
         add_menu_page(
             __('Kreebi Forms', 'kreebi-forms'),
             __('Kreebi Forms', 'kreebi-forms'),
             'manage_options',
             'krefrm_forms',
             array($this, 'render_page'),
-            'dashicons-feedback',
+            $icon_url,
             90
         );
 

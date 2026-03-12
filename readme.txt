@@ -52,9 +52,11 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 
 == Screenshots ==
 
-1. *Forms list* – overview of created forms in the admin.
-2. *Form editor* – drag‑and‑drop/JSON modal for building a form.
-3. *Submissions* – view submitted entries with export options.
+1. *Advanced Form Builder* – fully featured drag‑and‑drop interface with live preview and field settings.
+2. *Quick Form Builder* – create a simple form in seconds using prebuilt templates and shortcuts.
+3. *Submission Page* – review, search and export all form entries right from the admin dashboard.
+4. *Style Template Page* – choose or customise visual templates to style your forms without touching code.
+5. *Integrations Page* – connect fields to third‑party services like email, CRM, or webhooks with ease.
 
 == Upgrade Notice ==
 
