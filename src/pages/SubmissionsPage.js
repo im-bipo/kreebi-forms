@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
-import { Button, Notice, Spinner } from "@wordpress/components";
+import { Button, Notice, Spinner, Modal } from "@wordpress/components";
 import ProTag from "../components/ProTag";
 
 // Helper to parse form ID from URL hash
@@ -28,6 +28,20 @@ export default function SubmissionsPage() {
   const [selectedForm, setSelectedForm] = useState(() => getFormIdFromHash());
   const [viewMode, setViewMode] = useState("table"); // default to table view
   const [selectedSubmissions, setSelectedSubmissions] = useState([]); // for bulk actions
+
+  // state for our own confirmation modal (avoids browser dialog suppression)
+  const [confirmDialog, setConfirmDialog] = useState({
+    open: false,
+    id: null,
+    bulk: false,
+  });
+
+  const openConfirm = (id = null, bulk = false) => {
+    setConfirmDialog({ open: true, id, bulk });
+  };
+  const closeConfirm = () => {
+    setConfirmDialog({ open: false, id: null, bulk: false });
+  };
 
   const fetchSubmissions = useCallback(async () => {
     setLoading(true);
@@ -68,9 +82,7 @@ export default function SubmissionsPage() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm(__("Delete this submission?", "kreebi-forms"))) {
-      return;
-    }
+    // perform deletion after user confirmed via our modal
     try {
       await apiFetch({
         path: `/kreebi-forms/v1/submissions/${id}`,
@@ -86,13 +98,10 @@ export default function SubmissionsPage() {
 
   const handleBulkDelete = async () => {
     if (selectedSubmissions.length === 0) return;
-    if (
-      !window.confirm(
-        __("Delete selected submissions?", "kreebi-forms"),
-      )
-    ) {
-      return;
-    }
+    openConfirm(null, true);
+  };
+
+  const performBulkDelete = async () => {
     try {
       // Delete all selected submissions
       await Promise.all(
@@ -103,9 +112,7 @@ export default function SubmissionsPage() {
           }),
         ),
       );
-      setSuccess(
-        __("Selected submissions deleted.", "kreebi-forms"),
-      );
+      setSuccess(__("Selected submissions deleted.", "kreebi-forms"));
       fetchSubmissions();
       setSelectedSubmissions([]); // clear selection after delete
     } catch (err) {
@@ -284,7 +291,7 @@ export default function SubmissionsPage() {
                     variant="tertiary"
                     isSmall
                     isDestructive
-                    onClick={() => handleDelete(sub.id)}
+                    onClick={() => openConfirm(sub.id)}
                   >
                     {__("Delete", "kreebi-forms")}
                   </Button>
@@ -355,7 +362,7 @@ export default function SubmissionsPage() {
                           variant="tertiary"
                           isSmall
                           isDestructive
-                          onClick={() => handleDelete(sub.id)}
+                          onClick={() => openConfirm(sub.id)}
                         >
                           {__("Delete", "kreebi-forms")}
                         </Button>
@@ -367,6 +374,44 @@ export default function SubmissionsPage() {
             </div>
           )}
         </div>
+      )}
+
+      {/* confirmation modal (avoids browser dialog suppression) */}
+      {confirmDialog.open && (
+        <Modal
+          title={
+            confirmDialog.bulk
+              ? __("Delete selected submissions?", "kreebi-forms")
+              : __("Delete this submission?", "kreebi-forms")
+          }
+          onRequestClose={closeConfirm}
+          shouldCloseOnClickOutside={false}
+        >
+          <p>{__("This action cannot be undone.", "kreebi-forms")}</p>
+          <div style={{ marginTop: 20, textAlign: "right" }}>
+            <Button
+              variant="secondary"
+              onClick={closeConfirm}
+              style={{ marginRight: 8 }}
+            >
+              {__("Cancel", "kreebi-forms")}
+            </Button>
+            <Button
+              variant="primary"
+              isDestructive
+              onClick={async () => {
+                closeConfirm();
+                if (confirmDialog.bulk) {
+                  await performBulkDelete();
+                } else if (confirmDialog.id) {
+                  await handleDelete(confirmDialog.id);
+                }
+              }}
+            >
+              {__("Yes, delete", "kreebi-forms")}
+            </Button>
+          </div>
+        </Modal>
       )}
     </div>
   );
