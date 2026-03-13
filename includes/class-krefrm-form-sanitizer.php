@@ -185,6 +185,28 @@ class Krefrm_Form_Sanitizer
                 }
             }
 
+            // Webhook overrides
+            if ($integration_id === 'webhook') {
+                if (isset($settings['enabled'])) {
+                    $clean['enabled'] = (bool) $settings['enabled'];
+                }
+                if (isset($settings['urls'])) {
+                    $webhook_partial = Krefrm_Webhook_Service::sanitize_settings(array(
+                        'urls' => $settings['urls'],
+                    ));
+                    $clean['urls'] = $webhook_partial['urls'];
+                }
+                if (isset($settings['headers'])) {
+                    $clean['headers'] = sanitize_textarea_field($settings['headers']);
+                }
+                if (isset($settings['bodyTemplate'])) {
+                    $clean['bodyTemplate'] = sanitize_textarea_field($settings['bodyTemplate']);
+                }
+                if (isset($settings['tested'])) {
+                    $clean['tested'] = (bool) $settings['tested'];
+                }
+            }
+
             $sanitized[$integration_id] = $clean;
         }
 

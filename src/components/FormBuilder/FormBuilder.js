@@ -11,6 +11,7 @@
  *  onSave       {Function} called with the final JSON when the user saves
  *  onCancel     {Function} called when the user cancels
  *  saveLabel    {string}   label for the save button (defaults to "Save Form")
+ *  isEditing    {Boolean}  whether we're editing an existing form
  */
 
 import { useState, useCallback } from "@wordpress/element";
@@ -38,25 +39,70 @@ import { getIntegration } from "../../integrations/registry";
 /**
  * @param {Object}  props.enabledIntegrations       Map of integrationId → boolean
  * @param {Object}  props.globalIntegrationSettings  Map of settingsKey → settings object
+ * @param {string}  props.initialTab                Initial view to show (e.g., "quick-edit", "email-notification")
+ * @param {Function} props.onTabChange              Called when user switches tabs; receives (tabName)
  */
 export default function FormBuilder({
   initialData = {},
   onSave,
   onCancel,
   saveLabel,
+  isEditing = false,
+  formId = "",
   enabledIntegrations = {},
   globalIntegrationSettings = {},
+  initialTab = null,
+  onTabChange = () => {},
 }) {
   const builder = useFormBuilder(initialData);
-  const [view, setView] = useState("visual"); // "quick" | "visual" | "json" | "settings"
+
+  // Convert initialTab to internal view format
+  // "quick-edit" -> "quick", "email-notification" -> "intg:email-notification", etc.
+  const getInitialView = () => {
+    if (!initialTab) return "visual"; // default
+    if (initialTab === "quick-edit") return "quick";
+    if (initialTab.startsWith("intg:")) return initialTab;
+    return `intg:${initialTab}`; // treat other tabs as integrations
+  };
+
+  const [view, setView] = useState(getInitialView()); // "quick" | "visual" | "json" | "settings"
   const [activeDrag, setActiveDrag] = useState(null);
   const [insertIndex, setInsertIndex] = useState(null);
+
+  // Function for integrations to trigger form save with current state
+  const triggerFormSave = useCallback(() => {
+    if (onSave) {
+      onSave(builder.getJson());
+    }
+  }, [onSave, builder]);
 
   // Require a small move before activating drag (avoids accidental drag on click)
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: { distance: 5 },
     }),
+  );
+
+  // Helper to change view and notify parent about tab changes
+  const handleViewChange = useCallback(
+    (newView) => {
+      setView(newView);
+
+      // Convert internal view format back to tab name for parent
+      let tabName = null;
+      if (newView === "quick") {
+        tabName = "quick-edit";
+      } else if (newView === "visual") {
+        tabName = null; // default, no tab param
+      } else if (newView === "json") {
+        tabName = null; // JSON View also uses default URL
+      } else if (newView.startsWith("intg:")) {
+        tabName = newView.replace("intg:", "");
+      }
+
+      onTabChange(tabName);
+    },
+    [onTabChange],
   );
 
   /* Auto-select first field when none selected */
@@ -243,7 +289,7 @@ export default function FormBuilder({
               className={`krefrm-builder__toggle-btn ${
                 view === "quick" ? "is-active" : ""
               }`}
-              onClick={() => setView("quick")}
+              onClick={() => handleViewChange("quick")}
             >
               {__("Quick Editor", "kreebi-forms")}
             </button>
@@ -252,7 +298,7 @@ export default function FormBuilder({
               className={`krefrm-builder__toggle-btn ${
                 view === "visual" ? "is-active" : ""
               }`}
-              onClick={() => setView("visual")}
+              onClick={() => handleViewChange("visual")}
             >
               {__("Visual Editor", "kreebi-forms")}
             </button>
@@ -265,7 +311,7 @@ export default function FormBuilder({
                 className={`krefrm-builder__toggle-btn ${
                   view === tab.viewKey ? "is-active" : ""
                 }`}
-                onClick={() => setView(tab.viewKey)}
+                onClick={() => handleViewChange(tab.viewKey)}
               >
                 {tab.label}
               </button>
@@ -312,7 +358,7 @@ export default function FormBuilder({
           onSave={(json) => builder.setFromJson(json)}
           onAdvanced={(json) => {
             builder.setFromJson(json);
-            setView("visual");
+            handleViewChange("visual");
           }}
         />
       )}
@@ -332,11 +378,18 @@ export default function FormBuilder({
           const globalSettings = config.settingsKey
             ? globalIntegrationSettings[config.settingsKey] || {}
             : {};
+          const availableFields = builder.steps
+            .flatMap((step) => step?.fields || [])
+            .map((field) => ({ name: field?.name || "" }));
           return (
             <div className="krefrm-intg-panel">
               <FormTab
                 globalSettings={globalSettings}
                 formSettings={formSettings}
+                availableFields={availableFields}
+                formId={formId}
+                onSave={triggerFormSave}
+                isEditing={isEditing}
                 onChange={(updated) =>
                   builder.setFormIntegration(integrationId, updated)
                 }

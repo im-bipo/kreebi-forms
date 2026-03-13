@@ -87,6 +87,29 @@ class Krefrm_Rest_Api
             ),
         ));
 
+        // Webhook testing endpoint
+        register_rest_route(self::NAMESPACE, '/webhook/test', array(
+            array(
+                'methods'             => 'POST',
+                'callback'            => array($this, 'test_webhook'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+        ));
+
+        // Webhook logs endpoint
+        register_rest_route(self::NAMESPACE, '/webhook/logs', array(
+            array(
+                'methods'             => 'GET',
+                'callback'            => array($this, 'get_webhook_logs'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+            array(
+                'methods'             => 'DELETE',
+                'callback'            => array($this, 'clear_webhook_logs'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+        ));
+
         register_rest_route(self::NAMESPACE, '/submissions/(?P<id>\d+)', array(
             array(
                 'methods'             => 'DELETE',
@@ -149,6 +172,13 @@ class Krefrm_Rest_Api
             return new WP_Error('missing_name', __('Form name is required.', 'kreebi-forms'), array('status' => 400));
         }
 
+        // Validate webhook: if enabled, test must have passed
+        if (! empty($form_data['formIntegrations']['webhook']['enabled'])) {
+            if (empty($form_data['formIntegrations']['webhook']['tested'])) {
+                return new WP_Error('webhook_not_tested', __('Webhook must be tested before saving. Please test the webhook configuration in the Webhook tab.', 'kreebi-forms'), array('status' => 400));
+            }
+        }
+
         // Generate sequential numeric ID
         $form_id = $this->get_next_form_id();
 
@@ -184,6 +214,13 @@ class Krefrm_Rest_Api
 
         $sanitizer = new Krefrm_Form_Sanitizer();
         $form_data = $sanitizer->sanitize($body);
+
+        // Validate webhook: if enabled, test must have passed
+        if (! empty($form_data['formIntegrations']['webhook']['enabled'])) {
+            if (empty($form_data['formIntegrations']['webhook']['tested'])) {
+                return new WP_Error('webhook_not_tested', __('Webhook must be tested before saving. Please test the webhook configuration in the Webhook tab.', 'kreebi-forms'), array('status' => 400));
+            }
+        }
 
         // Preserve existing form ID
         $existing = get_post_meta($post->ID, '_krefrm_form_data', true);
@@ -275,10 +312,15 @@ class Krefrm_Rest_Api
 
     public function get_settings()
     {
+        $settings = get_option('krefrm_settings', array());
+        if (! is_array($settings)) {
+            $settings = array();
+        }
+
         return rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
-            'integrations' => isset(get_option('krefrm_settings', array())['integrations']) ? get_option('krefrm_settings', array())['integrations'] : array(),
-            'emailNotification' => isset(get_option('krefrm_settings', array())['emailNotification']) ? get_option('krefrm_settings', array())['emailNotification'] : array(),
+            'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
+            'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
         ));
     }
 
@@ -338,6 +380,91 @@ class Krefrm_Rest_Api
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
+        ));
+    }
+
+    /**
+     * Send webhook test request.
+     */
+    public function test_webhook($request)
+    {
+        $body = $request->get_json_params();
+        $webhook = isset($body['webhook']) && is_array($body['webhook'])
+            ? Krefrm_Webhook_Service::sanitize_settings($body['webhook'])
+            : Krefrm_Webhook_Service::get_default_settings();
+
+        if (empty($webhook['urls'])) {
+            return new WP_Error(
+                'missing_webhook_urls',
+                __('Add at least one valid webhook URL to run a test.', 'kreebi-forms'),
+                array('status' => 400)
+            );
+        }
+
+        $sample = isset($body['samplePayload']) && is_array($body['samplePayload'])
+            ? $body['samplePayload']
+            : array();
+
+        $form_id = isset($sample['formId']) ? sanitize_text_field($sample['formId']) : '102';
+        $form_description = isset($sample['formDescription']) ? sanitize_text_field($sample['formDescription']) : '';
+
+        $fields = array();
+        if (! empty($sample['fields']) && is_array($sample['fields'])) {
+            foreach ($sample['fields'] as $key => $value) {
+                $safe_key = sanitize_key($key);
+                if ('' === $safe_key) {
+                    continue;
+                }
+                $fields[$safe_key] = is_array($value)
+                    ? implode(', ', array_map('sanitize_text_field', $value))
+                    : sanitize_text_field((string) $value);
+            }
+        }
+
+        $results = Krefrm_Webhook_Service::dispatch(
+            $webhook,
+            $form_id,
+            $form_description,
+            $fields,
+            'test'
+        );
+
+        $passed = ! empty($results);
+        foreach ($results as $result) {
+            if (empty($result['passed'])) {
+                $passed = false;
+                break;
+            }
+        }
+
+        return rest_ensure_response(array(
+            'passed' => $passed,
+            'results' => $results,
+        ));
+    }
+
+    public function get_webhook_logs($request)
+    {
+        $form_id = $request->get_param('form_id');
+
+        if ($form_id) {
+            $logs = Krefrm_Webhook_Service::get_logs_by_form($form_id);
+        } else {
+            $logs = Krefrm_Webhook_Service::get_logs();
+        }
+
+        return rest_ensure_response(array(
+            'logs' => $logs,
+        ));
+    }
+
+    public function clear_webhook_logs()
+    {
+        Krefrm_Webhook_Service::clear_logs();
+
+        return rest_ensure_response(array(
+            'cleared' => true,
+            'logs' => array(),
         ));
     }
 

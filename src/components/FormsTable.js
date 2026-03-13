@@ -199,7 +199,9 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
                 variant="secondary"
                 isSmall
                 className="krefrm-form-card__btn krefrm-form-card__btn--quick-edit"
-                onClick={() => navigate(`forms/quick-edit?id=${form.post_id}`)}
+                onClick={() =>
+                  navigate(`forms/edit?id=${form.post_id}&tab=quick-edit`)
+                }
               >
                 {__("Quick Edit", "kreebi-forms")}
               </Button>

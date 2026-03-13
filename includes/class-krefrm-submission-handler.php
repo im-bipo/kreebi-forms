@@ -130,6 +130,11 @@ class Krefrm_Submission_Handler
             $this->trigger_email_notification($form_post, $submitted, $settings);
         }
 
+        // Webhook integration
+        if (! empty($integrations['webhook'])) {
+            $this->trigger_webhook($form_post, $submitted, $settings);
+        }
+
         // Hook for other integrations
         do_action('krefrm_trigger_integrations', $form_post, $submitted, $integrations, $settings);
     }
@@ -170,5 +175,31 @@ class Krefrm_Submission_Handler
         );
 
         wp_mail($recipient_email, $subject, $body, $headers);
+    }
+
+    /**
+     * Send webhook requests for the submission.
+     */
+    private function trigger_webhook($form_post, $submitted, $settings)
+    {
+        $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
+        $form_integrations = isset($form_data['formIntegrations']) && is_array($form_data['formIntegrations'])
+            ? $form_data['formIntegrations']
+            : array();
+        $form_webhook = isset($form_integrations['webhook']) && is_array($form_integrations['webhook'])
+            ? $form_integrations['webhook']
+            : array();
+
+        // Only dispatch if webhook is explicitly enabled for this form
+        if (empty($form_webhook['enabled'])) {
+            return;
+        }
+
+        $resolved = Krefrm_Webhook_Service::sanitize_settings($form_webhook);
+        if (empty($resolved['urls'])) {
+            return;
+        }
+
+        Krefrm_Webhook_Service::dispatch_from_form_post($resolved, $form_post, $submitted, 'submission');
     }
 }

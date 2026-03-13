@@ -57,6 +57,31 @@ export const INTEGRATIONS = [
       </svg>
     ),
   },
+  {
+    id: "webhook",
+    name: __("Webhook & Zapier", "kreebi-forms"),
+    description: __(
+      "Send form data to external services via webhooks or integrate with Zapier for thousands of app integrations.",
+      "kreebi-forms",
+    ),
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="12" cy="12" r="1" />
+        <circle cx="19" cy="5" r="1" />
+        <circle cx="5" cy="19" r="1" />
+        <line x1="12" y1="12" x2="19" y2="5" />
+        <line x1="12" y1="12" x2="5" y2="19" />
+      </svg>
+    ),
+  },
   /* premium integrations remain here for the time being */
   {
     id: "google-sheet",
@@ -127,32 +152,6 @@ export const INTEGRATIONS = [
       >
         <rect x="1" y="4" width="22" height="16" rx="2" ry="2" />
         <line x1="1" y1="10" x2="23" y2="10" />
-      </svg>
-    ),
-  },
-  {
-    id: "webhook",
-    name: __("Webhook & Zapier", "kreebi-forms"),
-    description: __(
-      "Send form data to external services via webhooks or integrate with Zapier for thousands of app integrations.",
-      "kreebi-forms",
-    ),
-    isPremium: true,
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <circle cx="12" cy="12" r="1" />
-        <circle cx="19" cy="5" r="1" />
-        <circle cx="5" cy="19" r="1" />
-        <line x1="12" y1="12" x2="19" y2="5" />
-        <line x1="12" y1="12" x2="5" y2="19" />
       </svg>
     ),
   },

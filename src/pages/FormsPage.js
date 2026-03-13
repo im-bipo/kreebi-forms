@@ -112,6 +112,13 @@ function getFormIdFromRoute(route) {
   return match ? parseInt(match[1], 10) : null;
 }
 
+// Helper to extract tab parameter from route (e.g., "forms/edit?id=123&tab=email-notification")
+// Returns the tab name or null if no tab specified
+function getTabFromRoute(route) {
+  const match = route.match(/[?&]tab=([^&]+)/);
+  return match ? match[1] : null;
+}
+
 export default function FormsPage({ route = "forms", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -121,6 +128,8 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
   const [editFormId, setEditFormId] = useState(null);
+  const [currentFormId, setCurrentFormId] = useState(null);
+  const [currentTab, setCurrentTab] = useState(null); // Track active tab in editor
   const [templateData, setTemplateData] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
@@ -128,7 +137,6 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
   const showCreatePage = route === "forms/create";
   const showQuickBuilder = route === "forms/quick-builder";
   const showEditPage = route.startsWith("forms/edit?");
-  const showQuickEditPage = route.startsWith("forms/quick-edit?");
 
   const fetchForms = useCallback(async () => {
     setLoading(true);
@@ -148,37 +156,25 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
   // Load form data when in edit mode
   useEffect(() => {
     const formId = getFormIdFromRoute(route);
-    if ((showEditPage || showQuickEditPage) && formId) {
+    const tabName = getTabFromRoute(route);
+
+    if (showEditPage && formId) {
       setEditFormId(formId);
+      setCurrentTab(tabName); // Set the tab from URL (or null for default visual editor)
       setLoading(true);
       apiFetch({ path: `/kreebi-forms/v1/forms/${formId}` })
         .then((data) => {
-          // For Quick Edit, flatten steps to fields for QuickBuilder
-          if (showQuickEditPage) {
-            const allFields = [];
-            if (data.steps && Array.isArray(data.steps)) {
-              data.steps.forEach((step) => {
-                if (step.fields && Array.isArray(step.fields)) {
-                  allFields.push(...step.fields);
-                }
-              });
-            }
-            const quickBuilderData = {
-              name: data.title || "",
-              fields: allFields,
-            };
-            setEditFormData(quickBuilderData);
-          } else {
-            // For Advance Edit, use FormBuilder format with steps
-            const formBuilderData = {
-              name: data.title || "",
-              description: data.description || "",
-              styleTemplate: data.styleTemplate || "kreebi_style_1",
-              steps: data.steps || [],
-              formIntegrations: data.formIntegrations || {},
-            };
-            setEditFormData(formBuilderData);
-          }
+          // Use FormBuilder format with steps for all edit modes
+          // The FormBuilder/CreateFormView will handle different views based on the tab
+          const formBuilderData = {
+            name: data.title || "",
+            description: data.description || "",
+            styleTemplate: data.styleTemplate || "kreebi_style_1",
+            steps: data.steps || [],
+            formIntegrations: data.formIntegrations || {},
+          };
+          setEditFormData(formBuilderData);
+          setCurrentFormId(data.form_id || "");
           setLoading(false);
         })
         .catch((err) => {
@@ -188,8 +184,10 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
     } else {
       setEditFormData(null);
       setEditFormId(null);
+      setCurrentFormId(null);
+      setCurrentTab(null);
     }
-  }, [route, showEditPage, showQuickEditPage]);
+  }, [route, showEditPage]);
 
   const handleCreate = async (parsed) => {
     await apiFetch({
@@ -235,19 +233,20 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
       data: parsed,
     });
     setSuccess(__("Form updated successfully!", "kreebi-forms"));
-    navigate("forms");
+    // Keep the editor open after saving; do not navigate back to the list.
     fetchForms();
   };
 
-  const handleQuickEditUpdate = async (parsed) => {
-    // Quick Edit sends flat format { name, fields }
-    // Convert to API format if needed
-    const formData = {
-      name: parsed.name || "",
-      fields: parsed.fields || [],
-      styleTemplate: "kreebi_style_1", // Use default for quick edit
-    };
-    await handleUpdate(formData);
+  // Handle tab changes in the editor
+  const handleTabChange = (newTab) => {
+    setCurrentTab(newTab);
+    // Update URL to include the tab parameter
+    if (newTab) {
+      navigate(`forms/edit?id=${editFormId}&tab=${newTab}`);
+    } else {
+      // If switching back to default visual editor, use URL without tab param
+      navigate(`forms/edit?id=${editFormId}`);
+    }
   };
 
   if (loading) {
@@ -268,6 +267,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
           navigate("forms");
           setTemplateData(null);
         }}
+        formId=""
       />
     );
   }
@@ -282,12 +282,31 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
       );
     }
     return (
-      <CreateFormView
-        initialData={editFormData}
-        onSubmit={handleUpdate}
-        onCancel={() => navigate("forms")}
-        isEditing={true}
-      />
+      <div>
+        {error && (
+          <Notice status="error" isDismissible onDismiss={() => setError("")}>
+            {error}
+          </Notice>
+        )}
+        {success && (
+          <Notice
+            status="success"
+            isDismissible
+            onDismiss={() => setSuccess("")}
+          >
+            {success}
+          </Notice>
+        )}
+        <CreateFormView
+          initialData={editFormData}
+          onSubmit={handleUpdate}
+          onCancel={() => navigate("forms")}
+          isEditing={true}
+          formId={currentFormId}
+          initialTab={currentTab}
+          onTabChange={handleTabChange}
+        />
+      </div>
     );
   }
 
@@ -327,29 +346,6 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
           setTemplateData(null);
           navigate("forms");
         }}
-      />
-    );
-  }
-
-  /* ─── Quick builder (edit) ─── */
-  if (showQuickEditPage) {
-    if (loading || !editFormData) {
-      return (
-        <div className="krefrm-loading">
-          <Spinner />
-        </div>
-      );
-    }
-    return (
-      <QuickBuilder
-        initialData={editFormData}
-        onSave={handleQuickEditUpdate}
-        onAdvanced={(jsonData) => {
-          setTemplateData(jsonData);
-          navigate(`forms/edit?id=${editFormId}`);
-        }}
-        onCancel={() => navigate("forms")}
-        saveLabel={__("Update Form", "kreebi-forms")}
       />
     );
   }

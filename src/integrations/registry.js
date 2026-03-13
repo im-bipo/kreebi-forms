@@ -11,11 +11,13 @@
 
 import EmailNotification from "./email-notification";
 import JsonView from "./json-view";
+import Webhook from "./webhook";
 
 /** @type {Record<string, { config: object, GlobalSettingsPage: Function, FormTab: Function|null }>} */
 export const INTEGRATION_REGISTRY = {
   "email-notification": EmailNotification,
   "json-view": JsonView,
+  webhook: Webhook,
 };
 
 /**

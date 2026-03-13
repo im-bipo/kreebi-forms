@@ -26,6 +26,7 @@ require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-post-types.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-shortcode.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-submission-handler.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-form-sanitizer.php';
+require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-webhook-service.php';
 require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-rest-api.php';
 
 // Load admin classes

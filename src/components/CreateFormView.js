@@ -17,16 +17,22 @@ const DEFAULT_ENABLED_INTEGRATIONS = Object.fromEntries(
  * Full-page create-form view – now powered by the visual form builder.
  *
  * Props:
- *  onSubmit    {Function} called with the form JSON object when the user saves
- *  onCancel    {Function} called when the user wants to go back
- *  initialData {Object}   form data (for editing)
- *  isEditing   {Boolean}  whether we're editing an existing form
+ *  onSubmit     {Function} called with the form JSON object when the user saves
+ *  onCancel     {Function} called when the user wants to go back
+ *  initialData  {Object}   form data (for editing)
+ *  isEditing    {Boolean}  whether we're editing an existing form
+ *  formId       {string}   the form's internal ID (for log fetching)
+ *  initialTab   {string}   initial tab/view to show (e.g., "quick-edit", "email-notification")
+ *  onTabChange  {Function} called when user switches tabs; receives (tabName)
  */
 export default function CreateFormView({
   onSubmit,
   onCancel,
   initialData = {},
   isEditing = false,
+  formId = "",
+  initialTab = null,
+  onTabChange = () => {},
 }) {
   const [error, setError] = useState("");
   const [enabledIntegrations, setEnabledIntegrations] = useState(
@@ -69,6 +75,7 @@ export default function CreateFormView({
             "kreebi-forms",
           ),
       );
+      throw err;
     }
   };
 
@@ -84,6 +91,8 @@ export default function CreateFormView({
         initialData={initialData}
         onSave={handleSave}
         onCancel={onCancel}
+        isEditing={isEditing}
+        formId={formId}
         saveLabel={
           isEditing
             ? __("Update Form", "kreebi-forms")
@@ -91,6 +100,8 @@ export default function CreateFormView({
         }
         enabledIntegrations={enabledIntegrations}
         globalIntegrationSettings={globalIntegrationSettings}
+        initialTab={initialTab}
+        onTabChange={onTabChange}
       />
     </div>
   );
