@@ -73,6 +73,20 @@ class Krefrm_Rest_Api
             ),
         ));
 
+        // Custom CSS endpoint
+        register_rest_route(self::NAMESPACE, '/custom-css', array(
+            array(
+                'methods'             => 'GET',
+                'callback'            => array($this, 'get_custom_css'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+            array(
+                'methods'             => 'POST',
+                'callback'            => array($this, 'save_custom_css'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+        ));
+
         register_rest_route(self::NAMESPACE, '/submissions/(?P<id>\d+)', array(
             array(
                 'methods'             => 'DELETE',
@@ -325,6 +339,151 @@ class Krefrm_Rest_Api
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
         ));
+    }
+
+    /* ─── Custom CSS ─── */
+
+    public function get_custom_css()
+    {
+        $css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+        $css_content = '';
+
+        if (file_exists($css_file)) {
+            $css_content = file_get_contents($css_file);
+        }
+
+        return rest_ensure_response(array(
+            'css' => $css_content,
+        ));
+    }
+
+    public function save_custom_css($request)
+    {
+        $body = $request->get_json_params();
+        $css = isset($body['css']) ? $body['css'] : '';
+
+        // Sanitize CSS by removing any script tags or other potentially dangerous content
+        $css = $this->sanitize_custom_css($css);
+
+        // Validate CSS syntax
+        $validation = $this->validate_css_syntax($css);
+        if (!$validation['valid']) {
+            return new WP_Error(
+                'invalid_css',
+                __('Invalid CSS syntax: ', 'kreebi-forms') . $validation['error'],
+                array('status' => 400)
+            );
+        }
+
+        // Save to file
+        $css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+
+        // Ensure the includes directory exists
+        if (!is_dir(KREFRM_PLUGIN_DIR . 'includes')) {
+            mkdir(KREFRM_PLUGIN_DIR . 'includes', 0755, true);
+        }
+
+        // Write file with proper file permissions
+        $result = file_put_contents($css_file, $css, LOCK_EX);
+
+        if ($result === false) {
+            return new WP_Error(
+                'file_write_error',
+                __('Could not save custom CSS file.', 'kreebi-forms'),
+                array('status' => 500)
+            );
+        }
+
+        return rest_ensure_response(array(
+            'success' => true,
+            'message' => __('Custom CSS saved successfully.', 'kreebi-forms'),
+            'css' => $css,
+        ));
+    }
+
+    /**
+     * Sanitize custom CSS input
+     * - Remove script tags and other potentially dangerous content
+     * - Strip HTML tags
+     * - Remove JavaScript event handlers
+     */
+    private function sanitize_custom_css($css)
+    {
+        // Remove any script tags
+        $css = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $css);
+
+        // Remove any HTML tags
+        $css = strip_tags($css);
+
+        // Remove JavaScript event handlers (onclick, onerror, etc.)
+        $css = preg_replace('/javascript:/is', '', $css);
+        $css = preg_replace('/on\w+\s*=/is', '', $css);
+
+        // Remove import statements (could load external CSS)
+        $css = preg_replace('/@import[^;]*;/is', '', $css);
+
+        // Trim whitespace
+        $css = trim($css);
+
+        return $css;
+    }
+
+    /**
+     * Validate CSS syntax
+     * Basic validation to check for balanced braces and proper structure
+     */
+    private function validate_css_syntax($css)
+    {
+        $css = trim($css);
+
+        // Empty CSS is valid
+        if (empty($css)) {
+            return array('valid' => true);
+        }
+
+        // Count opening and closing braces
+        $open_braces = substr_count($css, '{');
+        $close_braces = substr_count($css, '}');
+
+        if ($open_braces !== $close_braces) {
+            return array(
+                'valid' => false,
+                'error' => sprintf(
+                    __('Mismatched braces: %d opening, %d closing', 'kreebi-forms'),
+                    $open_braces,
+                    $close_braces
+                ),
+            );
+        }
+
+        // Check for unmatched parentheses (common in CSS functions like rgb(), calc(), etc.)
+        $open_parens = substr_count($css, '(');
+        $close_parens = substr_count($css, ')');
+
+        if ($open_parens !== $close_parens) {
+            return array(
+                'valid' => false,
+                'error' => sprintf(
+                    __('Mismatched parentheses: %d opening, %d closing', 'kreebi-forms'),
+                    $open_parens,
+                    $close_parens
+                ),
+            );
+        }
+
+        // Basic regex to check for proper CSS structure (selector { property: value; })
+        // This is a simplified check and won't catch all CSS syntax errors
+        if (!preg_match('/^[^{}]*\{[^{}]*\}/', $css)) {
+            // Only validate if CSS appears to have selectors and rules
+            if (strpos($css, '{') !== false || strpos($css, '}') !== false) {
+                return array(
+                    'valid' => false,
+                    'error' => __('CSS appears to have invalid structure', 'kreebi-forms'),
+                );
+            }
+        }
+
+        return array('valid' => true);
     }
 
     /* ─── Helpers ─── */

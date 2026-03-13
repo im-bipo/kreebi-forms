@@ -181,73 +181,50 @@ class Krefrm_Shortcode
             $html .= $this->get_multistep_script();
         }
 
-        // Wrap form in iframe with embedded CSS
-        return $this->wrap_form_in_iframe($html);
+        // Wrap form in Shadow DOM with embedded CSS
+        return $this->wrap_form_in_shadow_dom($html);
     }
 
     /**
-     * Wrap form HTML in iframe for complete CSS isolation.
+     * Wrap form HTML in Shadow DOM for complete CSS isolation (without iframe).
      */
-    private function wrap_form_in_iframe($form_html)
+    private function wrap_form_in_shadow_dom($form_html)
     {
-        // Generate unique iframe ID
-        $iframe_id = 'krefrm-form-' . wp_generate_uuid4();
+        // Generate unique element ID
+        $element_id = 'krefrm-form-' . wp_generate_uuid4();
 
         // Get embedded styles
         $styles = $this->get_iframe_styles();
 
-        // Escape form HTML for embedding in iframe
-        $escaped_form = esc_attr($form_html);
-
-        // Create iframe wrapper with embedded HTML
-        $iframe_html = '
-<script id="' . esc_attr($iframe_id) . '-setup">
+        // Create Shadow DOM wrapper with embedded HTML
+        $shadow_dom_html = '
+<div id="' . esc_attr($element_id) . '" class="krefrm-shadow-wrapper"></div>
+<script id="' . esc_attr($element_id) . '-setup">
 (function() {
   var formHTML = ' . wp_json_encode($form_html) . ';
-  var iframe = document.createElement("iframe");
-  iframe.id = "' . esc_attr($iframe_id) . '";
-  iframe.style.border = "none";
-  iframe.style.width = "100%";
-  iframe.style.minHeight = "400px";
-  iframe.style.background = "transparent";
-  iframe.setAttribute("sandbox", "allow-same-origin allow-forms allow-popups");
-  iframe.setAttribute("title", "Kreebi Form");
-  
-  var container = document.getElementById("' . esc_attr($iframe_id) . '-container");
-  if (!container) {
-    var scripts = document.getElementsByTagName("script");
-    var currentScript = document.getElementById("' . esc_attr($iframe_id) . '-setup");
-    currentScript.parentNode.insertBefore(iframe, currentScript);
-  } else {
-    container.appendChild(iframe);
-  }
-  
   var styles = ' . wp_json_encode($styles) . ';
+  var container = document.getElementById("' . esc_attr($element_id) . '");
   
-  iframe.onload = function() {
-    var doc = iframe.contentDocument || iframe.contentWindow.document;
-    var html = "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style>" + styles + "</style></head><body>" + formHTML + "</body></html>";
-    doc.open();
-    doc.write(html);
-    doc.close();
-    
-    // Auto-resize iframe
-    setTimeout(function() {
-      try {
-        var height = doc.documentElement.scrollHeight || doc.body.scrollHeight;
-        iframe.style.height = (height + 40) + "px";
-      } catch(e) {}
-    }, 100);
-  };
+  if (!container) return;
   
-  // Trigger onload
-  iframe.src = "about:blank";
+  // Create Shadow DOM root
+  var shadow = container.attachShadow({ mode: "open" });
+  
+  // Create style element
+  var styleEl = document.createElement("style");
+  styleEl.textContent = styles;
+  shadow.appendChild(styleEl);
+  
+  // Create wrapper for form content
+  var wrapper = document.createElement("div");
+  wrapper.style.cssText = "box-sizing: border-box;";
+  wrapper.innerHTML = formHTML;
+  shadow.appendChild(wrapper);
 })();
 </script>
-<div id="' . esc_attr($iframe_id) . '-container"></div>
         ';
 
-        return $iframe_html;
+        return $shadow_dom_html;
     }
 
     /**
@@ -255,7 +232,7 @@ class Krefrm_Shortcode
      */
     private function get_iframe_styles()
     {
-        return <<<'CSS'
+        $base_css = <<<'CSS'
         html, body {
           margin: 0;
           padding: 20px;
@@ -410,6 +387,15 @@ class Krefrm_Shortcode
         p { margin: 0; }
         p button { margin-top: 10px; }
 CSS;
+
+        // Append custom CSS saved via the admin panel (if present)
+        $custom_css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+        $custom_css = '';
+        if (file_exists($custom_css_file)) {
+            $custom_css = file_get_contents($custom_css_file);
+        }
+
+        return $base_css . "\n\n/* Custom CSS (saved via admin settings) */\n" . $custom_css;
     }
 
     /**
@@ -426,6 +412,18 @@ CSS;
             array(),
             $version
         );
+
+        // Enqueue custom CSS if it exists
+        $custom_css_path = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+        if (file_exists($custom_css_path)) {
+            $custom_css_version = filemtime($custom_css_path);
+            wp_enqueue_style(
+                'krefrm-custom-css',
+                KREFRM_PLUGIN_URL . 'includes/custom-css.css',
+                array('krefrm-frontend'),
+                $custom_css_version
+            );
+        }
     }
 
     /* ─── Helpers ─── */

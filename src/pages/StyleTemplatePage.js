@@ -26,21 +26,56 @@ const TEMPLATES = STYLE_TEMPLATES.map((template) => ({
 
 /* ── Sample form used in the live preview (iframe-isolated) ────────────────── */
 
-function LivePreview({ templateId }) {
-  const iframeRef = useRef(null);
+function LivePreview({ templateId, customCss }) {
+  const containerRef = useRef(null);
   const tpl = TEMPLATES.find((t) => t.id === templateId) || TEMPLATES[0];
   const styleClass =
     STYLE_CLASS_MAP[templateId] || STYLE_CLASS_MAP.kreebi_style_1;
 
   useEffect(() => {
-    if (!iframeRef.current) return;
+    if (!containerRef.current) return;
 
-    const iframeDoc =
-      iframeRef.current.contentDocument ||
-      iframeRef.current.contentWindow.document;
+    // Clear any existing shadow DOM
+    if (containerRef.current.shadowRoot) {
+      containerRef.current.shadowRoot.innerHTML = "";
+    }
 
-    // Build form HTML
-    const formHTML = `
+    // Attach Shadow DOM
+    const shadow =
+      containerRef.current.shadowRoot ||
+      containerRef.current.attachShadow({ mode: "open" });
+
+    // Create styles
+    const styleEl = document.createElement("style");
+    styleEl.textContent = `
+      :host {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      * {
+        all: revert;
+        box-sizing: border-box;
+      }
+
+      :host > div {
+        padding: 20px;
+        background: transparent;
+      }
+
+      form { display: block; }
+      input, button, label, textarea, select { all: revert; box-sizing: border-box; }
+      button { cursor: pointer; }
+
+      ${IFRAME_STYLES}
+      ${customCss}
+    `;
+    shadow.appendChild(styleEl);
+
+    // Create form HTML
+    const formDiv = document.createElement("div");
+    formDiv.innerHTML = `
       <form class="krefrm-stl-preview krefrm-frontend-form ${tpl.previewClass} ${styleClass.form}">
         <div class="krefrm-fields-flex">
           <div class="krefrm-field ${styleClass.field}">
@@ -68,50 +103,21 @@ function LivePreview({ templateId }) {
         <button type="submit" class="${styleClass.btn}">Submit</button>
       </form>
     `;
-
-    const html = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="UTF-8">
-          <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Form Preview</title>
-          <style>${IFRAME_STYLES}</style>
-        </head>
-        <body>${formHTML}</body>
-      </html>
-    `;
-
-    iframeDoc.open();
-    iframeDoc.write(html);
-    iframeDoc.close();
-
-    // Auto-resize iframe
-    const resizeIframe = () => {
-      try {
-        const height =
-          iframeDoc.documentElement.scrollHeight || iframeDoc.body.scrollHeight;
-        iframeRef.current.style.height = height + 40 + "px";
-      } catch {
-        // Cross-origin or access issue
-      }
-    };
-
-    setTimeout(resizeIframe, 100);
-  }, [templateId, styleClass, tpl]);
+    shadow.appendChild(formDiv);
+  }, [templateId, styleClass, tpl, customCss]);
 
   return (
-    <iframe
-      ref={iframeRef}
+    <div
+      ref={containerRef}
       style={{
         border: "1px solid #e0e0e2",
         borderRadius: "8px",
         width: "100%",
         minHeight: "400px",
         background: "#fff",
+        display: "block",
+        boxSizing: "border-box",
       }}
-      title="Form Preview"
-      sandbox="allow-same-origin"
     />
   );
 }
@@ -121,9 +127,14 @@ function LivePreview({ templateId }) {
 export default function StyleTemplatePage() {
   const [activeTemplate, setActiveTemplate] = useState("kreebi_style_1");
   const [loading, setLoading] = useState(true);
+  const [customCSS, setCustomCSS] = useState("");
+  const [cssError, setCssError] = useState("");
+  const [cssSaving, setCssSaving] = useState(false);
+  const [cssSaveMessage, setCssSaveMessage] = useState("");
+  const [previewKey, setPreviewKey] = useState(0);
   const upgradeUrl = "admin.php?page=krefrm_forms#upgrade-to-pro";
 
-  /* Load current setting on mount */
+  /* Load current settings on mount */
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
       headers: { "X-WP-Nonce": nonce },
@@ -135,6 +146,16 @@ export default function StyleTemplatePage() {
       })
       .catch(() => setActiveTemplate("kreebi_style_1"))
       .finally(() => setLoading(false));
+
+    // Load custom CSS
+    fetch(`${restUrl}/custom-css`, {
+      headers: { "X-WP-Nonce": nonce },
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setCustomCSS(data?.css || "");
+      })
+      .catch(() => setCustomCSS(""));
   }, []);
 
   const handleCardClick = (tpl) => {
@@ -152,6 +173,87 @@ export default function StyleTemplatePage() {
       },
       body: JSON.stringify({ styleTemplate: tpl.id }),
     });
+  };
+
+  const validateCSS = (css) => {
+    const trimmed = css.trim();
+
+    // Empty CSS is valid
+    if (!trimmed) {
+      return { valid: true };
+    }
+
+    // Check for balanced braces
+    const openBraces = (trimmed.match(/{/g) || []).length;
+    const closeBraces = (trimmed.match(/}/g) || []).length;
+
+    if (openBraces !== closeBraces) {
+      return {
+        valid: false,
+        error: `Mismatched braces: ${openBraces} opening, ${closeBraces} closing`,
+      };
+    }
+
+    // Check for balanced parentheses
+    const openParens = (trimmed.match(/\(/g) || []).length;
+    const closeParens = (trimmed.match(/\)/g) || []).length;
+
+    if (openParens !== closeParens) {
+      return {
+        valid: false,
+        error: `Mismatched parentheses: ${openParens} opening, ${closeParens} closing`,
+      };
+    }
+
+    // Check for script tags or suspicious content
+    if (/<script/i.test(trimmed) || /javascript:/i.test(trimmed)) {
+      return {
+        valid: false,
+        error: "JavaScript or script tags are not allowed",
+      };
+    }
+
+    return { valid: true };
+  };
+
+  const handleSaveCustomCSS = async () => {
+    setCssError("");
+    setCssSaveMessage("");
+
+    const validation = validateCSS(customCSS);
+    if (!validation.valid) {
+      setCssError(validation.error);
+      return;
+    }
+
+    setCssSaving(true);
+
+    try {
+      const response = await fetch(`${restUrl}/custom-css`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": nonce,
+        },
+        body: JSON.stringify({ css: customCSS }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setCssError(data?.message || "Failed to save CSS");
+        return;
+      }
+
+      setCssSaveMessage(__("Custom CSS saved successfully!", "kreebi-forms"));
+      setCustomCSS(data?.css ?? customCSS);
+      setPreviewKey((key) => key + 1);
+      setTimeout(() => setCssSaveMessage(""), 3000);
+    } catch (error) {
+      setCssError("Network error while saving CSS");
+    } finally {
+      setCssSaving(false);
+    }
   };
 
   if (loading) {
@@ -263,7 +365,68 @@ export default function StyleTemplatePage() {
         </p>
 
         <div className="krefrm-stl-preview-wrap">
-          <LivePreview templateId={activeTemplate} />
+          <LivePreview
+            key={previewKey}
+            templateId={activeTemplate}
+            customCss={customCSS}
+          />
+        </div>
+      </div>
+
+      {/* Custom CSS Section */}
+      <div className="krefrm-custom-css-section">
+        <h3 className="krefrm-custom-css-section__title">
+          {__("Custom CSS", "kreebi-forms")}
+        </h3>
+        <p className="krefrm-custom-css-section__subtitle">
+          {__(
+            "Add additional CSS to customize your forms. Your CSS will be isolated within the Shadow DOM.",
+            "kreebi-forms",
+          )}
+        </p>
+
+        <div className="krefrm-custom-css-editor">
+          <textarea
+            className="krefrm-custom-css-textarea"
+            value={customCSS}
+            onChange={(e) => {
+              setCustomCSS(e.target.value);
+              setCssError("");
+            }}
+            placeholder={__(
+              "/* Example:\n.krefrm-frontend-form {\n  max-width: 600px;\n  margin: 0 auto;\n}\n*/",
+              "kreebi-forms",
+            )}
+            rows="12"
+          />
+
+          {cssError && (
+            <div className="krefrm-custom-css-error">
+              <strong>{__("CSS Error:", "kreebi-forms")}</strong> {cssError}
+            </div>
+          )}
+
+          {cssSaveMessage && (
+            <div className="krefrm-custom-css-success">{cssSaveMessage}</div>
+          )}
+
+          <div className="krefrm-custom-css-actions">
+            <Button
+              variant="primary"
+              onClick={handleSaveCustomCSS}
+              disabled={cssSaving}
+            >
+              {cssSaving
+                ? __("Saving…", "kreebi-forms")
+                : __("Save Custom CSS", "kreebi-forms")}
+            </Button>
+            <p className="krefrm-custom-css-help">
+              {__(
+                "Tip: CSS will be validated before saving. Only valid CSS and comments are allowed.",
+                "kreebi-forms",
+              )}
+            </p>
+          </div>
         </div>
       </div>
     </div>

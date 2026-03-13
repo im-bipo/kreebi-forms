@@ -1,89 +1,66 @@
 /**
- * IsolatedForm – Wraps form in iframe for complete CSS isolation
+ * ShadowDOMForm – Wraps form in Shadow DOM for CSS isolation
  *
  * This component prevents ANY theme or parent CSS from affecting the form.
- * The form renders in a completely separate document with only our styles.
+ * Shadow DOM provides complete CSS scope isolation while keeping the form in the normal DOM.
  */
 
 import { useRef, useEffect } from "@wordpress/element";
 
-export function IsolatedForm({ content, styles, title = "" }) {
-  const iframeRef = useRef(null);
+export function ShadowDOMForm({ content, styles, title = "" }) {
+  const containerRef = useRef(null);
 
   useEffect(() => {
-    if (!iframeRef.current) return;
+    if (!containerRef.current) return;
 
-    const iframeDoc =
-      iframeRef.current.contentDocument ||
-      iframeRef.current.contentWindow.document;
+    // Clear previous shadow if any
+    if (containerRef.current.shadowRoot) {
+      containerRef.current.shadowRoot.innerHTML = "";
+    }
 
-    // Write complete HTML to iframe
-    const html = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>${title}</title>
-        <style>
-          /* Complete browser reset */
-          html, body {
-            margin: 0;
-            padding: 20px;
-            background: transparent;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-          }
-          
-          * {
-            all: revert;
-          }
+    // Attach and populate Shadow DOM
+    const shadow =
+      containerRef.current.shadowRoot ||
+      containerRef.current.attachShadow({ mode: "open" });
 
-          /* Template styles */
-          ${styles}
-        </style>
-      </head>
-      <body>
-        ${content}
-      </body>
-      </html>
-    `;
-
-    iframeDoc.open();
-    iframeDoc.write(html);
-    iframeDoc.close();
-
-    // Auto-resize iframe to fit content
-    const resizeIframe = () => {
-      try {
-        const height =
-          iframeDoc.documentElement.scrollHeight || iframeDoc.body.scrollHeight;
-        iframeRef.current.style.height = height + 20 + "px";
-      } catch {
-        // Cross-origin or other access issues
+    // Create style element
+    const styleEl = document.createElement("style");
+    styleEl.textContent = `
+      :host {
+        display: block;
       }
-    };
+      
+      * {
+        all: revert;
+        box-sizing: border-box;
+      }
+      
+      :host > div {
+        padding: 20px;
+        box-sizing: border-box;
+        background: transparent;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      }
 
-    // Resize after content loads
-    setTimeout(resizeIframe, 100);
-    iframeRef.current.onload = resizeIframe;
+      /* Template styles */
+      ${styles}
+    `;
+    shadow.appendChild(styleEl);
 
-    return () => {
-      // Cleanup
-    };
+    // Create wrapper for form content
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = content;
+    shadow.appendChild(wrapper);
   }, [content, styles]);
 
   return (
-    <iframe
-      ref={iframeRef}
-      id="krefrm-forms-container"
+    <div
+      ref={containerRef}
+      className="krefrm-shadow-container"
       style={{
-        border: "none",
+        display: "block",
         width: "100%",
-        minHeight: "400px",
-        background: "transparent",
       }}
-      title="Kreebi Form Preview"
-      sandbox="allow-same-origin"
     />
   );
 }

@@ -351,7 +351,8 @@
 #krefrm-forms-container .krefrm-ui-style-1-form {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-  max-width: 720px !important;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-field {
@@ -415,7 +416,8 @@
 #krefrm-forms-container .krefrm-ui-style-2-form {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-  max-width: 720px !important;
+  width: 100% !important;
+  max-width: none !important;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-field {
@@ -477,6 +479,97 @@
   background: #555 !important;
 }
 
+/* ─── Custom CSS Section ─── */
+
+.krefrm-custom-css-section {
+  margin-top: 48px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.krefrm-custom-css-section__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.krefrm-custom-css-section__subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+.krefrm-custom-css-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.krefrm-custom-css-textarea {
+  width: 100%;
+  padding: 12px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1d2327;
+  background: #f5f5f5;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.krefrm-custom-css-textarea:focus {
+  outline: none;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  background: #ffffff;
+}
+
+.krefrm-custom-css-error {
+  padding: 12px;
+  background: #fee;
+  border: 1px solid #f8b7af;
+  border-radius: 4px;
+  color: #992222;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.krefrm-custom-css-error strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.krefrm-custom-css-success {
+  padding: 12px;
+  background: #efe;
+  border: 1px solid #afd96f;
+  border-radius: 4px;
+  color: #229922;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.krefrm-custom-css-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.krefrm-custom-css-help {
+  margin: 0;
+  font-size: 12px;
+  color: #646970;
+  line-height: 1.5;
+}
+
 /* ─── Responsive ─── */
 
 @media (max-width: 600px) {
@@ -487,5 +580,13 @@
 
   .krefrm-stl-cards {
     grid-template-columns: 1fr;
+  }
+
+  .krefrm-custom-css-section {
+    padding: 16px;
+  }
+
+  .krefrm-custom-css-textarea {
+    font-size: 12px;
   }
 }
