@@ -194,7 +194,7 @@ class Krefrm_Rest_Api
             return $post_id;
         }
 
-        $form_data['id'] = $form_id;
+        $form_data['id'] = $this->normalize_form_id($form_id);
         update_post_meta($post_id, '_krefrm_form_data', $form_data);
 
         return rest_ensure_response($this->prepare_form(get_post($post_id)));
@@ -222,16 +222,16 @@ class Krefrm_Rest_Api
             }
         }
 
-        // Preserve existing form ID
+        // Preserve canonical public form ID.
         $existing = get_post_meta($post->ID, '_krefrm_form_data', true);
-        if (! empty($existing['id'])) {
-            $form_data['id'] = $existing['id'];
-        }
+        $form_id = $this->resolve_form_public_id($post, $existing);
+        $form_data['id'] = $form_id;
 
         wp_update_post(array(
             'ID'           => $post->ID,
             'post_title'   => $form_data['name'],
             'post_content' => $form_data['description'],
+            'post_name'    => $form_id,
         ));
 
         update_post_meta($post->ID, '_krefrm_form_data', $form_data);
@@ -249,22 +249,33 @@ class Krefrm_Rest_Api
         $force = filter_var($request->get_param('force'), FILTER_VALIDATE_BOOLEAN);
         if ($force) {
             // If the user explicitly requested a force delete, remove the form's submissions too.
-            $form_id_value = $post->post_name;
+            $form_data = get_post_meta($post->ID, '_krefrm_form_data', true);
+            $form_id_value = $this->resolve_form_public_id($post, $form_data);
+            $legacy_form_id_value = (string) $post->post_name;
+            $meta_query = array(
+                'relation' => 'OR',
+                array(
+                    'key'   => '_krefrm_form_id',
+                    'value' => $post->ID,
+                ),
+                array(
+                    'key'   => '_krefrm_form_id_value',
+                    'value' => $form_id_value,
+                ),
+            );
+
+            if ($legacy_form_id_value !== $form_id_value) {
+                $meta_query[] = array(
+                    'key'   => '_krefrm_form_id_value',
+                    'value' => $legacy_form_id_value,
+                );
+            }
+
             $submissions = get_posts(array(
                 'post_type'      => 'krefrm_submission',
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
-                'meta_query'     => array(
-                    'relation' => 'OR',
-                    array(
-                        'key'   => '_krefrm_form_id',
-                        'value' => $post->ID,
-                    ),
-                    array(
-                        'key'   => '_krefrm_form_id_value',
-                        'value' => $form_id_value,
-                    ),
-                ),
+                'meta_query'     => $meta_query,
             ));
             foreach ($submissions as $submission) {
                 wp_delete_post($submission->ID, true);
@@ -458,9 +469,31 @@ class Krefrm_Rest_Api
         ));
     }
 
-    public function clear_webhook_logs()
+    public function clear_webhook_logs($request)
     {
-        Krefrm_Webhook_Service::clear_logs();
+        $form_id = $request->get_param('form_id');
+
+        if ($form_id) {
+            // Clear logs for a specific form
+            $posts = get_posts(array(
+                'post_type' => 'krefrm_webhook_log',
+                'posts_per_page' => -1,
+                'fields' => 'ids',
+                'meta_query' => array(
+                    array(
+                        'key' => '_krefrm_webhook_form_id',
+                        'value' => (string) $form_id,
+                        'compare' => '=',
+                    ),
+                ),
+            ));
+            foreach ($posts as $post_id) {
+                wp_delete_post($post_id, true);
+            }
+        } else {
+            // Clear all logs
+            Krefrm_Webhook_Service::clear_logs();
+        }
 
         return rest_ensure_response(array(
             'cleared' => true,
@@ -618,7 +651,24 @@ class Krefrm_Rest_Api
     private function prepare_form($post)
     {
         $form_data = get_post_meta($post->ID, '_krefrm_form_data', true);
-        $form_id   = isset($form_data['id']) ? $form_data['id'] : $post->post_name;
+        $form_id   = $this->resolve_form_public_id($post, $form_data);
+
+        if (! is_array($form_data)) {
+            $form_data = array();
+        }
+
+        $needs_meta_sync = ! isset($form_data['id']) || (string) $form_data['id'] !== $form_id;
+        if ($needs_meta_sync) {
+            $form_data['id'] = $form_id;
+            update_post_meta($post->ID, '_krefrm_form_data', $form_data);
+        }
+
+        if ((string) $post->post_name !== $form_id) {
+            wp_update_post(array(
+                'ID' => $post->ID,
+                'post_name' => $form_id,
+            ));
+        }
 
         // Normalise to steps; also build a flat fields list for backward compat.
         $steps      = array();
@@ -659,7 +709,7 @@ class Krefrm_Rest_Api
         $form_id   = get_post_meta($post->ID, '_krefrm_form_id', true);
         $form_post = $form_id ? get_post($form_id) : null;
         $form_data = $form_post ? get_post_meta($form_post->ID, '_krefrm_form_data', true) : array();
-        $form_uuid = isset($form_data['id']) ? $form_data['id'] : ($form_post ? $form_post->post_name : '');
+        $form_uuid = $form_post ? $this->resolve_form_public_id($form_post, $form_data) : '';
         $data      = get_post_meta($post->ID, '_krefrm_data', true);
 
         return array(
@@ -670,6 +720,41 @@ class Krefrm_Rest_Api
             'date'      => get_the_date('F j, Y g:i a', $post),
             'data'      => is_array($data) ? $data : array(),
         );
+    }
+
+    /**
+     * Normalize user-facing form IDs to numeric strings (minimum 3 digits).
+     */
+    private function normalize_form_id($value)
+    {
+        $raw = preg_replace('/\D+/', '', (string) $value);
+        if ('' === $raw) {
+            return '';
+        }
+
+        return str_pad((string) intval($raw), 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Resolve canonical public form ID from form meta first, then slug.
+     */
+    private function resolve_form_public_id($post, $form_data)
+    {
+        if (is_array($form_data) && isset($form_data['id'])) {
+            $normalized = $this->normalize_form_id($form_data['id']);
+            if ('' !== $normalized) {
+                return $normalized;
+            }
+        }
+
+        if ($post instanceof WP_Post) {
+            $normalized = $this->normalize_form_id($post->post_name);
+            if ('' !== $normalized) {
+                return $normalized;
+            }
+        }
+
+        return $this->get_next_form_id();
     }
 
     private function get_next_form_id()

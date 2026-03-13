@@ -242,6 +242,8 @@ class Krefrm_Webhook_Service
      */
     private static function post_to_log($post)
     {
+        $status = get_post_meta($post->ID, '_krefrm_webhook_status', true);
+
         return array(
             'form_id' => get_post_meta($post->ID, '_krefrm_webhook_form_id', true),
             'form_name' => get_post_meta($post->ID, '_krefrm_webhook_form_name', true),
@@ -251,7 +253,8 @@ class Krefrm_Webhook_Service
             'response_code' => (int) get_post_meta($post->ID, '_krefrm_webhook_res_code', true),
             'response_body' => get_post_meta($post->ID, '_krefrm_webhook_res_body', true),
             'error' => get_post_meta($post->ID, '_krefrm_webhook_error', true),
-            'status' => get_post_meta($post->ID, '_krefrm_webhook_status', true),
+            'status' => $status,
+            'passed' => $status === 'success',
             'timestamp' => $post->post_date,
         );
     }

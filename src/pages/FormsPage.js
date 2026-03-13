@@ -106,10 +106,16 @@ const TEMPLATES = [
   },
 ];
 
-// Helper to extract ID from route params (e.g., "forms/edit?id=123")
-function getFormIdFromRoute(route) {
+// Legacy helper: extract post ID from route params (e.g., "forms/edit?id=123")
+function getPostIdFromRoute(route) {
   const match = route.match(/[?&]id=(\d+)/);
   return match ? parseInt(match[1], 10) : null;
+}
+
+// Preferred helper: extract public form ID (e.g., "forms/edit?form_id=001")
+function getPublicFormIdFromRoute(route) {
+  const match = route.match(/[?&]form_id=([^&]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
 }
 
 // Helper to extract tab parameter from route (e.g., "forms/edit?id=123&tab=email-notification")
@@ -155,14 +161,26 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
 
   // Load form data when in edit mode
   useEffect(() => {
-    const formId = getFormIdFromRoute(route);
+    const postIdFromRoute = getPostIdFromRoute(route);
+    const publicFormId = getPublicFormIdFromRoute(route);
     const tabName = getTabFromRoute(route);
 
-    if (showEditPage && formId) {
-      setEditFormId(formId);
+    let targetPostId = postIdFromRoute;
+    if (!targetPostId && publicFormId) {
+      const matchedForm = forms.find(
+        (item) => String(item.form_id || "") === String(publicFormId),
+      );
+      targetPostId = matchedForm ? matchedForm.post_id : null;
+    }
+
+    if (showEditPage && targetPostId) {
+      setEditFormId(targetPostId);
+      if (publicFormId) {
+        setCurrentFormId(publicFormId);
+      }
       setCurrentTab(tabName); // Set the tab from URL (or null for default visual editor)
       setLoading(true);
-      apiFetch({ path: `/kreebi-forms/v1/forms/${formId}` })
+      apiFetch({ path: `/kreebi-forms/v1/forms/${targetPostId}` })
         .then((data) => {
           // Use FormBuilder format with steps for all edit modes
           // The FormBuilder/CreateFormView will handle different views based on the tab
@@ -187,7 +205,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
       setCurrentFormId(null);
       setCurrentTab(null);
     }
-  }, [route, showEditPage]);
+  }, [route, showEditPage, forms]);
 
   const handleCreate = async (parsed) => {
     await apiFetch({
@@ -240,12 +258,15 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
   // Handle tab changes in the editor
   const handleTabChange = (newTab) => {
     setCurrentTab(newTab);
+    const routeId = currentFormId
+      ? `form_id=${encodeURIComponent(currentFormId)}`
+      : `id=${editFormId}`;
     // Update URL to include the tab parameter
     if (newTab) {
-      navigate(`forms/edit?id=${editFormId}&tab=${newTab}`);
+      navigate(`forms/edit?${routeId}&tab=${newTab}`);
     } else {
       // If switching back to default visual editor, use URL without tab param
-      navigate(`forms/edit?id=${editFormId}`);
+      navigate(`forms/edit?${routeId}`);
     }
   };
 

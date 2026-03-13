@@ -1,6 +1,7 @@
 import { useEffect, useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { Button, Notice } from "@wordpress/components";
+import { Button } from "@wordpress/components";
+import WebhookLogs from "./WebhookLogs";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
 
@@ -8,7 +9,6 @@ export default function WebhookGlobalSettings({ navigate }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [logsLoading, setLogsLoading] = useState(false);
-  const [clearingLogs, setClearingLogs] = useState(false);
 
   useEffect(() => {
     loadLogs();
@@ -19,8 +19,13 @@ export default function WebhookGlobalSettings({ navigate }) {
     fetch(`${restUrl}/webhook/logs`, {
       headers: { "X-WP-Nonce": nonce },
     })
-      .then((r) => r.json())
-      .then((data) => {
+      .then((r) => r.json().then((data) => ({ response: r, data })))
+      .then(({ response, data }) => {
+        // DEBUG: inspect logs response from server (global view)
+        console.log("[Webhook GlobalSettings] logs response", {
+          response,
+          data,
+        });
         setLogs(Array.isArray(data?.logs) ? data.logs : []);
       })
       .finally(() => {
@@ -30,13 +35,13 @@ export default function WebhookGlobalSettings({ navigate }) {
   };
 
   const handleClearLogs = () => {
-    setClearingLogs(true);
+    setLogsLoading(true);
     fetch(`${restUrl}/webhook/logs`, {
       method: "DELETE",
       headers: { "X-WP-Nonce": nonce },
     })
       .then(() => setLogs([]))
-      .finally(() => setClearingLogs(false));
+      .finally(() => setLogsLoading(false));
   };
 
   if (loading) {
@@ -109,67 +114,13 @@ export default function WebhookGlobalSettings({ navigate }) {
       </div>
 
       <div className="krefrm-webhook-logs">
-        <div className="krefrm-webhook-logs__header">
-          <h3>{__("All Webhook Logs", "kreebi-forms")}</h3>
-          <div className="krefrm-webhook-logs__actions">
-            <Button variant="secondary" onClick={loadLogs} isBusy={logsLoading}>
-              {__("Refresh", "kreebi-forms")}
-            </Button>
-            <Button
-              variant="tertiary"
-              onClick={handleClearLogs}
-              isBusy={clearingLogs}
-              disabled={clearingLogs || logs.length === 0}
-            >
-              {__("Clear Logs", "kreebi-forms")}
-            </Button>
-          </div>
-        </div>
-
-        {logs.length === 0 ? (
-          <p className="krefrm-webhook-logs__empty">
-            {__("No webhook logs yet.", "kreebi-forms")}
-          </p>
-        ) : (
-          <div className="krefrm-webhook-logs__list">
-            {logs.map((log, idx) => (
-              <details
-                key={`${log.timestamp}-${idx}`}
-                className="krefrm-webhook-log-item"
-              >
-                <summary>
-                  <span
-                    className={`krefrm-webhook-log-item__status ${
-                      log.passed ? "is-pass" : "is-fail"
-                    }`}
-                  >
-                    {log.passed ? "PASS" : "FAIL"}
-                  </span>
-                  <span>{log.source || "submission"}</span>
-                  <span>{log.url}</span>
-                  <span>{log.response_code || 0}</span>
-                  <span>{log.timestamp}</span>
-                </summary>
-                <div className="krefrm-webhook-log-item__grid">
-                  <div>
-                    <p>{__("Request Headers", "kreebi-forms")}</p>
-                    <pre>
-                      {JSON.stringify(log.request_headers || {}, null, 2)}
-                    </pre>
-                  </div>
-                  <div>
-                    <p>{__("Request Body", "kreebi-forms")}</p>
-                    <pre>{log.request_body || ""}</pre>
-                  </div>
-                  <div>
-                    <p>{__("Response Body", "kreebi-forms")}</p>
-                    <pre>{log.response_body || log.error || ""}</pre>
-                  </div>
-                </div>
-              </details>
-            ))}
-          </div>
-        )}
+        <WebhookLogs
+          logs={logs}
+          loading={logsLoading}
+          onRefetch={loadLogs}
+          onClear={handleClearLogs}
+          title={__("All Webhook Logs", "kreebi-forms")}
+        />
       </div>
     </div>
   );

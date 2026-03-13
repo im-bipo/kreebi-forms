@@ -317,7 +317,11 @@
 }
 
 .krefrm-intg-form-tab__header .components-toggle-control {
-  margin-top: 12px;
+  margin-top: 0;
+}
+
+.krefrm-intg-form-tab__header {
+  margin-bottom: 18px;
 }
 
 /* ─── Global preview (when using global settings) ─── */

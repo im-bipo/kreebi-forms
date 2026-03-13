@@ -40,18 +40,11 @@ class Krefrm_Submission_Handler
             exit;
         }
 
-        $posts = get_posts(array(
-            'post_type'      => 'krefrm_form',
-            'name'           => $form_id,
-            'post_status'    => 'publish',
-            'posts_per_page' => 1,
-        ));
+        $form_post = $this->find_form_post_by_public_id($form_id);
 
-        if (empty($posts)) {
+        if (! $form_post) {
             wp_die(esc_html__('Form not found.', 'kreebi-forms'));
         }
-
-        $form_post = $posts[0];
         $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
 
         // Sanitize submitted form fields array.
@@ -104,6 +97,44 @@ class Krefrm_Submission_Handler
 
         wp_safe_redirect(add_query_arg('krefrm_submitted', '1', wp_get_referer() ?: home_url()));
         exit;
+    }
+
+    /**
+     * Resolve a form post from the public form id.
+     *
+     * Tries slug first and then checks stored form meta for legacy records.
+     */
+    private function find_form_post_by_public_id($form_id)
+    {
+        $form_id = trim((string) $form_id);
+        if ('' === $form_id) {
+            return null;
+        }
+
+        $posts = get_posts(array(
+            'post_type'      => 'krefrm_form',
+            'name'           => sanitize_title($form_id),
+            'post_status'    => 'publish',
+            'posts_per_page' => 1,
+        ));
+        if (! empty($posts)) {
+            return $posts[0];
+        }
+
+        $all_posts = get_posts(array(
+            'post_type'      => 'krefrm_form',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+        ));
+
+        foreach ($all_posts as $post) {
+            $form_data = get_post_meta($post->ID, '_krefrm_form_data', true);
+            if (is_array($form_data) && isset($form_data['id']) && (string) $form_data['id'] === $form_id) {
+                return $post;
+            }
+        }
+
+        return null;
     }
 
     /**

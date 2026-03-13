@@ -7,19 +7,16 @@ import {
   Notice,
 } from "@wordpress/components";
 import VariableHelp, { buildFieldVars } from "./VariableHelp";
+import WebhookLogs from "./WebhookLogs";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
 
-const SAMPLE_PAYLOAD = {
-  formId: "102",
-  formDescription: "",
-  fields: {
-    name: "John Doe",
-    email: "john@example.com",
-    subject: "Testing webhook",
-    message: "This is a webhook test",
-    "new-field": "custom value",
-  },
+const SAMPLE_FIELDS = {
+  name: "John Doe",
+  email: "john@example.com",
+  subject: "Testing webhook",
+  message: "This is a webhook test",
+  "new-field": "custom value",
 };
 
 function toTextareaList(items = []) {
@@ -50,24 +47,33 @@ export default function WebhookFormTab({
   const webhookEnabled = formSettings.enabled === true;
   const fieldVars = buildFieldVars(availableFields);
 
-  // Fetch logs on mount and when webhook is enabled
+  // Fetch logs when webhook is enabled and we have a form ID.
+  // This ensures form-specific logs work even if the editor loads before the form ID is available.
   useEffect(() => {
-    if (webhookEnabled) {
-      loadLogs();
+    if (!webhookEnabled || !formId) {
+      return;
     }
-  }, [webhookEnabled]);
+
+    loadLogs();
+  }, [webhookEnabled, formId]);
 
   const loadLogs = async () => {
     setLogsLoading(true);
     try {
-      let url = `${restUrl}/webhook/logs`;
-      if (formId) {
-        url += `?form_id=${encodeURIComponent(formId)}`;
+      if (!formId) {
+        setLogs([]);
+        return;
       }
+
+      const url = `${restUrl}/webhook/logs?form_id=${encodeURIComponent(
+        formId,
+      )}`;
       const response = await fetch(url, {
         headers: { "X-WP-Nonce": nonce },
       });
       const data = await response.json();
+      // DEBUG: inspect logs response from server for form-specific view
+      console.log("[Webhook FormTab] logs response", { url, response, data });
       const logsArray = data?.logs || [];
       if (Array.isArray(logsArray)) {
         setLogs(logsArray);
@@ -75,6 +81,25 @@ export default function WebhookFormTab({
     } catch (err) {
       // Silently fail on log fetch
       console.error("Failed to load webhook logs", err);
+    }
+    setLogsLoading(false);
+  };
+
+  const handleClearLogs = async () => {
+    if (!formId) return;
+
+    setLogsLoading(true);
+    try {
+      await fetch(
+        `${restUrl}/webhook/logs?form_id=${encodeURIComponent(formId)}`,
+        {
+          method: "DELETE",
+          headers: { "X-WP-Nonce": nonce },
+        },
+      );
+      setLogs([]);
+    } catch (err) {
+      console.error("Failed to clear webhook logs", err);
     }
     setLogsLoading(false);
   };
@@ -130,7 +155,11 @@ export default function WebhookFormTab({
           headers: formSettings.headers || "",
           bodyTemplate: formSettings.bodyTemplate || "[[allForm]]",
         },
-        samplePayload: SAMPLE_PAYLOAD,
+        samplePayload: {
+          formId: formId ? String(formId) : "000",
+          formDescription: "",
+          fields: SAMPLE_FIELDS,
+        },
       }),
     })
       .then((r) => r.json())
@@ -274,50 +303,13 @@ export default function WebhookFormTab({
 
             {/* Right Column: Logs */}
             <div className="krefrm-webhook-layout__right">
-              {logs.length > 0 ? (
-                <div className="krefrm-webhook-logs-section">
-                  <h4>{__("Recent Webhook Activity", "kreebi-forms")}</h4>
-                  <div className="krefrm-webhook-logs">
-                    {logs.map((log, idx) => (
-                      <div key={idx} className="krefrm-webhook-log-entry">
-                        <div className="krefrm-webhook-log-status">
-                          <span
-                            className={`krefrm-webhook-log-badge ${
-                              log.status === "success"
-                                ? "krefrm-webhook-log-badge--success"
-                                : "krefrm-webhook-log-badge--error"
-                            }`}
-                          >
-                            {log.status === "success" ? "✓" : "✗"}
-                          </span>
-                        </div>
-                        <div className="krefrm-webhook-log-details">
-                          <div className="krefrm-webhook-log-url">
-                            {log.url}
-                          </div>
-                          <div className="krefrm-webhook-log-timestamp">
-                            {new Date(log.timestamp).toLocaleString()}
-                          </div>
-                          {log.status_code && (
-                            <div className="krefrm-webhook-log-code">
-                              {__("Status:", "kreebi-forms")} {log.status_code}
-                            </div>
-                          )}
-                          {log.error && (
-                            <div className="krefrm-webhook-log-error">
-                              {log.error}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                <div className="krefrm-webhook-logs-empty">
-                  <p>{__("No webhook activity yet", "kreebi-forms")}</p>
-                </div>
-              )}
+              <WebhookLogs
+                logs={logs}
+                loading={logsLoading}
+                onRefetch={loadLogs}
+                onClear={handleClearLogs}
+                title={__("Recent Webhook Activity", "kreebi-forms")}
+              />
             </div>
           </div>
         </>
