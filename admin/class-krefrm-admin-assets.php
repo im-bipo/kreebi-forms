@@ -94,7 +94,8 @@ class Krefrm_Admin_Assets
                             if (itemHash === "forms/create") {
                                 isActive = (hash === "forms/create");
                             } else if (itemHash === "submission") {
-                                isActive = (hash === "submission");
+                                // Allow additional params after `submission` (e.g. `#submission?formid=123`)
+                                isActive = hash.startsWith("submission");
                             } else if (itemHash === "style-templates") {
                                 isActive = (hash === "style-templates");
                             } else if (itemHash.startsWith("integrations")) {
@@ -103,7 +104,7 @@ class Krefrm_Admin_Assets
                                 isActive = (hash === "upgrade-to-pro");
                             } else if (itemHash === "forms") {
                                 // default to forms if nothing else matches
-                                isActive = (hash !== "forms/create" && hash !== "submission" && hash !== "style-templates" && !hash.startsWith("integrations") && hash !== "upgrade-to-pro");
+                                isActive = (hash !== "forms/create" && !hash.startsWith("submission") && hash !== "style-templates" && !hash.startsWith("integrations") && hash !== "upgrade-to-pro");
                             }
                             if (isActive) {
                                 li.classList.add("current");
