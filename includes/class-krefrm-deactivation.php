@@ -43,7 +43,7 @@ class Krefrm_Deactivation
             'email'         => isset($_POST['email']) ? sanitize_email($_POST['email']) : get_option('admin_email'),
             'timestamp'     => current_time('mysql'),
             'site_url'      => site_url(),
-            'plugin_version' => '1.1.0',
+            'plugin_version' => '1.1.1',
         );
 
         // Send survey data to email

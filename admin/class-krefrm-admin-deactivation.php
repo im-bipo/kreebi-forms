@@ -131,14 +131,14 @@ class Krefrm_Admin_Deactivation
             'krefrm-admin-deactivation',
             KREFRM_PLUGIN_URL . 'assets/css/admin-deactivation.css',
             array(),
-            '1.1.0'
+            '1.1.1'
         );
 
         wp_enqueue_script(
             'krefrm-admin-deactivation',
             KREFRM_PLUGIN_URL . 'assets/js/admin-deactivation.js',
             array('jquery'),
-            '1.1.0',
+            '1.1.1',
             true
         );
 
