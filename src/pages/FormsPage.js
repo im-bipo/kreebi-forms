@@ -219,11 +219,11 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
         path: `/kreebi-forms/v1/forms/${deleteTarget.id}?force=1`,
         method: "DELETE",
       });
-      setSuccess(__('Form deleted.', 'kreebi-forms'));
+      setSuccess(__("Form deleted.", "kreebi-forms"));
       fetchForms();
       setDeleteTarget(null);
     } catch (err) {
-      setError(err.message || __('Failed to delete form.', 'kreebi-forms'));
+      setError(err.message || __("Failed to delete form.", "kreebi-forms"));
     }
     setIsDeleting(false);
   };
