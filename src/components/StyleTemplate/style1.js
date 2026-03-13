@@ -11,7 +11,7 @@ const style1 = {
     input: "krefrm-ui-style-1-input",
     btn: "krefrm-ui-style-1-btn",
   },
-  iframeCss: `
+  shadowCss: `
   .krefrm-ui-style-1-form {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif ;
   }

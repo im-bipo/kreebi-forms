@@ -11,7 +11,7 @@ import ProTag from "../components/ProTag";
 import {
   STYLE_TEMPLATES,
   STYLE_CLASS_MAP,
-  IFRAME_STYLES,
+  SHADOW_STYLES,
 } from "../components/StyleTemplate";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
@@ -24,7 +24,7 @@ const TEMPLATES = STYLE_TEMPLATES.map((template) => ({
   description: __(template.description, "kreebi-forms"),
 }));
 
-/* ── Sample form used in the live preview (iframe-isolated) ────────────────── */
+/* ── Sample form used in the live preview (shadow-DOM isolated) ────────────────── */
 
 function LivePreview({ templateId, customCss }) {
   const containerRef = useRef(null);
@@ -68,7 +68,7 @@ function LivePreview({ templateId, customCss }) {
       input, button, label, textarea, select { all: revert; box-sizing: border-box; }
       button { cursor: pointer; }
 
-      ${IFRAME_STYLES}
+      ${SHADOW_STYLES}
       ${customCss}
     `;
     shadow.appendChild(styleEl);

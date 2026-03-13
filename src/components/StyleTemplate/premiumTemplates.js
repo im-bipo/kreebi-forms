@@ -12,7 +12,7 @@ const premiumTemplates = {
     input: "",
     btn: "",
   },
-  iframeCss: ``,
+  shadowCss: ``,
 };
 
 export default premiumTemplates;

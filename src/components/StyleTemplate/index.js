@@ -5,7 +5,7 @@ import premiumTemplates from "./premiumTemplates";
 
 export const STYLE_TEMPLATES = [style1, style2, blankDev, premiumTemplates];
 
-const IFRAME_BASE_STYLES = `
+const SHADOW_BASE_STYLES = `
   html, body {
     margin: 0;
     padding: 20px;
@@ -33,8 +33,8 @@ const IFRAME_BASE_STYLES = `
   }
 `;
 
-export const IFRAME_STYLES = `${IFRAME_BASE_STYLES}\n${STYLE_TEMPLATES.map(
-  (tpl) => tpl.iframeCss || "",
+export const SHADOW_STYLES = `${SHADOW_BASE_STYLES}\n${STYLE_TEMPLATES.map(
+  (tpl) => tpl.shadowCss || "",
 ).join("\n")}`;
 
 export const STYLE_CLASS_MAP = STYLE_TEMPLATES.reduce((acc, tpl) => {

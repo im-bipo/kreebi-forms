@@ -10,7 +10,7 @@ const blankDev = {
     input: "",
     btn: "",
   },
-  iframeCss: ``,
+  shadowCss: ``,
 };
 
 export default blankDev;
