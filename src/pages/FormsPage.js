@@ -117,6 +117,8 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
   const [editFormId, setEditFormId] = useState(null);
   const [templateData, setTemplateData] = useState(null);
@@ -200,24 +202,30 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
     fetchForms();
   };
 
-  const handleDelete = async (postId) => {
-    if (
-      !window.confirm(
-        __("Are you sure you want to delete this form?", "kreebi-forms"),
-      )
-    ) {
-      return;
-    }
+  const handleDelete = (postId) => {
+    const form = forms.find((f) => f.post_id === postId);
+    setDeleteTarget({
+      id: postId,
+      title: form ? form.title : "",
+    });
+  };
+
+  const handleForceDelete = async () => {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
     try {
       await apiFetch({
-        path: `/kreebi-forms/v1/forms/${postId}`,
+        path: `/kreebi-forms/v1/forms/${deleteTarget.id}?force=1`,
         method: "DELETE",
       });
-      setSuccess(__("Form deleted.", "kreebi-forms"));
+      setSuccess(__('Form deleted.', 'kreebi-forms'));
       fetchForms();
+      setDeleteTarget(null);
     } catch (err) {
-      setError(err.message || __("Failed to delete form.", "kreebi-forms"));
+      setError(err.message || __('Failed to delete form.', 'kreebi-forms'));
     }
+    setIsDeleting(false);
   };
 
   const handleUpdate = async (parsed) => {
@@ -411,6 +419,33 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
               checked={useAdvanceEditor}
               onChange={(v) => setUseAdvanceEditor(!!v)}
             />
+          </div>
+        </Modal>
+      )}
+
+      {deleteTarget && (
+        <Modal
+          title={__("Delete form", "kreebi-forms")}
+          onRequestClose={() => setDeleteTarget(null)}
+        >
+          <p>
+            {__(
+              "Deleting this form will permanently remove the form and all of its submissions. This cannot be undone.",
+              "kreebi-forms",
+            )}
+          </p>
+          <div className="krefrm-modal-actions">
+            <Button onClick={() => setDeleteTarget(null)}>
+              {__("Cancel", "kreebi-forms")}
+            </Button>
+            <Button
+              variant="primary"
+              isDestructive
+              isBusy={isDeleting}
+              onClick={handleForceDelete}
+            >
+              {__("Force Delete", "kreebi-forms")}
+            </Button>
           </div>
         </Modal>
       )}

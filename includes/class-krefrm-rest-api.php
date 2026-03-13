@@ -195,6 +195,31 @@ class Krefrm_Rest_Api
             return new WP_Error('not_found', __('Form not found.', 'kreebi-forms'), array('status' => 404));
         }
 
+        $force = filter_var($request->get_param('force'), FILTER_VALIDATE_BOOLEAN);
+        if ($force) {
+            // If the user explicitly requested a force delete, remove the form's submissions too.
+            $form_id_value = $post->post_name;
+            $submissions = get_posts(array(
+                'post_type'      => 'krefrm_submission',
+                'post_status'    => 'publish',
+                'posts_per_page' => -1,
+                'meta_query'     => array(
+                    'relation' => 'OR',
+                    array(
+                        'key'   => '_krefrm_form_id',
+                        'value' => $post->ID,
+                    ),
+                    array(
+                        'key'   => '_krefrm_form_id_value',
+                        'value' => $form_id_value,
+                    ),
+                ),
+            ));
+            foreach ($submissions as $submission) {
+                wp_delete_post($submission->ID, true);
+            }
+        }
+
         wp_delete_post($post->ID, true);
 
         return rest_ensure_response(array('deleted' => true));
