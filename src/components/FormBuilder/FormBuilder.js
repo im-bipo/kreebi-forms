@@ -57,10 +57,11 @@ export default function FormBuilder({
   const builder = useFormBuilder(initialData);
 
   // Convert initialTab to internal view format
-  // "quick-edit" -> "quick", "email-notification" -> "intg:email-notification", etc.
+  // "quick-edit" -> "quick", "json-view" -> "json", "email-notification" -> "intg:email-notification", etc.
   const getInitialView = () => {
     if (!initialTab) return "visual"; // default
     if (initialTab === "quick-edit") return "quick";
+    if (initialTab === "json-view") return "json";
     if (initialTab.startsWith("intg:")) return initialTab;
     return `intg:${initialTab}`; // treat other tabs as integrations
   };
@@ -95,7 +96,8 @@ export default function FormBuilder({
       } else if (newView === "visual") {
         tabName = null; // default, no tab param
       } else if (newView === "json") {
-        tabName = null; // JSON View also uses default URL
+        // JSON View is treated as an integration tab for URL consistency
+        tabName = "json-view";
       } else if (newView.startsWith("intg:")) {
         tabName = newView.replace("intg:", "");
       }
