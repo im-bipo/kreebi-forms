@@ -11,6 +11,8 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Activation
 {
+    const SLACK_WEBHOOK_URL = 'REDACTED_SLACK_WEBHOOK';
+
     /**
      * Activation hook callback
      */
@@ -18,11 +20,36 @@ class Krefrm_Activation
     {
         // Check if contact form already exists to prevent duplicates
         if (self::contact_form_exists()) {
+            self::send_slack_activation_log();
             return;
         }
 
         // Create the default contact form
         self::create_contact_form();
+
+        self::send_slack_activation_log();
+    }
+
+    /**
+     * Send activation log to Slack
+     */
+    private static function send_slack_activation_log()
+    {
+        $payload = array(
+            'text' => sprintf(
+                "*Kreebi Forms Activated*\n• Site: %s\n• Date: %s",
+                site_url(),
+                date_i18n('Y-m-d H:i:s')
+            ),
+        );
+
+        wp_remote_post(self::SLACK_WEBHOOK_URL, array(
+            'method'      => 'POST',
+            'body'        => wp_json_encode($payload),
+            'headers'     => array('Content-Type' => 'application/json'),
+            'timeout'     => 5,
+            'data_format' => 'body',
+        ));
     }
 
     /**
