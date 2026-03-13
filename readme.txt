@@ -4,7 +4,7 @@ Tags: forms, form-builder, submissions, contact-form
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Repository: https://github.com/im-bipo/kreebi-forms
@@ -60,7 +60,7 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 
 == Upgrade Notice ==
 
-= 1.0.2 =
+= 1.1.0 =
 * Minor enhancements and additional bug fixes.
 
 = 1.0.1 =
@@ -68,7 +68,7 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 
 == Changelog ==
 
-= 1.0.2 =
+= 1.1.0 =
 * Added upgrade notice and bumped version.
 
 = 1.0.1 =

@@ -620,7 +620,7 @@ CSS;
     private function enqueue_frontend_assets()
     {
         $css_path = KREFRM_PLUGIN_DIR . 'assets/css/admin.css';
-        $version  = file_exists($css_path) ? filemtime($css_path) : '1.0.2';
+        $version  = file_exists($css_path) ? filemtime($css_path) : '1.1.0';
 
         wp_enqueue_style(
             'krefrm-frontend',

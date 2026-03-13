@@ -125,14 +125,14 @@ class Krefrm_Admin_Assets
                 'krefrm-admin',
                 KREFRM_PLUGIN_URL . 'assets/css/admin.css',
                 array(),
-                '1.0.0'
+                '1.1.0'
             );
 
             wp_enqueue_script(
                 'krefrm-admin',
                 KREFRM_PLUGIN_URL . 'assets/js/admin.js',
                 array(),
-                '1.0.0',
+                '1.1.0',
                 true
             );
         }
