@@ -13,67 +13,66 @@ const style2 = {
   },
   iframeCss: `
   .krefrm-ui-style-2-form {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-    max-width: 720px !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif ;
   }
 
   .krefrm-ui-style-2-field {
-    margin-bottom: 14px !important;
-    padding: 10px 12px !important;
-    border: 1px solid #e0e0e0 !important;
-    border-radius: 3px !important;
-    background: #fafafa !important;
+    margin-bottom: 14px ;
+    padding: 10px 12px ;
+    border: 1px solid #e0e0e0 ;
+    border-radius: 3px ;
+    background: #fafafa ;
   }
 
   .krefrm-ui-style-2-label {
-    display: block !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    color: #444 !important;
-    margin-bottom: 6px !important;
+    display: block ;
+    font-size: 13px ;
+    font-weight: 700 ;
+    text-transform: uppercase ;
+    letter-spacing: 0.5px ;
+    color: #444 ;
+    margin-bottom: 6px ;
   }
 
   .krefrm-ui-style-2-input {
-    width: 100% !important;
-    padding: 8px 10px !important;
-    border: 1px solid #bbb !important;
-    border-radius: 3px !important;
-    font-size: 14px !important;
-    background: #fff !important;
-    box-sizing: border-box !important;
-    color: #1d2327 !important;
-    appearance: none !important;
-    -webkit-appearance: none !important;
+    width: 100% ;
+    padding: 8px 10px ;
+    border: 1px solid #bbb ;
+    border-radius: 3px ;
+    font-size: 14px ;
+    background: #fff ;
+    box-sizing: border-box ;
+    color: #1d2327 ;
+    appearance: none ;
+    -webkit-appearance: none ;
   }
 
   .krefrm-ui-style-2-input:focus {
-    border-color: #333 !important;
-    outline: none !important;
+    border-color: #333 ;
+    outline: none ;
   }
 
   .krefrm-ui-style-2-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 10px 24px !important;
-    font-size: 13px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.5px !important;
-    color: #fff !important;
-    background: #333 !important;
-    border: none !important;
-    border-radius: 3px !important;
-    cursor: pointer !important;
-    transition: background 0.2s !important;
-    line-height: 1.3 !important;
-    text-decoration: none !important;
+    display: inline-flex ;
+    align-items: center ;
+    justify-content: center ;
+    padding: 10px 24px ;
+    font-size: 13px ;
+    font-weight: 700 ;
+    text-transform: uppercase ;
+    letter-spacing: 0.5px ;
+    color: #fff ;
+    background: #333 ;
+    border: none ;
+    border-radius: 3px ;
+    cursor: pointer ;
+    transition: background 0.2s ;
+    line-height: 1.3 ;
+    text-decoration: none ;
   }
 
   .krefrm-ui-style-2-btn:hover {
-    background: #555 !important;
+    background: #555 ;
   }
   `,
 };

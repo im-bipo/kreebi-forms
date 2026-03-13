@@ -323,18 +323,18 @@
 #krefrm-forms-container form,
 #krefrm-forms-container div,
 #krefrm-forms-container fieldset {
-  display: block !important;
+  display: block;
 }
 
 #krefrm-forms-container input,
 #krefrm-forms-container button,
 #krefrm-forms-container label {
-  display: revert !important;
-  box-sizing: border-box !important;
+  display: revert;
+  box-sizing: border-box;
 }
 
 #krefrm-forms-container button {
-  cursor: pointer !important;
+  cursor: pointer;
 }
 
 #krefrm-forms-container input[type="text"],
@@ -343,140 +343,140 @@
 #krefrm-forms-container input[type="number"],
 #krefrm-forms-container textarea,
 #krefrm-forms-container select {
-  box-sizing: border-box !important;
+  box-sizing: border-box;
 }
 
 /* ─── Style 1 — Polished / Rounded ─── */
 
 #krefrm-forms-container .krefrm-ui-style-1-form {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-  width: 100% !important;
-  max-width: none !important;
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  width: 100%;
+  max-width: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-field {
-  margin-bottom: 14px !important;
+  margin-bottom: 14px;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-label {
-  display: block !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #1d2327 !important;
-  margin-bottom: 6px !important;
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2327;
+  margin-bottom: 6px;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-input {
-  width: 100% !important;
-  padding: 10px 14px !important;
-  border: 1px solid #c3c4c7 !important;
-  border-radius: 6px !important;
-  font-size: 14px !important;
-  background: #fff !important;
-  box-sizing: border-box !important;
-  color: #1d2327 !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+  color: #1d2327;
+  appearance: none;
+  -webkit-appearance: none;
   transition:
     border-color 0.2s,
-    box-shadow 0.2s !important;
+    box-shadow 0.2s;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-input:focus {
-  border-color: #2271b1 !important;
-  box-shadow: 0 0 0 1px #2271b1 !important;
-  outline: none !important;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 10px 24px !important;
-  font-size: 14px !important;
-  font-weight: 600 !important;
-  color: #fff !important;
-  background: #2271b1 !important;
-  border: none !important;
-  border-radius: 6px !important;
-  cursor: pointer !important;
-  transition: background 0.2s !important;
-  text-transform: none !important;
-  line-height: 1.3 !important;
-  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #2271b1;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-transform: none;
+  line-height: 1.3;
+  text-decoration: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-1-btn:hover {
-  background: #135e96 !important;
+  background: #135e96;
 }
 
 /* ─── Style 2 — Flat / Bordered ─── */
 
 #krefrm-forms-container .krefrm-ui-style-2-form {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
-  width: 100% !important;
-  max-width: none !important;
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  width: 100%;
+  max-width: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-field {
-  margin-bottom: 14px !important;
-  padding: 10px 12px !important;
-  border: 1px solid #e0e0e0 !important;
-  border-radius: 3px !important;
-  background: #fafafa !important;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background: #fafafa;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-label {
-  display: block !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  color: #444 !important;
-  margin-bottom: 6px !important;
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #444;
+  margin-bottom: 6px;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-input {
-  width: 100% !important;
-  padding: 8px 10px !important;
-  border: 1px solid #bbb !important;
-  border-radius: 3px !important;
-  font-size: 14px !important;
-  background: #fff !important;
-  box-sizing: border-box !important;
-  color: #1d2327 !important;
-  appearance: none !important;
-  -webkit-appearance: none !important;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+  color: #1d2327;
+  appearance: none;
+  -webkit-appearance: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-input:focus {
-  border-color: #333 !important;
-  outline: none !important;
+  border-color: #333;
+  outline: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-btn {
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 10px 24px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  color: #fff !important;
-  background: #333 !important;
-  border: none !important;
-  border-radius: 3px !important;
-  cursor: pointer !important;
-  transition: background 0.2s !important;
-  line-height: 1.3 !important;
-  text-decoration: none !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: #333;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s;
+  line-height: 1.3;
+  text-decoration: none;
 }
 
 #krefrm-forms-container .krefrm-ui-style-2-btn:hover {
-  background: #555 !important;
+  background: #555;
 }
 
 /* ─── Custom CSS Section ─── */

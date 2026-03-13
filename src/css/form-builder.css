@@ -184,9 +184,9 @@
 
 .krefrm-field-type__add {
   flex-shrink: 0;
-  font-size: 12px !important;
-  padding: 2px 8px !important;
-  min-height: unset !important;
+  font-size: 12px;
+  padding: 2px 8px;
+  min-height: unset;
 }
 
 /* ─── Form Preview (centre) ─── */
@@ -429,7 +429,7 @@
   transition:
     opacity 0.15s,
     color 0.15s;
-  padding: 2px !important;
+  padding: 2px;
 }
 
 .krefrm-field-card:hover .krefrm-field-card__remove {

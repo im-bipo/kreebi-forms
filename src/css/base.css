@@ -34,8 +34,8 @@
 }
 
 .krefrm-json-textarea textarea {
-  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace !important;
-  font-size: 13px !important;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", monospace;
+  font-size: 13px;
 }
 
 .krefrm-modal-actions {

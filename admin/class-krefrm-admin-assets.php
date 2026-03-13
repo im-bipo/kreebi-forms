@@ -56,7 +56,7 @@ class Krefrm_Admin_Assets
                     width: 80%;
 
                     background: #2271b1;
-                    color: #fff !important;
+                    color: #fff ;
                     padding: 6px 12px;
                     border-radius: 4px;
                     margin: 4px;
