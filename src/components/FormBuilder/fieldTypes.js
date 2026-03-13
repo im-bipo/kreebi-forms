@@ -53,6 +53,51 @@ const FIELD_TYPES = [
       wrapper: { class: "", id: "" },
     },
   },
+  {
+    type: "checkbox",
+    label: __("Checkbox", "kreebi-forms"),
+    icon: "☑",
+    defaults: {
+      name: "Checkbox Field",
+      type: "checkbox",
+      options: [
+        { label: "Option 1", value: "opt1" },
+        { label: "Option 2", value: "opt2" },
+      ],
+      required: false,
+      wrapper: { class: "", id: "" },
+    },
+  },
+  {
+    type: "radio",
+    label: __("Radio Button", "kreebi-forms"),
+    icon: "◉",
+    defaults: {
+      name: "Radio Button Field",
+      type: "radio",
+      options: [
+        { label: "Option 1", value: "opt1" },
+        { label: "Option 2", value: "opt2" },
+      ],
+      required: false,
+      wrapper: { class: "", id: "" },
+    },
+  },
+  {
+    type: "dropdown",
+    label: __("Dropdown", "kreebi-forms"),
+    icon: "▼",
+    defaults: {
+      name: "Dropdown Field",
+      type: "dropdown",
+      options: [
+        { label: "Option 1", value: "opt1" },
+        { label: "Option 2", value: "opt2" },
+      ],
+      required: false,
+      wrapper: { class: "", id: "" },
+    },
+  },
 ];
 
 export default FIELD_TYPES;

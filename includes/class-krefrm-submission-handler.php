@@ -66,8 +66,18 @@ class Krefrm_Submission_Handler
                 if (empty($sanitized_key)) {
                     continue;
                 }
-                // Sanitize field value - only accept strings
-                $sanitized_value = is_string($v) ? sanitize_text_field($v) : '';
+
+                // Handle both string and array values (for checkbox multi-select)
+                if (is_string($v)) {
+                    $sanitized_value = sanitize_text_field($v);
+                } elseif (is_array($v)) {
+                    // For checkbox fields with multiple selections, join with comma
+                    $sanitized_values = array_map('sanitize_text_field', $v);
+                    $sanitized_value = implode(', ', $sanitized_values);
+                } else {
+                    $sanitized_value = '';
+                }
+
                 $submitted[$sanitized_key] = $sanitized_value;
             }
         }

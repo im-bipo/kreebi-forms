@@ -152,15 +152,43 @@ export default function useFormBuilder(initial = {}) {
     [currentStepIndex],
   );
 
+  const normalizeField = (field) => {
+    const type = field.type || "text";
+    const baseField = { ...field, type };
+
+    if (["text", "email", "password", "number"].includes(type)) {
+      const { options, ...rest } = baseField;
+      return { ...rest, placeholder: rest.placeholder || "" };
+    }
+
+    if (["checkbox", "radio", "dropdown"].includes(type)) {
+      const { placeholder, ...rest } = baseField;
+      return {
+        ...rest,
+        options:
+          Array.isArray(rest.options) && rest.options.length > 0
+            ? rest.options
+            : [
+                { label: "Option 1", value: "opt1" },
+                { label: "Option 2", value: "opt2" },
+              ],
+      };
+    }
+
+    return baseField;
+  };
+
   const updateField = useCallback((stepIdx, fieldIdx, patch) => {
     setSteps((prev) =>
       prev.map((s, si) =>
         si === stepIdx
           ? {
               ...s,
-              fields: s.fields.map((f, fi) =>
-                fi === fieldIdx ? { ...f, ...patch } : f,
-              ),
+              fields: s.fields.map((f, fi) => {
+                if (fi !== fieldIdx) return f;
+                const updated = { ...f, ...patch };
+                return normalizeField(updated);
+              }),
             }
           : s,
       ),

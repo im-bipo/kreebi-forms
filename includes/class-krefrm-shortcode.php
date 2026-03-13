@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Shortcode
 {
-    private $allowed_types = array('text', 'email', 'password', 'number');
+    private $allowed_types = array('text', 'email', 'password', 'number', 'checkbox', 'radio', 'dropdown');
 
     /**
      * Map styleTemplate values to the CSS classes injected at render time.
@@ -286,6 +286,75 @@ class Krefrm_Shortcode
           outline: none ;
         }
         
+        /* Checkboxes & Radio buttons for Style 1 */
+        .krefrm-ui-style-1-field input[type="checkbox"],
+        .krefrm-ui-style-1-field input[type="radio"] {
+          min-width: 18px ;
+          min-height: 18px ;
+          width: 18px ;
+          height: 18px ;
+          padding: 0 ;
+          border: initial ;
+          background: initial ;
+          appearance: auto ;
+          -webkit-appearance: auto ;
+          margin-right: 8px ;
+          cursor: pointer ;
+          accent-color: #2271b1 ;
+          opacity: 1 ;
+          visibility: visible ;
+          pointer-events: auto ;
+        }
+        
+        .krefrm-ui-style-1-field input[type="checkbox"] + label,
+        .krefrm-ui-style-1-field input[type="radio"] + label {
+          display: inline ;
+          font-weight: normal ;
+          margin-left: 0 ;
+          cursor: pointer ;
+          pointer-events: auto ;
+        }
+        
+        .krefrm-ui-style-1-field fieldset {
+          border: none ;
+          padding: 0 ;
+          margin: 0 ;
+        }
+        
+        .krefrm-ui-style-1-field legend {
+          display: block ;
+          font-size: 14px ;
+          font-weight: 600 ;
+          color: #1d2327 ;
+          margin-bottom: 8px ;
+          padding: 0 ;
+        }
+        
+        /* Select for Style 1 */
+        .krefrm-ui-style-1-field select {
+          width: 100% ;
+          padding: 10px 14px ;
+          border: 1px solid #c3c4c7 ;
+          border-radius: 6px ;
+          font-size: 14px ;
+          background: #fff ;
+          box-sizing: border-box ;
+          color: #1d2327 ;
+          appearance: none ;
+          -webkit-appearance: none ;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232271b1' d='M6 9L1 4h10z'/%3E%3C/svg%3E") ;
+          background-repeat: no-repeat ;
+          background-position: right 10px center ;
+          padding-right: 32px ;
+          cursor: pointer ;
+        }
+        
+        .krefrm-ui-style-1-field select:focus {
+          border-color: #2271b1 ;
+          box-shadow: 0 0 0 1px #2271b1 ;
+          outline: none ;
+        }
+        
         .krefrm-ui-style-1-btn {
           display: inline-flex ;
           align-items: center ;
@@ -349,6 +418,76 @@ class Krefrm_Shortcode
           outline: none ;
         }
         
+        /* Checkboxes & Radio buttons for Style 2 */
+        .krefrm-ui-style-2-field input[type="checkbox"],
+        .krefrm-ui-style-2-field input[type="radio"] {
+          min-width: 18px ;
+          min-height: 18px ;
+          width: 18px ;
+          height: 18px ;
+          padding: 0 ;
+          border: initial ;
+          background: initial ;
+          appearance: auto ;
+          -webkit-appearance: auto ;
+          margin-right: 8px ;
+          cursor: pointer ;
+          accent-color: #333 ;
+          opacity: 1 ;
+          visibility: visible ;
+          pointer-events: auto ;
+        }
+        
+        .krefrm-ui-style-2-field input[type="checkbox"] + label,
+        .krefrm-ui-style-2-field input[type="radio"] + label {
+          display: inline ;
+          font-weight: normal ;
+          margin-left: 0 ;
+          cursor: pointer ;
+          pointer-events: auto ;
+        }
+        
+        .krefrm-ui-style-2-field fieldset {
+          border: none ;
+          padding: 0 ;
+          margin: 0 ;
+        }
+        
+        .krefrm-ui-style-2-field legend {
+          display: block ;
+          font-size: 13px ;
+          font-weight: 700 ;
+          text-transform: uppercase ;
+          letter-spacing: 0.5px ;
+          color: #444 ;
+          margin-bottom: 8px ;
+          padding: 0 ;
+        }
+        
+        /* Select for Style 2 */
+        .krefrm-ui-style-2-field select {
+          width: 100% ;
+          padding: 8px 10px ;
+          border: 1px solid #bbb ;
+          border-radius: 3px ;
+          font-size: 14px ;
+          background: #fff ;
+          box-sizing: border-box ;
+          color: #1d2327 ;
+          appearance: none ;
+          -webkit-appearance: none ;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E") ;
+          background-repeat: no-repeat ;
+          background-position: right 10px center ;
+          padding-right: 32px ;
+          cursor: pointer ;
+        }
+        
+        .krefrm-ui-style-2-field select:focus {
+          border-color: #333 ;
+          outline: none ;
+        }
+        
         .krefrm-ui-style-2-btn {
           display: inline-flex ;
           align-items: center ;
@@ -380,6 +519,85 @@ class Krefrm_Shortcode
         
         .krefrm-required-star {
           color: #d63638;
+        }
+        
+        /* ─── Default styles for checkbox, radio, select (all templates) ─── */
+        input[type="checkbox"],
+        input[type="radio"] {
+          min-width: 18px ;
+          min-height: 18px ;
+          width: 18px ;
+          height: 18px ;
+          padding: 0 ;
+          border: initial ;
+          background: initial ;
+          appearance: auto ;
+          -webkit-appearance: auto ;
+          cursor: pointer ;
+          accent-color: #2271b1 ;
+          margin: 0 ;
+          margin-right: 8px ;
+          flex-shrink: 0 ;
+          opacity: 1 ;
+          visibility: visible ;
+          pointer-events: auto ;
+        }
+        
+        input[type="checkbox"] + label,
+        input[type="radio"] + label {
+          display: inline ;
+          font-weight: normal ;
+          margin-left: 0 ;
+          cursor: pointer ;
+          pointer-events: auto ;
+        }
+        
+        .krefrm-checkbox-option,
+        .krefrm-radio-option {
+          display: flex ;
+          align-items: center ;
+          margin-bottom: 10px ;
+          pointer-events: auto ;
+          cursor: pointer ;
+        }
+        
+        fieldset {
+          border: none ;
+          padding: 0 ;
+          margin: 0 ;
+        }
+        
+        legend {
+          display: block ;
+          font-size: 14px ;
+          font-weight: 600 ;
+          color: #1d2327 ;
+          margin-bottom: 10px ;
+          padding: 0 ;
+        }
+        
+        select {
+          width: 100% ;
+          padding: 10px 14px ;
+          border: 1px solid #c3c4c7 ;
+          border-radius: 6px ;
+          font-size: 14px ;
+          background: #fff ;
+          box-sizing: border-box ;
+          color: #1d2327 ;
+          appearance: none ;
+          -webkit-appearance: none ;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232271b1' d='M6 9L1 4h10z'/%3E%3C/svg%3E") ;
+          background-repeat: no-repeat ;
+          background-position: right 10px center ;
+          padding-right: 32px ;
+          cursor: pointer ;
+        }
+        
+        select:focus {
+          border-color: #2271b1 ;
+          box-shadow: 0 0 0 1px #2271b1 ;
+          outline: none ;
         }
         
         p { margin: 0; }
@@ -436,6 +654,7 @@ CSS;
         }
         $placeholder = isset($f['placeholder']) ? $f['placeholder'] : '';
         $required    = ! empty($f['required']);
+        $options     = isset($f['options']) && is_array($f['options']) ? $f['options'] : array();
 
         // Auto-generated unique input id
         $input_id = 'krefrm_' . sanitize_key($form_id) . '_s' . $step_index . '_f' . $field_index;
@@ -452,13 +671,67 @@ CSS;
         // Input classes
         $input_class = ! empty($style_classes['input']) ? ' class="' . esc_attr($style_classes['input']) . '"' : '';
 
-        $html  = '<div class="' . $wrapper_classes . '">';
-        $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
-        $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"' . $input_class;
-        if ($required) {
-            $html .= ' required';
+        $html = '<div class="' . $wrapper_classes . '">';
+
+        // Handle checkbox, radio, and dropdown types
+        if ($type === 'checkbox') {
+            $html .= '<fieldset>';
+            $html .= '<legend' . $label_class . '>' . esc_html($name) . '</legend>';
+            foreach ($options as $opt) {
+                $opt_value = isset($opt['value']) ? sanitize_text_field($opt['value']) : '';
+                $opt_label = isset($opt['label']) ? sanitize_text_field($opt['label']) : '';
+                $opt_id    = $input_id . '_' . sanitize_key($opt_value);
+                $html .= '<div class="krefrm-checkbox-option">';
+                $html .= '<input type="checkbox" id="' . esc_attr($opt_id) . '" name="krefrm_fields[' . esc_attr($key) . '][]" value="' . esc_attr($opt_value) . '"' . $input_class;
+                if ($required) {
+                    $html .= ' required';
+                }
+                $html .= ' />';
+                $html .= '<label for="' . esc_attr($opt_id) . '">' . esc_html($opt_label) . '</label>';
+                $html .= '</div>';
+            }
+            $html .= '</fieldset>';
+        } elseif ($type === 'radio') {
+            $html .= '<fieldset>';
+            $html .= '<legend' . $label_class . '>' . esc_html($name) . '</legend>';
+            foreach ($options as $opt) {
+                $opt_value = isset($opt['value']) ? sanitize_text_field($opt['value']) : '';
+                $opt_label = isset($opt['label']) ? sanitize_text_field($opt['label']) : '';
+                $opt_id    = $input_id . '_' . sanitize_key($opt_value);
+                $html .= '<div class="krefrm-radio-option">';
+                $html .= '<input type="radio" id="' . esc_attr($opt_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" value="' . esc_attr($opt_value) . '"' . $input_class;
+                if ($required) {
+                    $html .= ' required';
+                }
+                $html .= ' />';
+                $html .= '<label for="' . esc_attr($opt_id) . '" style="display: inline; margin-left: 6px;">' . esc_html($opt_label) . '</label>';
+                $html .= '</div>';
+            }
+            $html .= '</fieldset>';
+        } elseif ($type === 'dropdown') {
+            $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
+            $html .= '<select id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']"' . $input_class;
+            if ($required) {
+                $html .= ' required';
+            }
+            $html .= '>';
+            $html .= '<option value="">' . esc_html(__('Select an option', 'kreebi-forms')) . '</option>';
+            foreach ($options as $opt) {
+                $opt_value = isset($opt['value']) ? sanitize_text_field($opt['value']) : '';
+                $opt_label = isset($opt['label']) ? sanitize_text_field($opt['label']) : '';
+                $html .= '<option value="' . esc_attr($opt_value) . '">' . esc_html($opt_label) . '</option>';
+            }
+            $html .= '</select>';
+        } else {
+            // Text, email, password, number fields
+            $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
+            $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"' . $input_class;
+            if ($required) {
+                $html .= ' required';
+            }
+            $html .= ' />';
         }
-        $html .= ' />';
+
         $html .= '</div>';
 
         return $html;

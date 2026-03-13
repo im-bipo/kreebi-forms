@@ -77,11 +77,87 @@ export default function SettingsPanel({
           onChange={(val) => update({ type: val })}
         />
 
-        <TextControl
-          label={__("Placeholder", "kreebi-forms")}
-          value={field.placeholder || ""}
-          onChange={(val) => update({ placeholder: val })}
-        />
+        {field.type !== "checkbox" &&
+          field.type !== "radio" &&
+          field.type !== "dropdown" && (
+            <TextControl
+              label={__("Placeholder", "kreebi-forms")}
+              value={field.placeholder || ""}
+              onChange={(val) => update({ placeholder: val })}
+            />
+          )}
+
+        {(field.type === "checkbox" ||
+          field.type === "radio" ||
+          field.type === "dropdown") && (
+          <div
+            style={{
+              marginTop: 16,
+              padding: "12px",
+              backgroundColor: "#f9f9f9",
+              borderRadius: "4px",
+            }}
+          >
+            <p style={{ marginTop: 0, fontWeight: "bold", fontSize: "13px" }}>
+              {__("Options", "kreebi-forms")}
+            </p>
+            {Array.isArray(field.options) &&
+              field.options.map((opt, optIdx) => (
+                <div
+                  key={optIdx}
+                  style={{ marginBottom: "8px", display: "flex", gap: "8px" }}
+                >
+                  <TextControl
+                    placeholder={__("Label", "kreebi-forms")}
+                    value={opt.label || ""}
+                    onChange={(val) => {
+                      const newOpts = [...field.options];
+                      newOpts[optIdx].label = val;
+                      update({ options: newOpts });
+                    }}
+                    style={{ flex: 1 }}
+                  />
+                  <TextControl
+                    placeholder={__("Value", "kreebi-forms")}
+                    value={opt.value || ""}
+                    onChange={(val) => {
+                      const newOpts = [...field.options];
+                      newOpts[optIdx].value = val;
+                      update({ options: newOpts });
+                    }}
+                    style={{ flex: 1 }}
+                  />
+                  <Button
+                    variant="secondary"
+                    isSmall
+                    isDestructive
+                    onClick={() => {
+                      const newOpts = field.options.filter(
+                        (_, i) => i !== optIdx,
+                      );
+                      update({ options: newOpts });
+                    }}
+                  >
+                    ✕
+                  </Button>
+                </div>
+              ))}
+            <Button
+              variant="secondary"
+              isSmall
+              onClick={() => {
+                const newOpts = [...(field.options || [])];
+                newOpts.push({
+                  label: `Option ${newOpts.length + 1}`,
+                  value: `opt${newOpts.length + 1}`,
+                });
+                update({ options: newOpts });
+              }}
+            >
+              {__("Add Option", "kreebi-forms")}
+            </Button>
+          </div>
+        )}
 
         <ToggleControl
           label={__("Required", "kreebi-forms")}

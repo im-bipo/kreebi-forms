@@ -67,7 +67,9 @@ const ADD_FIELD_TYPES = [
   { type: "email", label: "Email", icon: "@" },
   { type: "number", label: "Number", icon: "#" },
   { type: "password", label: "Password", icon: "••" },
-  { type: "select", label: "Select", icon: "▾" },
+  { type: "checkbox", label: "Checkbox", icon: "☑" },
+  { type: "radio", label: "Radio Button", icon: "◉" },
+  { type: "dropdown", label: "Dropdown", icon: "▼" },
 ];
 
 let _qid = 0;
@@ -90,13 +92,23 @@ function fieldFromTemplate(f) {
 function newBlankField(type = "text") {
   const meta =
     ADD_FIELD_TYPES.find((t) => t.type === type) || ADD_FIELD_TYPES[0];
+  const hasOptions =
+    type === "checkbox" || type === "radio" || type === "dropdown";
   return {
     _uid: quid(),
     name: `${meta.label} Field`,
     type,
-    placeholder: "",
+    placeholder:
+      type !== "checkbox" && type !== "radio" && type !== "dropdown"
+        ? ""
+        : undefined,
     required: false,
-    options: type === "select" ? ["Option 1", "Option 2"] : [],
+    options: hasOptions
+      ? [
+          { label: "Option 1", value: "opt1" },
+          { label: "Option 2", value: "opt2" },
+        ]
+      : [],
   };
 }
 
@@ -190,10 +202,39 @@ export default function QuickBuilder({
     dragOverItem.current = null;
   };
 
-  /* ─── Field CRUD ─── */
+  const normalizeField = (field) => {
+    const type = field.type || "text";
+    const baseField = { ...field, type };
+
+    if (["text", "email", "password", "number"].includes(type)) {
+      const { options, ...rest } = baseField;
+      return { ...rest, placeholder: rest.placeholder || "" };
+    }
+
+    if (["checkbox", "radio", "dropdown"].includes(type)) {
+      const { placeholder, ...rest } = baseField;
+      return {
+        ...rest,
+        options:
+          Array.isArray(rest.options) && rest.options.length > 0
+            ? rest.options
+            : [
+                { label: "Option 1", value: "opt1" },
+                { label: "Option 2", value: "opt2" },
+              ],
+      };
+    }
+
+    return baseField;
+  };
+
   const updateField = useCallback((uid, patch) => {
     setFields((prev) =>
-      prev.map((f) => (f._uid === uid ? { ...f, ...patch } : f)),
+      prev.map((f) => {
+        if (f._uid !== uid) return f;
+        const updated = { ...f, ...patch };
+        return normalizeField(updated);
+      }),
     );
   }, []);
 
@@ -219,16 +260,17 @@ export default function QuickBuilder({
   const handleSave = async () => {
     setSaving(true);
     try {
-      await onSave(buildJson());
-    } catch (_) {
-      /* caller handles errors */
+      const jsonToSave = buildJson();
+      await onSave(jsonToSave);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   /* ─── Edit in Advance Builder ─── */
   const handleAdvanced = () => {
-    onAdvanced(buildJson());
+    const jsonToPass = buildJson();
+    onAdvanced(jsonToPass);
   };
 
   return (
@@ -328,14 +370,18 @@ export default function QuickBuilder({
                       onChange={(v) => updateField(field._uid, { name: v })}
                       __nextHasNoMarginBottom
                     />
-                    <TextControl
-                      label={__("Placeholder", "kreebi-forms")}
-                      value={field.placeholder}
-                      onChange={(v) =>
-                        updateField(field._uid, { placeholder: v })
-                      }
-                      __nextHasNoMarginBottom
-                    />
+                    {field.type !== "checkbox" &&
+                      field.type !== "radio" &&
+                      field.type !== "dropdown" && (
+                        <TextControl
+                          label={__("Placeholder", "kreebi-forms")}
+                          value={field.placeholder || ""}
+                          onChange={(v) =>
+                            updateField(field._uid, { placeholder: v })
+                          }
+                          __nextHasNoMarginBottom
+                        />
+                      )}
                     <SelectControl
                       label={__("Type", "kreebi-forms")}
                       value={field.type}
@@ -343,9 +389,125 @@ export default function QuickBuilder({
                         label: t.label,
                         value: t.type,
                       }))}
-                      onChange={(v) => updateField(field._uid, { type: v })}
+                      onChange={(v) => {
+                        updateField(field._uid, { type: v });
+                      }}
                       __nextHasNoMarginBottom
                     />
+                    {(field.type === "checkbox" ||
+                      field.type === "radio" ||
+                      field.type === "dropdown") && (
+                      <div
+                        style={{
+                          marginTop: "12px",
+                          padding: "12px",
+                          backgroundColor: "#f9f9f9",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        <p
+                          style={{
+                            marginTop: 0,
+                            marginBottom: "8px",
+                            fontWeight: "bold",
+                            fontSize: "13px",
+                          }}
+                        >
+                          {__("Options", "kreebi-forms")}
+                        </p>
+                        {Array.isArray(field.options) &&
+                          field.options.map((opt, optIdx) => (
+                            <div
+                              key={optIdx}
+                              style={{
+                                marginBottom: "8px",
+                                display: "flex",
+                                gap: "6px",
+                              }}
+                            >
+                              <input
+                                type="text"
+                                placeholder={__("Label", "kreebi-forms")}
+                                value={opt.label || ""}
+                                onChange={(e) => {
+                                  const newOpts = [...field.options];
+                                  newOpts[optIdx].label = e.target.value;
+                                  updateField(field._uid, { options: newOpts });
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                style={{
+                                  flex: 1,
+                                  padding: "6px 8px",
+                                  fontSize: "12px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "3px",
+                                }}
+                              />
+                              <input
+                                type="text"
+                                placeholder={__("Value", "kreebi-forms")}
+                                value={opt.value || ""}
+                                onChange={(e) => {
+                                  const newOpts = [...field.options];
+                                  newOpts[optIdx].value = e.target.value;
+                                  updateField(field._uid, { options: newOpts });
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                                style={{
+                                  flex: 1,
+                                  padding: "6px 8px",
+                                  fontSize: "12px",
+                                  border: "1px solid #ddd",
+                                  borderRadius: "3px",
+                                }}
+                              />
+
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const newOpts = field.options.filter(
+                                    (_, i) => i !== optIdx,
+                                  );
+                                  updateField(field._uid, { options: newOpts });
+                                }}
+                                style={{
+                                  padding: "6px 10px",
+                                  fontSize: "12px",
+                                  border: "1px solid #dc2f2f",
+                                  color: "#dc2f2f",
+                                  backgroundColor: "#fff",
+                                  borderRadius: "3px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                ✕
+                              </button>
+                            </div>
+                          ))}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const newOpts = [...(field.options || [])];
+                            newOpts.push({
+                              label: `Option ${newOpts.length + 1}`,
+                              value: `opt${newOpts.length + 1}`,
+                            });
+                            updateField(field._uid, { options: newOpts });
+                          }}
+                          style={{
+                            padding: "6px 12px",
+                            fontSize: "12px",
+                            border: "1px solid #ddd",
+                            backgroundColor: "#fff",
+                            borderRadius: "3px",
+                            cursor: "pointer",
+                            marginTop: "4px",
+                          }}
+                        >
+                          {__("+ Add Option", "kreebi-forms")}
+                        </button>
+                      </div>
+                    )}
                     <ToggleControl
                       label={__("Required", "kreebi-forms")}
                       checked={field.required}

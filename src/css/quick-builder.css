@@ -280,3 +280,65 @@
   color: #1d2327;
   box-sizing: border-box;
 }
+
+/* Options editor styling */
+
+.krefrm-qb .krefrm-options-editor {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+}
+
+.krefrm-qb .krefrm-options-editor__title {
+  margin: 0 0 8px;
+  font-weight: bold;
+  font-size: 13px;
+  color: #1d2327;
+}
+
+.krefrm-qb .krefrm-options-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.krefrm-qb .krefrm-options-row input {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.krefrm-qb .krefrm-options-row__delete-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #dc2f2f;
+  color: #dc2f2f;
+  background-color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background-color 0.15s;
+}
+
+.krefrm-qb .krefrm-options-row__delete-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.krefrm-qb .krefrm-options-editor__add-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-top: 4px;
+  transition: background-color 0.15s;
+}
+
+.krefrm-qb .krefrm-options-editor__add-btn:hover {
+  background-color: #f5f5f5;
+}

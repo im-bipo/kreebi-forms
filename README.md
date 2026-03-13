@@ -87,7 +87,7 @@ Replace `001` with the generated form ID.
 
 ## Supported field types
 
-`text`, `email`, `password`, `number`
+`text`, `email`, `password`, `number`, `checkbox`, `radio`, `dropdown`
 
 ## Development & Modification Guide
 
@@ -164,7 +164,7 @@ Removes the `/build` directory without rebuilding.
 
 #### Creating Custom Form from JSON
 
-Example form JSON structure:
+Example form JSON structure with all field types:
 
 ```json
 {
@@ -172,26 +172,154 @@ Example form JSON structure:
   "description": "Get in touch with us",
   "fields": [
     {
-      "id": "name",
+      "name": "Full Name",
       "type": "text",
-      "label": "Full Name",
-      "required": true,
-      "placeholder": "Enter your name"
-    },
-    {
-      "id": "email",
-      "type": "email",
-      "label": "Email Address",
+      "placeholder": "Enter your name",
       "required": true
     },
     {
-      "id": "message",
-      "type": "textarea",
-      "label": "Message",
+      "name": "Email Address",
+      "type": "email",
+      "placeholder": "your@email.com",
+      "required": true
+    },
+    {
+      "name": "Phone Number",
+      "type": "number",
+      "placeholder": "+1 555-0000",
       "required": false
+    },
+    {
+      "name": "Product Interest",
+      "type": "dropdown",
+      "required": true,
+      "options": [
+        { "label": "Product A", "value": "prod_a" },
+        { "label": "Product B", "value": "prod_b" },
+        { "label": "Product C", "value": "prod_c" }
+      ]
+    },
+    {
+      "name": "How did you hear about us?",
+      "type": "radio",
+      "required": true,
+      "options": [
+        { "label": "Google Search", "value": "google" },
+        { "label": "Social Media", "value": "social" },
+        { "label": "Referral", "value": "referral" },
+        { "label": "Other", "value": "other" }
+      ]
+    },
+    {
+      "name": "Interests",
+      "type": "checkbox",
+      "required": false,
+      "options": [
+        { "label": "Marketing", "value": "marketing" },
+        { "label": "Sales", "value": "sales" },
+        { "label": "Support", "value": "support" },
+        { "label": "Development", "value": "development" }
+      ]
+    },
+    {
+      "name": "Password",
+      "type": "password",
+      "placeholder": "Enter password",
+      "required": true
     }
   ],
   "submitButtonText": "Send Message"
+}
+```
+
+### Field Type Reference
+
+#### Text Input
+
+```json
+{
+  "name": "Full Name",
+  "type": "text",
+  "placeholder": "Enter your name",
+  "required": true
+}
+```
+
+#### Email Input
+
+```json
+{
+  "name": "Email Address",
+  "type": "email",
+  "placeholder": "your@email.com",
+  "required": true
+}
+```
+
+#### Number Input
+
+```json
+{
+  "name": "Phone Number",
+  "type": "number",
+  "placeholder": "+1 555-0000",
+  "required": false
+}
+```
+
+#### Password Input
+
+```json
+{
+  "name": "Password",
+  "type": "password",
+  "placeholder": "Enter password",
+  "required": true
+}
+```
+
+#### Dropdown / Select
+
+```json
+{
+  "name": "Choose an Option",
+  "type": "dropdown",
+  "required": true,
+  "options": [
+    { "label": "Option 1", "value": "opt1" },
+    { "label": "Option 2", "value": "opt2" },
+    { "label": "Option 3", "value": "opt3" }
+  ]
+}
+```
+
+#### Radio Buttons
+
+```json
+{
+  "name": "Select One",
+  "type": "radio",
+  "required": true,
+  "options": [
+    { "label": "Option A", "value": "opt_a" },
+    { "label": "Option B", "value": "opt_b" },
+    { "label": "Option C", "value": "opt_c" }
+  ]
+}
+```
+
+#### Checkboxes
+
+```json
+{
+  "name": "Select Multiple",
+  "type": "checkbox",
+  "required": false,
+  "options": [
+    { "label": "Item 1", "value": "item1" },
+    { "label": "Item 2", "value": "item2" },
+    { "label": "Item 3", "value": "item3" }
+  ]
 }
 ```
 
@@ -226,15 +354,6 @@ Edit files in `/src/`:
 2. **Embed Test Form** using shortcode: `[kreebi_form id="test-001"]`
 3. **Submit Test Data** and verify it appears in **Kreebi Forms > Submissions**
 4. **Check WordPress Logs** for errors (if debugging is enabled)
-
-### Common Development Tasks
-
-#### Debug JavaScript
-
-```javascript
-// Enable in browser console
-console.log(formData);
-```
 
 #### Check Form Submissions
 

@@ -52,6 +52,17 @@ const style2 = {
     outline: none ;
   }
 
+  .krefrm-ui-style-2-input[type="checkbox"],
+  .krefrm-ui-style-2-input[type="radio"] {
+    width: 18px ;
+    height: 18px ;
+    padding: 0 ;
+    border: initial ;
+    background: initial ;
+    appearance: auto ;
+    -webkit-appearance: auto ;
+  }
+
   .krefrm-ui-style-2-btn {
     display: inline-flex ;
     align-items: center ;

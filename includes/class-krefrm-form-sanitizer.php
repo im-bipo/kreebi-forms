@@ -12,7 +12,7 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Form_Sanitizer
 {
-    private $allowed_types = array('text', 'email', 'password', 'number');
+    private $allowed_types = array('text', 'email', 'password', 'number', 'checkbox', 'radio', 'dropdown');
 
     private $allowed_style_templates = array('kreebi_style_1', 'kreebi_style_2', 'blank_dev');
 
@@ -88,6 +88,9 @@ class Krefrm_Form_Sanitizer
     private function sanitize_field($field)
     {
         $type = isset($field['type']) ? sanitize_key($field['type']) : 'text';
+        if ('select' === $type) {
+            $type = 'dropdown';
+        }
         if (! in_array($type, $this->allowed_types, true)) {
             $type = 'text';
         }
@@ -95,9 +98,13 @@ class Krefrm_Form_Sanitizer
         $sanitized_field = array(
             'name'        => isset($field['name']) ? sanitize_text_field($field['name']) : '',
             'type'        => $type,
-            'placeholder' => isset($field['placeholder']) ? sanitize_text_field($field['placeholder']) : '',
             'required'    => ! empty($field['required']),
         );
+
+        // Add placeholder only for non-choice-based fields
+        if (! in_array($type, array('checkbox', 'radio', 'dropdown'), true)) {
+            $sanitized_field['placeholder'] = isset($field['placeholder']) ? sanitize_text_field($field['placeholder']) : '';
+        }
 
         // Layout (colSpan for grid width)
         $col_span = 12; // default full width
@@ -110,6 +117,32 @@ class Krefrm_Form_Sanitizer
             }
         }
         $sanitized_field['layout'] = array('colSpan' => $col_span);
+
+        // Handle choice-based fields (checkbox, radio, dropdown)
+        if (in_array($type, array('checkbox', 'radio', 'dropdown'), true)) {
+            $sanitized_field['options'] = array();
+
+            if (! empty($field['options']) && is_array($field['options'])) {
+                foreach ($field['options'] as $option) {
+                    if (is_array($option)) {
+                        $label = isset($option['label']) ? sanitize_text_field($option['label']) : '';
+                        $value = isset($option['value']) ? sanitize_text_field($option['value']) : '';
+                    } else {
+                        $label = sanitize_text_field((string) $option);
+                        $value = $label;
+                    }
+
+                    if ('' === $label && '' === $value) {
+                        continue;
+                    }
+
+                    $sanitized_field['options'][] = array(
+                        'label' => $label,
+                        'value' => $value,
+                    );
+                }
+            }
+        }
 
         return $sanitized_field;
     }
