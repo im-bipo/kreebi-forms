@@ -730,6 +730,7 @@ class Krefrm_Shortcode
           border-radius: 6px;
           font-size: 14px;
           line-height: 1.4;
+          border: 1px solid transparent;
         }
 
         .krefrm-submit-feedback.is-hidden {
@@ -752,6 +753,57 @@ class Krefrm_Shortcode
           background: #edf7ed;
           color: #1f5f31;
           border: 1px solid #9fd7a9;
+        }
+
+        /* Style 1 feedback tone: rounded + soft WP blue accents */
+        .krefrm-ui-style-1-form .krefrm-submit-feedback {
+          border-radius: 6px;
+          font-size: 14px;
+        }
+
+        .krefrm-ui-style-1-form .krefrm-submit-feedback.is-loading {
+          background: #f0f6fc;
+          color: #1d4f91;
+          border-color: #b6d4fe;
+        }
+
+        .krefrm-ui-style-1-form .krefrm-submit-feedback.is-error {
+          background: #fcf0f1;
+          color: #8a2424;
+          border-color: #f1b3b8;
+        }
+
+        .krefrm-ui-style-1-form .krefrm-submit-feedback.is-success {
+          background: #edf7ed;
+          color: #1f5f31;
+          border-color: #9fd7a9;
+        }
+
+        /* Style 2 feedback tone: flatter card + stronger borders/uppercase */
+        .krefrm-ui-style-2-form .krefrm-submit-feedback {
+          border-radius: 3px;
+          font-size: 13px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.4px;
+        }
+
+        .krefrm-ui-style-2-form .krefrm-submit-feedback.is-loading {
+          background: #f7f7f7;
+          color: #333;
+          border-color: #a8a8a8;
+        }
+
+        .krefrm-ui-style-2-form .krefrm-submit-feedback.is-error {
+          background: #fff4f4;
+          color: #6e1e1e;
+          border-color: #c17d7d;
+        }
+
+        .krefrm-ui-style-2-form .krefrm-submit-feedback.is-success {
+          background: #f2faf2;
+          color: #205022;
+          border-color: #7eb182;
         }
 
         button[disabled],

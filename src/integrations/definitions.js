@@ -78,6 +78,28 @@ export const INTEGRATIONS = [
       </svg>
     ),
   },
+  {
+    id: "captcha",
+    name: __("Captcha Protection", "kreebi-forms"),
+    description: __(
+      "Add Google reCAPTCHA v3 to protect every form submission from spam and automated bots.",
+      "kreebi-forms",
+    ),
+    icon: (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+    ),
+  },
   /* premium integrations remain here for the time being */
   {
     id: "google-sheet",
@@ -102,28 +124,6 @@ export const INTEGRATIONS = [
         <line x1="15" y1="3" x2="15" y2="21" />
         <line x1="3" y1="9" x2="21" y2="9" />
         <line x1="3" y1="15" x2="21" y2="15" />
-      </svg>
-    ),
-  },
-  {
-    id: "captcha",
-    name: __("Captcha Protection", "kreebi-forms"),
-    description: __(
-      "Add Google reCAPTCHA v3 to protect every form submission from spam and automated bots.",
-      "kreebi-forms",
-    ),
-    icon: (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        aria-hidden="true"
-      >
-        <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
-        <path d="m9 12 2 2 4-4" />
       </svg>
     ),
   },
