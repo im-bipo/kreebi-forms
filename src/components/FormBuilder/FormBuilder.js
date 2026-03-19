@@ -357,7 +357,12 @@ export default function FormBuilder({
       {view === "quick" && (
         <QuickBuilder
           initialData={builder.getJson()}
-          onSave={(json) => builder.setFromJson(json)}
+          onSave={async (json) => {
+            builder.setFromJson(json);
+            if (onSave) {
+              await onSave(json);
+            }
+          }}
           onAdvanced={(json) => {
             builder.setFromJson(json);
             handleViewChange("visual");
