@@ -51,7 +51,8 @@ export default function EmailNotificationFormTab({
         subject: globalSettings.subject || "",
         styleVariant: globalSettings.styleVariant || "style1",
         logoUrl: globalSettings.logoUrl || "",
-        businessName: globalSettings.businessName || globalSettings.senderName || "",
+        businessName:
+          globalSettings.businessName || globalSettings.senderName || "",
         message: globalSettings.message || "",
         themeColor: globalSettings.themeColor || "#1875E5",
         footerContactDetails: globalSettings.footerContactDetails || "",
@@ -174,14 +175,18 @@ export default function EmailNotificationFormTab({
             label={__("Logo URL", "kreebi-forms")}
             value={formSettings.logoUrl ?? ""}
             onChange={update("logoUrl")}
-            placeholder={globalSettings.logoUrl || "https://example.com/logo.png"}
+            placeholder={
+              globalSettings.logoUrl || "https://example.com/logo.png"
+            }
           />
           <TextControl
             label={__("Business Name (Header)", "kreebi-forms")}
             value={formSettings.businessName ?? ""}
             onChange={update("businessName")}
             placeholder={
-              globalSettings.businessName || globalSettings.senderName || "My Business"
+              globalSettings.businessName ||
+              globalSettings.senderName ||
+              "My Business"
             }
           />
           <TextareaControl

@@ -340,7 +340,11 @@ export default function EmailNotificationGlobalSettings({ navigate }) {
                   <img
                     src={settings.logoUrl}
                     alt={__("Logo", "kreebi-forms")}
-                    style={{ maxHeight: "48px", width: "auto", marginBottom: "10px" }}
+                    style={{
+                      maxHeight: "48px",
+                      width: "auto",
+                      marginBottom: "10px",
+                    }}
                   />
                 )}
                 <p style={{ margin: "0 0 12px", whiteSpace: "pre-wrap" }}>
@@ -366,19 +370,29 @@ export default function EmailNotificationGlobalSettings({ navigate }) {
                     </p>
                   </div>
                 )}
-                <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}>
+                <div
+                  style={{ borderTop: "1px solid #f0f0f0", paddingTop: "10px" }}
+                >
                   <p style={{ margin: "0 0 6px", whiteSpace: "pre-wrap" }}>
                     {settings.footerContactDetails || "Contact details"}
                   </p>
-                  <p style={{ margin: "0 0 2px" }}>{settings.footerName || "Name"}</p>
-                  <p style={{ margin: 0 }}>{settings.footerEmail || "email@example.com"}</p>
+                  <p style={{ margin: "0 0 2px" }}>
+                    {settings.footerName || "Name"}
+                  </p>
+                  <p style={{ margin: 0 }}>
+                    {settings.footerEmail || "email@example.com"}
+                  </p>
                 </div>
                 <div style={{ marginTop: "14px", fontSize: "12px" }}>
                   <a
                     href="https://kreebiforms.com/"
                     target="_blank"
                     rel="noreferrer"
-                    style={{ color: "#1875E5", textDecoration: "none", fontWeight: 600 }}
+                    style={{
+                      color: "#1875E5",
+                      textDecoration: "none",
+                      fontWeight: 600,
+                    }}
                   >
                     Kreebi Forms
                   </a>
