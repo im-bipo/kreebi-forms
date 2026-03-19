@@ -225,19 +225,14 @@
   justify-content: center;
   width: 34px;
   height: 34px;
-  background: transparent;
   border: none;
   border-radius: 10px;
-  color: #6b7280;
   cursor: pointer;
   font-size: 18px;
   line-height: 1;
   transition:
     background 150ms ease,
     color 150ms ease;
-}
-
-.krefrm-form-card__menu-button:hover {
   background: rgba(34, 113, 177, 0.08);
   color: #2271b1;
 }
