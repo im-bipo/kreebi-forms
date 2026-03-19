@@ -174,11 +174,32 @@ class Krefrm_Form_Sanitizer
 
             // Email notification overrides
             if ($integration_id === 'email-notification') {
-                $text_fields = array('recipientEmail', 'senderName', 'subject');
+                $text_fields = array(
+                    'recipientEmail',
+                    'senderName',
+                    'subject',
+                    'styleVariant',
+                    'businessName',
+                    'footerName',
+                    'footerEmail',
+                );
                 foreach ($text_fields as $key) {
                     if (isset($settings[$key])) {
                         $clean[$key] = sanitize_text_field($settings[$key]);
                     }
+                }
+                if (isset($settings['logoUrl'])) {
+                    $clean['logoUrl'] = esc_url_raw($settings['logoUrl']);
+                }
+                if (isset($settings['themeColor'])) {
+                    $color = sanitize_text_field($settings['themeColor']);
+                    $clean['themeColor'] = preg_match('/^#[0-9A-Fa-f]{6}$/', $color) ? strtoupper($color) : '#1875E5';
+                }
+                if (isset($settings['message'])) {
+                    $clean['message'] = sanitize_textarea_field($settings['message']);
+                }
+                if (isset($settings['footerContactDetails'])) {
+                    $clean['footerContactDetails'] = sanitize_textarea_field($settings['footerContactDetails']);
                 }
                 if (isset($settings['bodyTemplate'])) {
                     $clean['bodyTemplate'] = sanitize_textarea_field($settings['bodyTemplate']);

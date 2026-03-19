@@ -15,7 +15,17 @@ import {
   ToggleControl,
   TextControl,
   TextareaControl,
+  BaseControl,
+  Button,
 } from "@wordpress/components";
+
+const STYLE_OPTIONS = [
+  { id: "style1", label: __("Style 1 (With Form Data)", "kreebi-forms") },
+  {
+    id: "style2",
+    label: __("Style 2 (Without Form Data)", "kreebi-forms"),
+  },
+];
 
 export default function EmailNotificationFormTab({
   globalSettings = {},
@@ -39,7 +49,14 @@ export default function EmailNotificationFormTab({
         recipientEmail: globalSettings.recipientEmail || "",
         senderName: globalSettings.senderName || "",
         subject: globalSettings.subject || "",
-        bodyTemplate: globalSettings.bodyTemplate || "",
+        styleVariant: globalSettings.styleVariant || "style1",
+        logoUrl: globalSettings.logoUrl || "",
+        businessName: globalSettings.businessName || globalSettings.senderName || "",
+        message: globalSettings.message || "",
+        themeColor: globalSettings.themeColor || "#1875E5",
+        footerContactDetails: globalSettings.footerContactDetails || "",
+        footerName: globalSettings.footerName || "",
+        footerEmail: globalSettings.footerEmail || "",
       });
     }
   };
@@ -97,6 +114,16 @@ export default function EmailNotificationFormTab({
                 {globalSettings.senderName || "—"}
               </span>
             </div>
+            <div className="krefrm-intg-form-tab__preview-row">
+              <span className="krefrm-intg-form-tab__preview-label">
+                {__("Template:", "kreebi-forms")}
+              </span>
+              <span className="krefrm-intg-form-tab__preview-value">
+                {globalSettings.styleVariant === "style2"
+                  ? __("Style 2 (Without Form Data)", "kreebi-forms")
+                  : __("Style 1 (With Form Data)", "kreebi-forms")}
+              </span>
+            </div>
           </div>
         </div>
       ) : (
@@ -126,16 +153,68 @@ export default function EmailNotificationFormTab({
               globalSettings.subject || "Notification from your website"
             }
           />
+          <BaseControl label={__("Template Style", "kreebi-forms")}>
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+              {STYLE_OPTIONS.map((opt) => (
+                <Button
+                  key={opt.id}
+                  variant={
+                    (formSettings.styleVariant || "style1") === opt.id
+                      ? "primary"
+                      : "secondary"
+                  }
+                  onClick={() => update("styleVariant")(opt.id)}
+                >
+                  {opt.label}
+                </Button>
+              ))}
+            </div>
+          </BaseControl>
+          <TextControl
+            label={__("Logo URL", "kreebi-forms")}
+            value={formSettings.logoUrl ?? ""}
+            onChange={update("logoUrl")}
+            placeholder={globalSettings.logoUrl || "https://example.com/logo.png"}
+          />
+          <TextControl
+            label={__("Business Name (Header)", "kreebi-forms")}
+            value={formSettings.businessName ?? ""}
+            onChange={update("businessName")}
+            placeholder={
+              globalSettings.businessName || globalSettings.senderName || "My Business"
+            }
+          />
           <TextareaControl
-            label={__("Email Body Template", "kreebi-forms")}
-            help={__(
-              "Use {fields} to include all submitted values.",
-              "kreebi-forms",
-            )}
-            value={formSettings.bodyTemplate ?? ""}
-            onChange={update("bodyTemplate")}
-            rows={5}
-            placeholder={globalSettings.bodyTemplate || ""}
+            label={__("Message", "kreebi-forms")}
+            value={formSettings.message ?? ""}
+            onChange={update("message")}
+            rows={4}
+            placeholder={globalSettings.message || ""}
+          />
+          <TextControl
+            label={__("Theme Color (Hex)", "kreebi-forms")}
+            value={formSettings.themeColor ?? ""}
+            onChange={update("themeColor")}
+            placeholder={globalSettings.themeColor || "#1875E5"}
+          />
+          <TextareaControl
+            label={__("Footer Contact Details", "kreebi-forms")}
+            value={formSettings.footerContactDetails ?? ""}
+            onChange={update("footerContactDetails")}
+            rows={3}
+            placeholder={globalSettings.footerContactDetails || ""}
+          />
+          <TextControl
+            label={__("Footer Name", "kreebi-forms")}
+            value={formSettings.footerName ?? ""}
+            onChange={update("footerName")}
+            placeholder={globalSettings.footerName || ""}
+          />
+          <TextControl
+            label={__("Footer Email", "kreebi-forms")}
+            value={formSettings.footerEmail ?? ""}
+            onChange={update("footerEmail")}
+            placeholder={globalSettings.footerEmail || ""}
           />
         </div>
       )}

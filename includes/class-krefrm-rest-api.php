@@ -390,11 +390,32 @@ class Krefrm_Rest_Api
             $email_settings = $body['emailNotification'];
             if (is_array($email_settings)) {
                 $sanitized = array();
-                $text_fields = array('recipientEmail', 'senderName', 'subject');
+                $text_fields = array(
+                    'recipientEmail',
+                    'senderName',
+                    'subject',
+                    'styleVariant',
+                    'businessName',
+                    'footerName',
+                    'footerEmail',
+                );
                 foreach ($text_fields as $key) {
                     if (isset($email_settings[$key])) {
                         $sanitized[$key] = sanitize_text_field($email_settings[$key]);
                     }
+                }
+                if (isset($email_settings['logoUrl'])) {
+                    $sanitized['logoUrl'] = esc_url_raw($email_settings['logoUrl']);
+                }
+                if (isset($email_settings['themeColor'])) {
+                    $color = sanitize_text_field($email_settings['themeColor']);
+                    $sanitized['themeColor'] = preg_match('/^#[0-9A-Fa-f]{6}$/', $color) ? strtoupper($color) : '#1875E5';
+                }
+                if (isset($email_settings['message'])) {
+                    $sanitized['message'] = sanitize_textarea_field($email_settings['message']);
+                }
+                if (isset($email_settings['footerContactDetails'])) {
+                    $sanitized['footerContactDetails'] = sanitize_textarea_field($email_settings['footerContactDetails']);
                 }
                 // Body template can contain newlines – use textarea sanitizer
                 if (isset($email_settings['bodyTemplate'])) {

@@ -300,30 +300,45 @@ class Krefrm_Submission_Handler
      */
     private function trigger_email_notification($form_post, $submitted, $settings)
     {
-        $email_settings = isset($settings['emailNotification']) ? $settings['emailNotification'] : array();
+        $global_email_settings = isset($settings['emailNotification']) && is_array($settings['emailNotification'])
+            ? $settings['emailNotification']
+            : array();
 
-        // Get defaults
-        $recipient_email = ! empty($email_settings['recipientEmail']) ? $email_settings['recipientEmail'] : get_option('admin_email');
-        $sender_name = ! empty($email_settings['senderName']) ? $email_settings['senderName'] : get_bloginfo('name');
-        $subject = ! empty($email_settings['subject']) ? $email_settings['subject'] : sprintf('Notification | %s', get_bloginfo('name'));
-        $body_template = ! empty($email_settings['bodyTemplate']) ? $email_settings['bodyTemplate'] : "You have received a new form submission.\n\nSubmitted Data:\n{fields}";
+        $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
+        $form_integrations = isset($form_data['formIntegrations']) && is_array($form_data['formIntegrations'])
+            ? $form_data['formIntegrations']
+            : array();
+        $form_email_settings = isset($form_integrations['email-notification']) && is_array($form_integrations['email-notification'])
+            ? $form_integrations['email-notification']
+            : array();
 
+        $email_settings = $this->resolve_email_notification_settings($global_email_settings, $form_email_settings);
 
-        // Replace placeholders
-        $form_name = esc_html($form_post->post_title);
-        $subject = str_replace('{form_name}', $form_name, $subject);
-
-        // Format fields for email
-        $fields_html = '';
-        foreach ($submitted as $field_name => $field_value) {
-            $fields_html .= sprintf("%s: %s\n", esc_html($field_name), esc_html($field_value));
+        $recipient_email = $email_settings['recipientEmail'];
+        if ('' === $recipient_email) {
+            $recipient_email = sanitize_email(get_option('admin_email', ''));
         }
-        $body = str_replace('{fields}', trim($fields_html), $body_template);
+        if ('' === $recipient_email) {
+            return;
+        }
 
-        // Send email
+        $sender_name = $email_settings['senderName'];
+        if ('' === $sender_name) {
+            $sender_name = sanitize_text_field(get_bloginfo('name'));
+        }
+
+        $subject = $email_settings['subject'];
+        if ('' === $subject) {
+            $subject = sprintf('Notification | %s', get_bloginfo('name'));
+        }
+        $subject = str_replace('{form_name}', sanitize_text_field($form_post->post_title), $subject);
+
+        $fields_html = $this->build_submission_fields_table_html($submitted);
+        $body = $this->build_email_notification_html($email_settings, $form_post, $fields_html);
+
         $headers = array(
-            'From: ' . $sender_name . ' <' . get_option('admin_email') . '>',
-            'Content-Type: text/plain; charset=UTF-8',
+            'From: ' . $sender_name . ' <' . sanitize_email(get_option('admin_email', '')) . '>',
+            'Content-Type: text/html; charset=UTF-8',
         );
 
         wp_mail($recipient_email, $subject, $body, $headers);
@@ -353,6 +368,192 @@ class Krefrm_Submission_Handler
         }
 
         Krefrm_Webhook_Service::dispatch_from_form_post($resolved, $form_post, $submitted, 'submission');
+    }
+
+    /**
+     * Resolve global + form-level email settings.
+     */
+    private function resolve_email_notification_settings($global_settings, $form_settings)
+    {
+        $global = $this->sanitize_email_notification_settings($global_settings);
+
+        if (! is_array($form_settings) || empty($form_settings)) {
+            return $global;
+        }
+
+        $use_global = ! isset($form_settings['_useGlobal']) || (bool) $form_settings['_useGlobal'];
+        if ($use_global) {
+            return $global;
+        }
+
+        $resolved = $global;
+        $overrides = $this->sanitize_email_notification_settings($form_settings, $global);
+
+        foreach ($overrides as $key => $value) {
+            if ($key === '_useGlobal') {
+                continue;
+            }
+            if (is_string($value) && '' === trim($value)) {
+                continue;
+            }
+            $resolved[$key] = $value;
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * Sanitize email notification settings with defaults.
+     */
+    private function sanitize_email_notification_settings($settings, $defaults = null)
+    {
+        if (! is_array($defaults)) {
+            $defaults = array(
+                'recipientEmail' => sanitize_email(get_option('admin_email', '')),
+                'senderName' => sanitize_text_field(get_bloginfo('name')),
+                'subject' => sprintf('Notification | %s', sanitize_text_field(get_bloginfo('name'))),
+                'styleVariant' => 'style1',
+                'logoUrl' => '',
+                'businessName' => sanitize_text_field(get_bloginfo('name')),
+                'message' => "Hello,\n\nYou have received a new form submission. Please review the details below.",
+                'themeColor' => '#1875E5',
+                'footerContactDetails' => 'Contact us for support anytime.',
+                'footerName' => sanitize_text_field(get_bloginfo('name')),
+                'footerEmail' => sanitize_email(get_option('admin_email', '')),
+                'bodyTemplate' => "You have received a new form submission.\n\nSubmitted Data:\n{fields}",
+            );
+        }
+
+        $settings = is_array($settings) ? $settings : array();
+
+        $sanitized = $defaults;
+
+        if (isset($settings['_useGlobal'])) {
+            $sanitized['_useGlobal'] = (bool) $settings['_useGlobal'];
+        }
+
+        if (isset($settings['recipientEmail'])) {
+            $sanitized['recipientEmail'] = sanitize_text_field($settings['recipientEmail']);
+        }
+        if (isset($settings['senderName'])) {
+            $sanitized['senderName'] = sanitize_text_field($settings['senderName']);
+        }
+        if (isset($settings['subject'])) {
+            $sanitized['subject'] = sanitize_text_field($settings['subject']);
+        }
+        if (isset($settings['styleVariant'])) {
+            $variant = sanitize_key($settings['styleVariant']);
+            $sanitized['styleVariant'] = in_array($variant, array('style1', 'style2'), true) ? $variant : 'style1';
+        }
+        if (isset($settings['logoUrl'])) {
+            $sanitized['logoUrl'] = esc_url_raw($settings['logoUrl']);
+        }
+        if (isset($settings['businessName'])) {
+            $sanitized['businessName'] = sanitize_text_field($settings['businessName']);
+        }
+        if (isset($settings['message'])) {
+            $sanitized['message'] = sanitize_textarea_field($settings['message']);
+        }
+        if (isset($settings['themeColor'])) {
+            $color = sanitize_text_field($settings['themeColor']);
+            $sanitized['themeColor'] = preg_match('/^#[0-9A-Fa-f]{6}$/', $color) ? strtoupper($color) : '#1875E5';
+        }
+        if (isset($settings['footerContactDetails'])) {
+            $sanitized['footerContactDetails'] = sanitize_textarea_field($settings['footerContactDetails']);
+        }
+        if (isset($settings['footerName'])) {
+            $sanitized['footerName'] = sanitize_text_field($settings['footerName']);
+        }
+        if (isset($settings['footerEmail'])) {
+            $sanitized['footerEmail'] = sanitize_email($settings['footerEmail']);
+        }
+        if (isset($settings['bodyTemplate'])) {
+            $sanitized['bodyTemplate'] = sanitize_textarea_field($settings['bodyTemplate']);
+        }
+
+        return $sanitized;
+    }
+
+    /**
+     * Build submission fields block HTML.
+     */
+    private function build_submission_fields_table_html($submitted)
+    {
+        $rows = '';
+        foreach ($submitted as $field_name => $field_value) {
+            $rows .= '<tr>'
+                . '<td style="padding:8px 10px;border-bottom:1px solid #e8ecf2;font-weight:600;color:#243447;width:35%;">' . esc_html($field_name) . '</td>'
+                . '<td style="padding:8px 10px;border-bottom:1px solid #e8ecf2;color:#334155;">' . esc_html($field_value) . '</td>'
+                . '</tr>';
+        }
+
+        if ('' === $rows) {
+            $rows = '<tr><td colspan="2" style="padding:10px;color:#64748b;">No form data submitted.</td></tr>';
+        }
+
+        return '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;border:1px solid #e8ecf2;border-radius:8px;overflow:hidden;">'
+            . '<tbody>' . $rows . '</tbody>'
+            . '</table>';
+    }
+
+    /**
+     * Build branded HTML body for email notifications.
+     */
+    private function build_email_notification_html($email_settings, $form_post, $fields_html)
+    {
+        $theme_color = isset($email_settings['themeColor']) ? $email_settings['themeColor'] : '#1875E5';
+        if (! preg_match('/^#[0-9A-Fa-f]{6}$/', $theme_color)) {
+            $theme_color = '#1875E5';
+        }
+
+        $style_variant = isset($email_settings['styleVariant']) ? $email_settings['styleVariant'] : 'style1';
+        $include_form_data = ('style2' !== $style_variant);
+
+        $business_name = ! empty($email_settings['businessName'])
+            ? $email_settings['businessName']
+            : (! empty($email_settings['senderName']) ? $email_settings['senderName'] : get_bloginfo('name'));
+
+        $logo_html = '';
+        if (! empty($email_settings['logoUrl'])) {
+            $logo_html = '<div style="margin-bottom:12px;"><img src="' . esc_url($email_settings['logoUrl']) . '" alt="Logo" style="max-height:58px;width:auto;display:block;" /></div>';
+        }
+
+        $message_text = isset($email_settings['message']) ? $email_settings['message'] : '';
+        $message_html = '<p style="margin:0 0 14px;line-height:1.6;color:#1f2937;white-space:pre-line;">' . nl2br(esc_html($message_text)) . '</p>';
+
+        $footer_contact = isset($email_settings['footerContactDetails']) ? $email_settings['footerContactDetails'] : '';
+        $footer_name = isset($email_settings['footerName']) ? $email_settings['footerName'] : '';
+        $footer_email = isset($email_settings['footerEmail']) ? $email_settings['footerEmail'] : '';
+
+        $form_data_html = '';
+        if ($include_form_data) {
+            $form_data_html = '<div style="margin:0 0 16px;padding:12px;border:1px solid #dce8fb;border-radius:10px;background:#f8fbff;">'
+                . '<p style="margin:0 0 10px;font-weight:700;color:' . esc_attr($theme_color) . ';">Form Data</p>'
+                . $fields_html
+                . '</div>';
+        }
+
+        $html = '<div style="background:#f3f6fa;padding:22px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">'
+            . '<table role="presentation" cellpadding="0" cellspacing="0" style="max-width:700px;margin:0 auto;width:100%;background:#ffffff;border:1px solid #e5e9f2;border-radius:12px;overflow:hidden;">'
+            . '<tbody>'
+            . '<tr><td style="background:' . esc_attr($theme_color) . ';padding:16px 18px;color:#ffffff;font-size:20px;font-weight:700;">' . esc_html($business_name) . '</td></tr>'
+            . '<tr><td style="padding:18px;">'
+            . $logo_html
+            . $message_html
+            . $form_data_html
+            . '<div style="border-top:1px solid #eef2f7;padding-top:12px;color:#334155;line-height:1.55;">'
+            . '<p style="margin:0 0 4px;white-space:pre-line;">' . nl2br(esc_html($footer_contact)) . '</p>'
+            . '<p style="margin:0 0 4px;">' . esc_html($footer_name) . '</p>'
+            . '<p style="margin:0;">' . esc_html($footer_email) . '</p>'
+            . '</div>'
+            . '<p style="margin:16px 0 0;font-size:12px;">'
+            . '<a href="https://kreebiforms.com/" target="_blank" rel="noopener noreferrer" style="color:#1875E5;text-decoration:none;font-weight:600;">Kreebi Forms</a>'
+            . '</p>'
+            . '</td></tr>'
+            . '</tbody></table>'
+            . '</div>';
+
+        return $html;
     }
 
     /**
