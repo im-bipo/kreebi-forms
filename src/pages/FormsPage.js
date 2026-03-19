@@ -118,11 +118,16 @@ function getPublicFormIdFromRoute(route) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-// Helper to extract tab parameter from route (e.g., "forms/edit?id=123&tab=email-notification")
-// Returns the tab name or null if no tab specified
+// Extract tab from path segment (e.g., "forms/edit/email-notification?form_id=001").
+// Backward-compatible with legacy "tab" query parameter.
 function getTabFromRoute(route) {
-  const match = route.match(/[?&]tab=([^&]+)/);
-  return match ? match[1] : null;
+  const pathMatch = route.match(/^forms\/edit\/([^?]+)/);
+  if (pathMatch) {
+    return decodeURIComponent(pathMatch[1]);
+  }
+
+  const queryMatch = route.match(/[?&]tab=([^&]+)/);
+  return queryMatch ? decodeURIComponent(queryMatch[1]) : null;
 }
 
 export default function FormsPage({ route = "forms", navigate = () => {} }) {
@@ -142,7 +147,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
 
   const showCreatePage = route === "forms/create";
   const showQuickBuilder = route === "forms/quick-builder";
-  const showEditPage = route.startsWith("forms/edit?");
+  const showEditPage = route.startsWith("forms/edit");
 
   const fetchForms = useCallback(async () => {
     setLoading(true);
@@ -261,11 +266,10 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
     const routeId = currentFormId
       ? `form_id=${encodeURIComponent(currentFormId)}`
       : `id=${editFormId}`;
-    // Update URL to include the tab parameter
+
     if (newTab) {
-      navigate(`forms/edit?${routeId}&tab=${newTab}`);
+      navigate(`forms/edit/${encodeURIComponent(newTab)}?${routeId}`);
     } else {
-      // If switching back to default visual editor, use URL without tab param
       navigate(`forms/edit?${routeId}`);
     }
   };
