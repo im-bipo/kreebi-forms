@@ -17,46 +17,48 @@ class Krefrm_Submission_Handler
 
     public function handle_submission()
     {
+        $is_ajax = $this->is_ajax_submission_request();
+
         // Verify nonce first
         if (! isset($_POST['krefrm_frontend_submit'])) {
-            wp_safe_redirect(wp_get_referer() ?: home_url());
-            exit;
+            $this->respond_error(__('Invalid submission. Please refresh and try again.', 'kreebi-forms'), $is_ajax);
         }
 
         $nonce = sanitize_text_field(wp_unslash($_POST['krefrm_frontend_submit']));
         if (! wp_verify_nonce($nonce, 'krefrm_frontend_submit')) {
-            wp_die(esc_html__('Invalid submission (bad nonce).', 'kreebi-forms'));
+            $this->respond_error(__('Invalid submission (bad nonce).', 'kreebi-forms'), $is_ajax);
         }
 
         // Validate and sanitize form ID
         if (! isset($_POST['krefrm_form_id'])) {
-            wp_safe_redirect(wp_get_referer() ?: home_url());
-            exit;
+            $this->respond_error(__('Form not found.', 'kreebi-forms'), $is_ajax);
         }
 
         $form_id = sanitize_text_field(wp_unslash($_POST['krefrm_form_id']));
         if (empty($form_id)) {
-            wp_safe_redirect(wp_get_referer() ?: home_url());
-            exit;
+            $this->respond_error(__('Form not found.', 'kreebi-forms'), $is_ajax);
         }
 
         $form_post = $this->find_form_post_by_public_id($form_id);
 
         if (! $form_post) {
-            wp_die(esc_html__('Form not found.', 'kreebi-forms'));
+            $this->respond_error(__('Form not found.', 'kreebi-forms'), $is_ajax);
         }
         $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
 
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Input is unslashed and validated/sanitized below.
+        $form_fields_raw = isset($_POST['krefrm_fields']) ? wp_unslash($_POST['krefrm_fields']) : null;
+        $validation_result = $this->validate_submission_fields($form_data, $form_fields_raw);
+        if (is_wp_error($validation_result)) {
+            $this->respond_error($validation_result->get_error_message(), $is_ajax);
+        }
+
         if (! $this->verify_recaptcha_v3_submission()) {
-            $error_message = __('Captcha verification failed. Please try again.', 'kreebi-forms');
-            wp_safe_redirect(add_query_arg('krefrm_error', rawurlencode($error_message), wp_get_referer() ?: home_url()));
-            exit;
+            $this->respond_error(__('Captcha verification failed. Please try again.', 'kreebi-forms'), $is_ajax);
         }
 
         // Sanitize submitted form fields array.
         $submitted = array();
-        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Input is unslashed and each field value is sanitized in the loop below.
-        $form_fields_raw = isset($_POST['krefrm_fields']) ? wp_unslash($_POST['krefrm_fields']) : null;
         if (is_array($form_fields_raw)) {
             $form_fields = $form_fields_raw;
             foreach ($form_fields as $k => $v) {
@@ -90,8 +92,7 @@ class Krefrm_Submission_Handler
         ));
 
         if (is_wp_error($post_id)) {
-            wp_safe_redirect(add_query_arg('krefrm_error', rawurlencode($post_id->get_error_message()), wp_get_referer() ?: home_url()));
-            exit;
+            $this->respond_error($post_id->get_error_message(), $is_ajax);
         }
 
         update_post_meta($post_id, '_krefrm_form_id', $form_post->ID);
@@ -101,8 +102,122 @@ class Krefrm_Submission_Handler
         // Trigger all active integrations
         $this->trigger_integrations($form_post, $submitted);
 
+        $this->respond_success(__('Successfully send message.', 'kreebi-forms'), $is_ajax);
+    }
+
+    /**
+     * Determine whether submission expects JSON response.
+     */
+    private function is_ajax_submission_request()
+    {
+        if (! empty($_POST['krefrm_ajax']) && '1' === (string) wp_unslash($_POST['krefrm_ajax'])) {
+            return true;
+        }
+
+        if (! empty($_SERVER['HTTP_X_REQUESTED_WITH'])) {
+            $requested_with = sanitize_text_field(wp_unslash($_SERVER['HTTP_X_REQUESTED_WITH']));
+            if ('xmlhttprequest' === strtolower($requested_with)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Return success as JSON for ajax, otherwise keep redirect behavior.
+     */
+    private function respond_success($message, $is_ajax)
+    {
+        if ($is_ajax) {
+            wp_send_json_success(array('message' => $message));
+        }
+
         wp_safe_redirect(add_query_arg('krefrm_submitted', '1', wp_get_referer() ?: home_url()));
         exit;
+    }
+
+    /**
+     * Return error as JSON for ajax, otherwise keep redirect behavior.
+     */
+    private function respond_error($message, $is_ajax)
+    {
+        // Write a server log entry for failure diagnosis.
+        if (function_exists('error_log')) {
+            error_log('[KREFRM] form submission error: ' . $message);
+        }
+
+        if ($is_ajax) {
+            wp_send_json_error(array('message' => $message), 400);
+        }
+
+        wp_safe_redirect(add_query_arg('krefrm_error', rawurlencode($message), wp_get_referer() ?: home_url()));
+        exit;
+    }
+
+    /**
+     * Validate required and typed fields from configured form schema.
+     */
+    private function validate_submission_fields($form_data, $raw_fields)
+    {
+        if (! is_array($raw_fields)) {
+            $raw_fields = array();
+        }
+
+        if (! is_array($form_data)) {
+            return true;
+        }
+
+        $steps = array();
+        if (! empty($form_data['steps']) && is_array($form_data['steps'])) {
+            $steps = $form_data['steps'];
+        } elseif (! empty($form_data['fields']) && is_array($form_data['fields'])) {
+            $steps = array(array('fields' => $form_data['fields']));
+        }
+
+        foreach ($steps as $step) {
+            $fields = isset($step['fields']) && is_array($step['fields']) ? $step['fields'] : array();
+            foreach ($fields as $field) {
+                if (! is_array($field)) {
+                    continue;
+                }
+
+                $label = isset($field['name']) ? sanitize_text_field($field['name']) : __('This field', 'kreebi-forms');
+                $type = isset($field['type']) ? sanitize_key($field['type']) : 'text';
+                $required = ! empty($field['required']);
+
+                $key_source = isset($field['name']) ? $field['name'] : '';
+                $key = sanitize_key(preg_replace('/\s+/', '_', strtolower((string) $key_source)));
+                if ('' === $key) {
+                    continue;
+                }
+
+                $value = isset($raw_fields[$key]) ? $raw_fields[$key] : null;
+
+                if ($required) {
+                    if (is_array($value) && empty($value)) {
+                        return new WP_Error('krefrm_required', sprintf(__('%s is required.', 'kreebi-forms'), $label));
+                    }
+                    if (! is_array($value) && '' === trim((string) $value)) {
+                        return new WP_Error('krefrm_required', sprintf(__('%s is required.', 'kreebi-forms'), $label));
+                    }
+                }
+
+                if ('email' === $type && ! empty($value)) {
+                    if (! is_email((string) $value)) {
+                        return new WP_Error('krefrm_invalid_email', sprintf(__('%s must be a valid email address.', 'kreebi-forms'), $label));
+                    }
+                }
+
+                if ('number' === $type && ! empty($value)) {
+                    if (! is_numeric((string) $value)) {
+                        return new WP_Error('krefrm_invalid_number', sprintf(__('%s must be a valid number.', 'kreebi-forms'), $label));
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**

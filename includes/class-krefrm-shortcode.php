@@ -260,47 +260,169 @@ class Krefrm_Shortcode
   wrapper.innerHTML = formHTML;
   shadow.appendChild(wrapper);
 
-  if (captchaConfig && captchaConfig.enabled && captchaConfig.siteKey) {
-    var form = shadow.querySelector("form.krefrm-frontend-form");
-    if (form) {
-      form.addEventListener("submit", function(event) {
-        event.preventDefault();
+  var form = shadow.querySelector("form.krefrm-frontend-form");
+  if (!form) {
+    return;
+  }
 
-        var tokenInput = form.querySelector("input[name=\"krefrm_recaptcha_token\"]");
-        if (!tokenInput) {
-          form.submit();
+  var submitButton = form.querySelector("button[type=\"submit\"], input[type=\"submit\"]");
+
+  var feedback = form.querySelector(".krefrm-submit-feedback");
+  if (!feedback) {
+    feedback = document.createElement("div");
+    feedback.className = "krefrm-submit-feedback is-hidden";
+    feedback.setAttribute("aria-live", "polite");
+    form.appendChild(feedback);
+  }
+
+  var setFeedback = function(type, message) {
+    feedback.className = "krefrm-submit-feedback";
+    if (!message) {
+      feedback.className += " is-hidden";
+      feedback.textContent = "";
+      return;
+    }
+
+    if (type === "loading") {
+      feedback.className += " is-loading";
+    } else if (type === "error") {
+      feedback.className += " is-error";
+    } else {
+      feedback.className += " is-success";
+    }
+    feedback.textContent = message;
+  };
+
+  var setButtonState = function(disabled, text) {
+    if (!submitButton) {
+      return;
+    }
+    submitButton.disabled = !!disabled;
+    if (typeof text === "string" && text.length > 0) {
+      if (submitButton.tagName === "INPUT") {
+        submitButton.value = text;
+      } else {
+        submitButton.textContent = text;
+      }
+    }
+  };
+
+  var getCaptchaToken = function() {
+    return new Promise(function(resolve, reject) {
+      if (!(captchaConfig && captchaConfig.enabled && captchaConfig.siteKey)) {
+        resolve("");
+        return;
+      }
+
+      var tokenInput = form.querySelector("input[name=\"krefrm_recaptcha_token\"]");
+      if (!tokenInput) {
+        reject(new Error("Captcha token field is missing."));
+        return;
+      }
+
+      var executeCaptcha = function(tries) {
+        if (!window.grecaptcha || typeof window.grecaptcha.ready !== "function") {
+          if (tries >= 40) {
+            reject(new Error("Captcha failed to load. Please try again."));
+            return;
+          }
+          window.setTimeout(function() {
+            executeCaptcha(tries + 1);
+          }, 100);
           return;
         }
 
-        var executeCaptcha = function(tries) {
-          if (!window.grecaptcha || typeof window.grecaptcha.ready !== "function") {
-            if (tries >= 40) {
-              form.submit();
-              return;
-            }
-            window.setTimeout(function() {
-              executeCaptcha(tries + 1);
-            }, 100);
-            return;
-          }
+        window.grecaptcha.ready(function() {
+          window.grecaptcha
+            .execute(captchaConfig.siteKey, { action: "krefrm_submit" })
+            .then(function(token) {
+              tokenInput.value = token || "";
+              resolve(token || "");
+            })
+            .catch(function() {
+              reject(new Error("Captcha verification failed. Please try again."));
+            });
+        });
+      };
 
-          window.grecaptcha.ready(function() {
-            window.grecaptcha
-              .execute(captchaConfig.siteKey, { action: "krefrm_submit" })
-              .then(function(token) {
-                tokenInput.value = token || "";
-                form.submit();
-              })
-              .catch(function() {
-                form.submit();
-              });
-          });
-        };
+      executeCaptcha(0);
+    });
+  };
 
-        executeCaptcha(0);
-      });
+  form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    if (form.getAttribute("data-krefrm-submitted") === "1") {
+      return;
     }
-  }
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      setButtonState(false, "Send Again");
+      setFeedback("error", "Please fill in all required fields with valid values.");
+      return;
+    }
+
+    setButtonState(true, "Submitting...");
+    setFeedback("loading", "Submitting...");
+
+    getCaptchaToken()
+      .then(function(token) {
+        var data = new FormData(form);
+        data.set("krefrm_ajax", "1");
+        if (token) {
+          data.set("krefrm_recaptcha_token", token);
+        }
+
+        var submitUrl = form.getAttribute("action") || "";
+        if (!submitUrl) {
+          throw new Error("Check your network connection.");
+        }
+
+        return window.fetch(submitUrl, {
+          method: "POST",
+          body: data,
+          credentials: "same-origin",
+          headers: {
+            "Accept": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+          }
+        });
+      })
+      .then(function(response) {
+        return response
+          .json()
+          .catch(function() {
+            throw new Error("Check your network connection.");
+          })
+          .then(function(payload) {
+            return { response: response, payload: payload };
+          });
+      })
+      .then(function(result) {
+        var response = result.response;
+        var payload = result.payload;
+
+        if (!response.ok || !payload || !payload.success) {
+          var message = (payload && payload.data && payload.data.message)
+            ? payload.data.message
+            : "Check your network connection.";
+          throw new Error(message);
+        }
+
+        form.setAttribute("data-krefrm-submitted", "1");
+        setButtonState(true, "Submitted");
+        setFeedback("success", (payload.data && payload.data.message) ? payload.data.message : "Successfully send message.");
+      })
+      .catch(function(error) {
+        setButtonState(false, "Send Again");
+        var message = (error && error.message) ? error.message : "";
+        if (!message || /failed to fetch|networkerror/i.test(message)) {
+          message = "Check your network connection.";
+        }
+        setFeedback("error", message);
+      });
+  });
 })();
 </script>
         ';
@@ -600,6 +722,42 @@ class Krefrm_Shortcode
         
         .krefrm-required-star {
           color: #d63638;
+        }
+
+        .krefrm-submit-feedback {
+          margin-top: 12px;
+          padding: 10px 12px;
+          border-radius: 6px;
+          font-size: 14px;
+          line-height: 1.4;
+        }
+
+        .krefrm-submit-feedback.is-hidden {
+          display: none;
+        }
+
+        .krefrm-submit-feedback.is-loading {
+          background: #f0f6fc;
+          color: #1d4f91;
+          border: 1px solid #b6d4fe;
+        }
+
+        .krefrm-submit-feedback.is-error {
+          background: #fcf0f1;
+          color: #8a2424;
+          border: 1px solid #f1b3b8;
+        }
+
+        .krefrm-submit-feedback.is-success {
+          background: #edf7ed;
+          color: #1f5f31;
+          border: 1px solid #9fd7a9;
+        }
+
+        button[disabled],
+        input[type="submit"][disabled] {
+          opacity: 0.7;
+          cursor: not-allowed;
         }
         
         /* ─── Default styles for checkbox, radio, select (all templates) ─── */
@@ -909,7 +1067,7 @@ CSS;
     var form=step.closest(".krefrm-multistep-form");
     if(!form)return;
     if(btn.classList.contains("krefrm-next-btn")){
-      var inputs=step.querySelectorAll("input[required]");
+      var inputs=step.querySelectorAll("input[required], select[required], textarea[required]");
       for(var i=0;i<inputs.length;i++){
         if(!inputs[i].checkValidity()){inputs[i].reportValidity();return;}
       }

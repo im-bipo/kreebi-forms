@@ -55,3 +55,6 @@ register_deactivation_hook(__FILE__, array('Krefrm_Deactivation', 'deactivate'))
 
 // Initialize plugin
 Krefrm_Plugin::instance();
+
+// error logging for debugging purposes
+error_log('[KREFRM] Kreebi Forms plugin loaded successfully.');
