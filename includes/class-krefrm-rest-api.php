@@ -328,10 +328,29 @@ class Krefrm_Rest_Api
             $settings = array();
         }
 
+        $captcha = isset($settings['captcha']) && is_array($settings['captcha'])
+            ? $settings['captcha']
+            : array();
+
+        $threshold = isset($captcha['v3Threshold']) ? floatval($captcha['v3Threshold']) : 0.5;
+        if ($threshold < 0) {
+            $threshold = 0;
+        }
+        if ($threshold > 1) {
+            $threshold = 1;
+        }
+
         return rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
+            'captcha' => array(
+                'enabled' => ! empty($captcha['enabled']),
+                'mode' => 'v3',
+                'siteKey' => isset($captcha['siteKey']) ? sanitize_text_field($captcha['siteKey']) : '',
+                'hasSecretKey' => ! empty($captcha['secretKey']),
+                'v3Threshold' => $threshold,
+            ),
         ));
     }
 
@@ -385,12 +404,75 @@ class Krefrm_Rest_Api
             }
         }
 
+        if (isset($body['captcha'])) {
+            $incoming_captcha = $body['captcha'];
+            if (is_array($incoming_captcha)) {
+                $existing_captcha = isset($settings['captcha']) && is_array($settings['captcha'])
+                    ? $settings['captcha']
+                    : array();
+
+                $sanitized_captcha = array(
+                    'enabled' => ! empty($incoming_captcha['enabled']),
+                    'mode' => 'v3',
+                    'siteKey' => isset($incoming_captcha['siteKey'])
+                        ? sanitize_text_field($incoming_captcha['siteKey'])
+                        : (isset($existing_captcha['siteKey']) ? sanitize_text_field($existing_captcha['siteKey']) : ''),
+                    'secretKey' => isset($existing_captcha['secretKey']) ? sanitize_text_field($existing_captcha['secretKey']) : '',
+                    'v3Threshold' => 0.5,
+                );
+
+                if (isset($incoming_captcha['secretKey']) && '' !== trim((string) $incoming_captcha['secretKey'])) {
+                    $sanitized_captcha['secretKey'] = sanitize_text_field($incoming_captcha['secretKey']);
+                }
+
+                if (isset($incoming_captcha['v3Threshold'])) {
+                    $threshold = floatval($incoming_captcha['v3Threshold']);
+                    if ($threshold < 0) {
+                        $threshold = 0;
+                    }
+                    if ($threshold > 1) {
+                        $threshold = 1;
+                    }
+                    $sanitized_captcha['v3Threshold'] = $threshold;
+                } elseif (isset($existing_captcha['v3Threshold'])) {
+                    $threshold = floatval($existing_captcha['v3Threshold']);
+                    if ($threshold < 0) {
+                        $threshold = 0;
+                    }
+                    if ($threshold > 1) {
+                        $threshold = 1;
+                    }
+                    $sanitized_captcha['v3Threshold'] = $threshold;
+                }
+
+                $settings['captcha'] = $sanitized_captcha;
+            }
+        }
+
         update_option('krefrm_settings', $settings);
+
+        $captcha = isset($settings['captcha']) && is_array($settings['captcha'])
+            ? $settings['captcha']
+            : array();
+        $threshold = isset($captcha['v3Threshold']) ? floatval($captcha['v3Threshold']) : 0.5;
+        if ($threshold < 0) {
+            $threshold = 0;
+        }
+        if ($threshold > 1) {
+            $threshold = 1;
+        }
 
         return rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
+            'captcha' => array(
+                'enabled' => ! empty($captcha['enabled']),
+                'mode' => 'v3',
+                'siteKey' => isset($captcha['siteKey']) ? sanitize_text_field($captcha['siteKey']) : '',
+                'hasSecretKey' => ! empty($captcha['secretKey']),
+                'v3Threshold' => $threshold,
+            ),
         ));
     }
 

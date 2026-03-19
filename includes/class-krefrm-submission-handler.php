@@ -47,6 +47,12 @@ class Krefrm_Submission_Handler
         }
         $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
 
+        if (! $this->verify_recaptcha_v3_submission()) {
+            $error_message = __('Captcha verification failed. Please try again.', 'kreebi-forms');
+            wp_safe_redirect(add_query_arg('krefrm_error', rawurlencode($error_message), wp_get_referer() ?: home_url()));
+            exit;
+        }
+
         // Sanitize submitted form fields array.
         $submitted = array();
         // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Input is unslashed and each field value is sanitized in the loop below.
@@ -232,5 +238,88 @@ class Krefrm_Submission_Handler
         }
 
         Krefrm_Webhook_Service::dispatch_from_form_post($resolved, $form_post, $submitted, 'submission');
+    }
+
+    /**
+     * Verify reCAPTCHA v3 token for frontend submission.
+     */
+    private function verify_recaptcha_v3_submission()
+    {
+        $settings = get_option('krefrm_settings', array());
+        if (! is_array($settings)) {
+            return true;
+        }
+
+        $captcha = isset($settings['captcha']) && is_array($settings['captcha'])
+            ? $settings['captcha']
+            : array();
+
+        $integrations = isset($settings['integrations']) && is_array($settings['integrations'])
+            ? $settings['integrations']
+            : array();
+        if (empty($integrations['captcha'])) {
+            return true;
+        }
+
+        if (empty($captcha['enabled'])) {
+            return true;
+        }
+
+        $site_key = isset($captcha['siteKey']) ? sanitize_text_field($captcha['siteKey']) : '';
+        $secret_key = isset($captcha['secretKey']) ? sanitize_text_field($captcha['secretKey']) : '';
+        if ('' === $site_key || '' === $secret_key) {
+            return false;
+        }
+
+        $token = '';
+        if (isset($_POST['krefrm_recaptcha_token'])) {
+            $token = sanitize_text_field(wp_unslash($_POST['krefrm_recaptcha_token']));
+        }
+        if ('' === $token) {
+            return false;
+        }
+
+        $threshold = isset($captcha['v3Threshold']) ? floatval($captcha['v3Threshold']) : 0.5;
+        if ($threshold < 0) {
+            $threshold = 0;
+        }
+        if ($threshold > 1) {
+            $threshold = 1;
+        }
+
+        $remote_ip = '';
+        if (! empty($_SERVER['REMOTE_ADDR'])) {
+            $remote_ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+        }
+
+        $body = array(
+            'secret' => $secret_key,
+            'response' => $token,
+        );
+        if ('' !== $remote_ip) {
+            $body['remoteip'] = $remote_ip;
+        }
+
+        $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
+            'timeout' => 10,
+            'body' => $body,
+        ));
+
+        if (is_wp_error($response)) {
+            return false;
+        }
+
+        $payload = json_decode(wp_remote_retrieve_body($response), true);
+        if (! is_array($payload) || empty($payload['success'])) {
+            return false;
+        }
+
+        if (! isset($payload['action']) || 'krefrm_submit' !== (string) $payload['action']) {
+            return false;
+        }
+
+        $score = isset($payload['score']) ? floatval($payload['score']) : 0;
+
+        return $score >= $threshold;
     }
 }

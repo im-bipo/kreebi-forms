@@ -1,9 +1,5 @@
 /**
  * Definitions used by the integrations administration page.
- *
- * Keeping these in a separate module makes the page itself slimmer and gives
- * integration modules a single place to read from when they need to influence
- * the card list (e.g. during upgrades).
  */
 
 import { __ } from "@wordpress/i18n";
@@ -113,10 +109,9 @@ export const INTEGRATIONS = [
     id: "captcha",
     name: __("Captcha Protection", "kreebi-forms"),
     description: __(
-      "Add Google reCAPTCHA v3 to your forms to prevent spam and bot submissions. Requires minimal configuration.",
+      "Add Google reCAPTCHA v3 to protect every form submission from spam and automated bots.",
       "kreebi-forms",
     ),
-    isPremium: true,
     icon: (
       <svg
         viewBox="0 0 24 24"

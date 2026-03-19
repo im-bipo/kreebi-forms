@@ -72,12 +72,14 @@ class Krefrm_Shortcode
       return '';
     }
 
-    $this->enqueue_frontend_assets();
-
     $form_data = get_post_meta($form_post->ID, '_krefrm_form_data', true);
     $form_id   = (is_array($form_data) && ! empty($form_data['id']))
       ? (string) $form_data['id']
       : (string) $form_post->post_name;
+
+    $captcha_settings = $this->get_frontend_captcha_settings();
+
+    $this->enqueue_frontend_assets($captcha_settings);
 
     // Resolve style template — global option overrides any per-form value
     $style_template = get_option('krefrm_style_template', 'kreebi_style_1');
@@ -107,6 +109,9 @@ class Krefrm_Shortcode
     $html .= '<input type="hidden" name="action" value="krefrm_submit">';
     $html .= '<input type="hidden" name="krefrm_form_id" value="' . esc_attr($form_id) . '">';
     $html .= wp_nonce_field('krefrm_frontend_submit', 'krefrm_frontend_submit', true, false);
+    if (! empty($captcha_settings['enabled']) && ! empty($captcha_settings['siteKey'])) {
+      $html .= '<input type="hidden" name="krefrm_recaptcha_token" value="">';
+    }
 
     foreach ($steps as $step_index => $step) {
       $step_name = isset($step['name']) ? $step['name'] : '';
@@ -176,7 +181,7 @@ class Krefrm_Shortcode
     }
 
     // Wrap form in Shadow DOM with embedded CSS
-    return $this->wrap_form_in_shadow_dom($html);
+    return $this->wrap_form_in_shadow_dom($html, $captcha_settings);
   }
 
   /**
@@ -221,7 +226,7 @@ class Krefrm_Shortcode
   /**
    * Wrap form HTML in Shadow DOM for complete CSS isolation (without iframe).
    */
-  private function wrap_form_in_shadow_dom($form_html)
+  private function wrap_form_in_shadow_dom($form_html, $captcha_settings = array())
   {
     // Generate unique element ID
     $element_id = 'krefrm-form-' . wp_generate_uuid4();
@@ -237,6 +242,7 @@ class Krefrm_Shortcode
   var formHTML = ' . wp_json_encode($form_html) . ';
   var styles = ' . wp_json_encode($styles) . ';
   var container = document.getElementById("' . esc_attr($element_id) . '");
+  var captchaConfig = ' . wp_json_encode($captcha_settings) . ';
   
   if (!container) return;
   
@@ -253,6 +259,48 @@ class Krefrm_Shortcode
   wrapper.style.cssText = "box-sizing: border-box;";
   wrapper.innerHTML = formHTML;
   shadow.appendChild(wrapper);
+
+  if (captchaConfig && captchaConfig.enabled && captchaConfig.siteKey) {
+    var form = shadow.querySelector("form.krefrm-frontend-form");
+    if (form) {
+      form.addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        var tokenInput = form.querySelector("input[name=\"krefrm_recaptcha_token\"]");
+        if (!tokenInput) {
+          form.submit();
+          return;
+        }
+
+        var executeCaptcha = function(tries) {
+          if (!window.grecaptcha || typeof window.grecaptcha.ready !== "function") {
+            if (tries >= 40) {
+              form.submit();
+              return;
+            }
+            window.setTimeout(function() {
+              executeCaptcha(tries + 1);
+            }, 100);
+            return;
+          }
+
+          window.grecaptcha.ready(function() {
+            window.grecaptcha
+              .execute(captchaConfig.siteKey, { action: "krefrm_submit" })
+              .then(function(token) {
+                tokenInput.value = token || "";
+                form.submit();
+              })
+              .catch(function() {
+                form.submit();
+              });
+          });
+        };
+
+        executeCaptcha(0);
+      });
+    }
+  }
 })();
 </script>
         ';
@@ -650,7 +698,7 @@ CSS;
   /**
    * Enqueue frontend CSS for form rendering.
    */
-  private function enqueue_frontend_assets()
+  private function enqueue_frontend_assets($captcha_settings = array())
   {
     $css_path = KREFRM_PLUGIN_DIR . 'assets/css/admin.css';
     $version  = file_exists($css_path) ? filemtime($css_path) : '1.1.1';
@@ -673,6 +721,49 @@ CSS;
         $custom_css_version
       );
     }
+
+    if (! empty($captcha_settings['enabled']) && ! empty($captcha_settings['siteKey'])) {
+      wp_enqueue_script(
+        'krefrm-recaptcha-v3',
+        'https://www.google.com/recaptcha/api.js?render=' . rawurlencode($captcha_settings['siteKey']),
+        array(),
+        null,
+        true
+      );
+    }
+  }
+
+  /**
+   * Return sanitized global captcha settings used on frontend.
+   */
+  private function get_frontend_captcha_settings()
+  {
+    $settings = get_option('krefrm_settings', array());
+    if (! is_array($settings)) {
+      return array(
+        'enabled' => false,
+        'siteKey' => '',
+      );
+    }
+
+    $integrations = isset($settings['integrations']) && is_array($settings['integrations'])
+      ? $settings['integrations']
+      : array();
+    if (empty($integrations['captcha'])) {
+      return array(
+        'enabled' => false,
+        'siteKey' => '',
+      );
+    }
+
+    $captcha = isset($settings['captcha']) && is_array($settings['captcha'])
+      ? $settings['captcha']
+      : array();
+
+    return array(
+      'enabled' => ! empty($captcha['enabled']),
+      'siteKey' => isset($captcha['siteKey']) ? sanitize_text_field($captcha['siteKey']) : '',
+    );
   }
 
   /* ─── Helpers ─── */

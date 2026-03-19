@@ -12,12 +12,14 @@
 import EmailNotification from "./email-notification";
 import JsonView from "./json-view";
 import Webhook from "./webhook";
+import Captcha from "./captcha";
 
 /** @type {Record<string, { config: object, GlobalSettingsPage: Function, FormTab: Function|null }>} */
 export const INTEGRATION_REGISTRY = {
   "email-notification": EmailNotification,
   "json-view": JsonView,
   webhook: Webhook,
+  captcha: Captcha,
 };
 
 /**
