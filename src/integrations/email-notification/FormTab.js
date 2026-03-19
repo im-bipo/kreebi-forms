@@ -10,33 +10,63 @@
  *  onChange        {Function} called with updated formSettings
  */
 
+import { useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import {
   ToggleControl,
   TextControl,
-  TextareaControl,
   BaseControl,
   Button,
 } from "@wordpress/components";
-
-const STYLE_OPTIONS = [
-  { id: "style1", label: __("Style 1 (With Form Data)", "kreebi-forms") },
-  {
-    id: "style2",
-    label: __("Style 2 (Without Form Data)", "kreebi-forms"),
-  },
-];
+import EmailTemplateStyleEditor from "./StyleEditor";
+import {
+  DEFAULT_EMAIL_TEMPLATE_SETTINGS,
+  STYLE_OPTIONS,
+} from "./templateSettings";
 
 export default function EmailNotificationFormTab({
   globalSettings = {},
   formSettings = {},
   onChange,
+  onSave,
+  formId = "",
 }) {
   // If _useGlobal is not explicitly false, default to using global settings
   const useGlobal = formSettings._useGlobal !== false;
 
   const update = (key) => (value) =>
     onChange({ ...formSettings, _useGlobal: false, [key]: value });
+
+  const updateField = (key, value) =>
+    onChange({ ...formSettings, _useGlobal: false, [key]: value });
+
+  const isStyleEditorRoute =
+    typeof window !== "undefined" &&
+    window.location.hash.includes("forms/edit/email-notification/edit-style?");
+
+  useEffect(() => {
+    if (!isStyleEditorRoute || typeof window === "undefined") return;
+    const hash = window.location.hash.replace(/^#\/?/, "");
+    const queryIndex = hash.indexOf("?");
+    if (queryIndex === -1) return;
+    const queryString = hash.slice(queryIndex + 1);
+    const layout = new URLSearchParams(queryString).get("layout");
+    if (
+      (layout === "style1" || layout === "style2") &&
+      formSettings.styleVariant !== layout
+    ) {
+      onChange({ ...formSettings, _useGlobal: false, styleVariant: layout });
+    }
+  }, [isStyleEditorRoute, formSettings, onChange]);
+
+  const activeSettings = {
+    ...DEFAULT_EMAIL_TEMPLATE_SETTINGS,
+    ...globalSettings,
+    ...(useGlobal ? {} : formSettings),
+  };
+
+  const selectedStyle =
+    formSettings.styleVariant || globalSettings.styleVariant || "style1";
 
   const handleUseGlobalToggle = (val) => {
     if (val) {
@@ -49,18 +79,37 @@ export default function EmailNotificationFormTab({
         recipientEmail: globalSettings.recipientEmail || "",
         senderName: globalSettings.senderName || "",
         subject: globalSettings.subject || "",
-        styleVariant: globalSettings.styleVariant || "style1",
-        logoUrl: globalSettings.logoUrl || "",
-        businessName:
-          globalSettings.businessName || globalSettings.senderName || "",
-        message: globalSettings.message || "",
-        themeColor: globalSettings.themeColor || "#1875E5",
-        footerContactDetails: globalSettings.footerContactDetails || "",
-        footerName: globalSettings.footerName || "",
-        footerEmail: globalSettings.footerEmail || "",
+        ...DEFAULT_EMAIL_TEMPLATE_SETTINGS,
+        ...globalSettings,
       });
     }
   };
+
+  const openStyleEditor = () => {
+    const targetFormId = formId || "";
+    window.location.hash = `forms/edit/email-notification/edit-style?form_id=${encodeURIComponent(
+      targetFormId,
+    )}&layout=${encodeURIComponent(selectedStyle)}`;
+  };
+
+  const closeStyleEditor = () => {
+    const targetFormId = formId || "";
+    window.location.hash = `forms/edit?form_id=${encodeURIComponent(
+      targetFormId,
+    )}&tab=email-notification`;
+  };
+
+  if (isStyleEditorRoute) {
+    return (
+      <EmailTemplateStyleEditor
+        settings={activeSettings}
+        onUpdate={updateField}
+        onBack={closeStyleEditor}
+        onSave={onSave}
+        saveLabel={__("Save Form", "kreebi-forms")}
+      />
+    );
+  }
 
   return (
     <div className="krefrm-intg-form-tab">
@@ -155,72 +204,27 @@ export default function EmailNotificationFormTab({
             }
           />
           <BaseControl label={__("Template Style", "kreebi-forms")}>
-            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+            <div style={{ display: "grid", gap: "8px" }}>
               {STYLE_OPTIONS.map((opt) => (
-                <Button
+                <label
                   key={opt.id}
-                  variant={
-                    (formSettings.styleVariant || "style1") === opt.id
-                      ? "primary"
-                      : "secondary"
-                  }
-                  onClick={() => update("styleVariant")(opt.id)}
+                  style={{ display: "flex", alignItems: "center", gap: "8px" }}
                 >
-                  {opt.label}
-                </Button>
+                  <input
+                    type="radio"
+                    checked={selectedStyle === opt.id}
+                    onChange={() => update("styleVariant")(opt.id)}
+                  />
+                  <span>{opt.label}</span>
+                </label>
               ))}
+              <div>
+                <Button variant="secondary" onClick={openStyleEditor}>
+                  {__("Edit", "kreebi-forms")}
+                </Button>
+              </div>
             </div>
           </BaseControl>
-          <TextControl
-            label={__("Logo URL", "kreebi-forms")}
-            value={formSettings.logoUrl ?? ""}
-            onChange={update("logoUrl")}
-            placeholder={
-              globalSettings.logoUrl || "https://example.com/logo.png"
-            }
-          />
-          <TextControl
-            label={__("Business Name (Header)", "kreebi-forms")}
-            value={formSettings.businessName ?? ""}
-            onChange={update("businessName")}
-            placeholder={
-              globalSettings.businessName ||
-              globalSettings.senderName ||
-              "My Business"
-            }
-          />
-          <TextareaControl
-            label={__("Message", "kreebi-forms")}
-            value={formSettings.message ?? ""}
-            onChange={update("message")}
-            rows={4}
-            placeholder={globalSettings.message || ""}
-          />
-          <TextControl
-            label={__("Theme Color (Hex)", "kreebi-forms")}
-            value={formSettings.themeColor ?? ""}
-            onChange={update("themeColor")}
-            placeholder={globalSettings.themeColor || "#1875E5"}
-          />
-          <TextareaControl
-            label={__("Footer Contact Details", "kreebi-forms")}
-            value={formSettings.footerContactDetails ?? ""}
-            onChange={update("footerContactDetails")}
-            rows={3}
-            placeholder={globalSettings.footerContactDetails || ""}
-          />
-          <TextControl
-            label={__("Footer Name", "kreebi-forms")}
-            value={formSettings.footerName ?? ""}
-            onChange={update("footerName")}
-            placeholder={globalSettings.footerName || ""}
-          />
-          <TextControl
-            label={__("Footer Email", "kreebi-forms")}
-            value={formSettings.footerEmail ?? ""}
-            onChange={update("footerEmail")}
-            placeholder={globalSettings.footerEmail || ""}
-          />
         </div>
       )}
     </div>

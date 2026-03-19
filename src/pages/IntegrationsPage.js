@@ -60,12 +60,20 @@ export default function IntegrationsPage({ route, navigate }) {
 
   /* If route points to a sub-page, render it instead */
   if (route.startsWith("integrations/")) {
-    const subId = route.replace("integrations/", "");
+    const subRoute = parseIntegrationSubRoute(route);
+    const subId = subRoute.integrationId;
     // Only render sub-page if this integration is enabled
-    if (enabled[subId]) {
+    if (subId && enabled[subId]) {
       const SubPage = getIntegrationSubPage(subId);
       if (SubPage) {
-        return <SubPage navigate={navigate} />;
+        return (
+          <SubPage
+            navigate={navigate}
+            route={route}
+            subPath={subRoute.subPath}
+            query={subRoute.query}
+          />
+        );
       }
     }
     // Unknown or disabled sub-page → fall back to list
@@ -173,4 +181,16 @@ export default function IntegrationsPage({ route, navigate }) {
 function getIntegrationSubPage(id) {
   const integration = getIntegration(id);
   return integration?.GlobalSettingsPage || null;
+}
+
+function parseIntegrationSubRoute(route) {
+  const raw = route.replace(/^integrations\//, "");
+  const [pathPart, queryString = ""] = raw.split("?");
+  const segments = pathPart.split("/").filter(Boolean);
+
+  return {
+    integrationId: segments[0] || "",
+    subPath: segments.slice(1).join("/"),
+    query: new URLSearchParams(queryString),
+  };
 }

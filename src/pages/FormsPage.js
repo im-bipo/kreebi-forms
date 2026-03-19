@@ -123,7 +123,8 @@ function getPublicFormIdFromRoute(route) {
 function getTabFromRoute(route) {
   const pathMatch = route.match(/^forms\/edit\/([^?]+)/);
   if (pathMatch) {
-    return decodeURIComponent(pathMatch[1]);
+    const pathValue = decodeURIComponent(pathMatch[1]);
+    return pathValue.split("/")[0] || null;
   }
 
   const queryMatch = route.match(/[?&]tab=([^&]+)/);

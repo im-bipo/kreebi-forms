@@ -180,8 +180,7 @@ class Krefrm_Form_Sanitizer
                     'subject',
                     'styleVariant',
                     'businessName',
-                    'footerName',
-                    'footerEmail',
+                    'buttonText',
                 );
                 foreach ($text_fields as $key) {
                     if (isset($settings[$key])) {
@@ -190,6 +189,9 @@ class Krefrm_Form_Sanitizer
                 }
                 if (isset($settings['logoUrl'])) {
                     $clean['logoUrl'] = esc_url_raw($settings['logoUrl']);
+                }
+                if (isset($settings['buttonUrl'])) {
+                    $clean['buttonUrl'] = esc_url_raw($settings['buttonUrl']);
                 }
                 if (isset($settings['themeColor'])) {
                     $color = sanitize_text_field($settings['themeColor']);

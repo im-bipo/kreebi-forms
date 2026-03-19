@@ -396,8 +396,7 @@ class Krefrm_Rest_Api
                     'subject',
                     'styleVariant',
                     'businessName',
-                    'footerName',
-                    'footerEmail',
+                    'buttonText',
                 );
                 foreach ($text_fields as $key) {
                     if (isset($email_settings[$key])) {
@@ -406,6 +405,9 @@ class Krefrm_Rest_Api
                 }
                 if (isset($email_settings['logoUrl'])) {
                     $sanitized['logoUrl'] = esc_url_raw($email_settings['logoUrl']);
+                }
+                if (isset($email_settings['buttonUrl'])) {
+                    $sanitized['buttonUrl'] = esc_url_raw($email_settings['buttonUrl']);
                 }
                 if (isset($email_settings['themeColor'])) {
                     $color = sanitize_text_field($email_settings['themeColor']);

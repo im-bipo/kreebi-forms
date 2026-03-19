@@ -416,10 +416,10 @@ class Krefrm_Submission_Handler
                 'logoUrl' => '',
                 'businessName' => sanitize_text_field(get_bloginfo('name')),
                 'message' => "Hello,\n\nYou have received a new form submission. Please review the details below.",
+                'buttonText' => 'View Submission',
+                'buttonUrl' => '',
                 'themeColor' => '#1875E5',
                 'footerContactDetails' => 'Contact us for support anytime.',
-                'footerName' => sanitize_text_field(get_bloginfo('name')),
-                'footerEmail' => sanitize_email(get_option('admin_email', '')),
                 'bodyTemplate' => "You have received a new form submission.\n\nSubmitted Data:\n{fields}",
             );
         }
@@ -453,6 +453,12 @@ class Krefrm_Submission_Handler
         }
         if (isset($settings['message'])) {
             $sanitized['message'] = sanitize_textarea_field($settings['message']);
+        }
+        if (isset($settings['buttonText'])) {
+            $sanitized['buttonText'] = sanitize_text_field($settings['buttonText']);
+        }
+        if (isset($settings['buttonUrl'])) {
+            $sanitized['buttonUrl'] = esc_url_raw($settings['buttonUrl']);
         }
         if (isset($settings['themeColor'])) {
             $color = sanitize_text_field($settings['themeColor']);
@@ -515,40 +521,51 @@ class Krefrm_Submission_Handler
 
         $logo_html = '';
         if (! empty($email_settings['logoUrl'])) {
-            $logo_html = '<div style="margin-bottom:12px;"><img src="' . esc_url($email_settings['logoUrl']) . '" alt="Logo" style="max-height:58px;width:auto;display:block;" /></div>';
+            $logo_html = '<div style="margin-bottom:12px;"><img src="' . esc_url($email_settings['logoUrl']) . '" alt="Logo" style="max-height:58px;width:auto;display:block;margin:0 auto;" /></div>';
         }
 
         $message_text = isset($email_settings['message']) ? $email_settings['message'] : '';
-        $message_html = '<p style="margin:0 0 14px;line-height:1.6;color:#1f2937;white-space:pre-line;">' . nl2br(esc_html($message_text)) . '</p>';
+        $message_html = '<p style="margin:0 0 14px;line-height:1.55;color:#111827;white-space:pre-line;font-size:16px;font-weight:600;">' . nl2br(esc_html($message_text)) . '</p>';
+
+        $button_text = isset($email_settings['buttonText']) ? sanitize_text_field($email_settings['buttonText']) : '';
+        $button_url = isset($email_settings['buttonUrl']) ? esc_url($email_settings['buttonUrl']) : '';
+        if ('' === $button_url) {
+            $button_url = esc_url(admin_url('admin.php?page=krefrm_forms#forms'));
+        }
+        $button_html = '';
+        if ('' !== trim($button_text)) {
+            $button_html = '<p style="margin:14px 0 0;text-align:center;">'
+                . '<a href="' . $button_url . '" target="_blank" rel="noopener noreferrer" style="display:inline-block;background:' . esc_attr($theme_color) . ';color:#ffffff;text-decoration:none;font-weight:700;padding:11px 20px;border-radius:2px;">' . esc_html($button_text) . '</a>'
+                . '</p>';
+        }
 
         $footer_contact = isset($email_settings['footerContactDetails']) ? $email_settings['footerContactDetails'] : '';
-        $footer_name = isset($email_settings['footerName']) ? $email_settings['footerName'] : '';
-        $footer_email = isset($email_settings['footerEmail']) ? $email_settings['footerEmail'] : '';
 
         $form_data_html = '';
         if ($include_form_data) {
-            $form_data_html = '<div style="margin:0 0 16px;padding:12px;border:1px solid #dce8fb;border-radius:10px;background:#f8fbff;">'
+            $form_data_html = '<div style="margin:14px 0 0;padding:12px;border:1px solid #dce8fb;background:#f8fbff;text-align:left;">'
                 . '<p style="margin:0 0 10px;font-weight:700;color:' . esc_attr($theme_color) . ';">Form Data</p>'
                 . $fields_html
                 . '</div>';
         }
 
-        $html = '<div style="background:#f3f6fa;padding:22px 14px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">'
-            . '<table role="presentation" cellpadding="0" cellspacing="0" style="max-width:700px;margin:0 auto;width:100%;background:#ffffff;border:1px solid #e5e9f2;border-radius:12px;overflow:hidden;">'
+        $html = '<div style="background:#ededed;padding:20px 12px;font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;">'
+            . '<table role="presentation" cellpadding="0" cellspacing="0" style="max-width:640px;margin:0 auto;width:100%;background:#ededed;">'
             . '<tbody>'
-            . '<tr><td style="background:' . esc_attr($theme_color) . ';padding:16px 18px;color:#ffffff;font-size:20px;font-weight:700;">' . esc_html($business_name) . '</td></tr>'
-            . '<tr><td style="padding:18px;">'
+            . '<tr><td style="text-align:center;padding:8px 0 14px;">'
             . $logo_html
+            . '<p style="margin:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;font-weight:700;color:#1f2937;display:inline-block;border-bottom:3px solid ' . esc_attr($theme_color) . ';padding-bottom:4px;">' . esc_html($business_name) . '</p>'
+            . '</td></tr>'
+            . '<tr><td style="background:#ffffff;border:1px solid #e2e2e2;padding:22px 16px;text-align:center;">'
             . $message_html
+            . $button_html
             . $form_data_html
-            . '<div style="border-top:1px solid #eef2f7;padding-top:12px;color:#334155;line-height:1.55;">'
-            . '<p style="margin:0 0 4px;white-space:pre-line;">' . nl2br(esc_html($footer_contact)) . '</p>'
-            . '<p style="margin:0 0 4px;">' . esc_html($footer_name) . '</p>'
-            . '<p style="margin:0;">' . esc_html($footer_email) . '</p>'
-            . '</div>'
-            . '<p style="margin:16px 0 0;font-size:12px;">'
+            . '</td></tr>'
+            . '<tr><td style="background:#666666;color:#ffffff;padding:18px 16px;text-align:center;line-height:1.55;">'
+            . '<p style="margin:0 0 6px;white-space:pre-line;">' . nl2br(esc_html($footer_contact)) . '</p>'
+            . '</td></tr>'
+            . '<tr><td style="text-align:center;padding:12px 0 0;font-size:12px;">'
             . '<a href="https://kreebiforms.com/" target="_blank" rel="noopener noreferrer" style="color:#1875E5;text-decoration:none;font-weight:600;">Kreebi Forms</a>'
-            . '</p>'
             . '</td></tr>'
             . '</tbody></table>'
             . '</div>';

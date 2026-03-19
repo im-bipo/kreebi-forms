@@ -74,17 +74,17 @@ class Krefrm_Activation
         if (empty($settings['emailNotification']['message'])) {
             $settings['emailNotification']['message'] = "Hello,\n\nYou have received a new form submission. Please review the details below.";
         }
+        if (empty($settings['emailNotification']['buttonText'])) {
+            $settings['emailNotification']['buttonText'] = 'View Submission';
+        }
+        if (empty($settings['emailNotification']['buttonUrl'])) {
+            $settings['emailNotification']['buttonUrl'] = '';
+        }
         if (empty($settings['emailNotification']['themeColor'])) {
             $settings['emailNotification']['themeColor'] = '#1875E5';
         }
         if (empty($settings['emailNotification']['footerContactDetails'])) {
             $settings['emailNotification']['footerContactDetails'] = 'Contact us for support anytime.';
-        }
-        if (empty($settings['emailNotification']['footerName'])) {
-            $settings['emailNotification']['footerName'] = $site_title;
-        }
-        if (empty($settings['emailNotification']['footerEmail'])) {
-            $settings['emailNotification']['footerEmail'] = $admin_email;
         }
         if (empty($settings['emailNotification']['bodyTemplate'])) {
             $settings['emailNotification']['bodyTemplate'] = self::DEFAULT_EMAIL_TEMPLATE;
