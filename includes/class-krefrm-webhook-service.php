@@ -207,6 +207,7 @@ class Krefrm_Webhook_Service
             'posts_per_page' => -1,
             'orderby' => 'ID',
             'order' => 'DESC',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Filtering logs by stored form ID requires meta query.
             'meta_query' => array(
                 array(
                     'key' => '_krefrm_webhook_form_id',

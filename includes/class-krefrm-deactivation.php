@@ -26,8 +26,10 @@ class Krefrm_Deactivation
      */
     public static function handle_survey_submission()
     {
+        $nonce = isset($_POST['nonce']) ? sanitize_text_field(wp_unslash($_POST['nonce'])) : '';
+
         // Verify nonce
-        if (! isset($_POST['nonce']) || ! wp_verify_nonce($_POST['nonce'], 'krefrm_deactivation_nonce')) {
+        if ('' === $nonce || ! wp_verify_nonce($nonce, 'krefrm_deactivation_nonce')) {
             wp_send_json_error(array('message' => 'Security check failed'));
         }
 
@@ -38,13 +40,15 @@ class Krefrm_Deactivation
 
         // Collect survey data
         $survey_data = array(
-            'reason'        => isset($_POST['reason']) ? sanitize_text_field($_POST['reason']) : '',
-            'feedback'      => isset($_POST['feedback']) ? sanitize_textarea_field($_POST['feedback']) : '',
-            'email'         => isset($_POST['email']) ? sanitize_email($_POST['email']) : get_option('admin_email'),
+            'reason'        => isset($_POST['reason']) ? sanitize_text_field(wp_unslash($_POST['reason'])) : '',
+            'feedback'      => isset($_POST['feedback']) ? sanitize_textarea_field(wp_unslash($_POST['feedback'])) : '',
+            'email'         => isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : get_option('admin_email'),
             'timestamp'     => current_time('mysql'),
             'site_url'      => site_url(),
             'plugin_version' => '1.1.1',
         );
+
+        $delete_data = isset($_POST['delete_data']) ? sanitize_text_field(wp_unslash($_POST['delete_data'])) : '';
 
         // Send survey data to email
         self::send_survey_email($survey_data);
@@ -54,13 +58,13 @@ class Krefrm_Deactivation
             'reason'      => $survey_data['reason'],
             'feedback'    => $survey_data['feedback'],
             'email'       => $survey_data['email'],
-            'delete_data' => (isset($_POST['delete_data']) && $_POST['delete_data'] === 'true') ? 'Yes' : 'No',
+            'delete_data' => ('true' === $delete_data) ? 'Yes' : 'No',
             'site'        => $survey_data['site_url'],
             'datetime'    => $survey_data['timestamp'],
         ));
 
         // Delete all data if checkbox is checked
-        if (isset($_POST['delete_data']) && $_POST['delete_data'] === 'true') {
+        if ('true' === $delete_data) {
             self::delete_all_data();
         }
 
@@ -194,6 +198,7 @@ class Krefrm_Deactivation
         delete_option('kreebi_forms_webhooks');
 
         // Delete all postmeta for krefrm post types
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Cleanup query for plugin-owned postmeta at deactivation.
         $wpdb->query(
             "DELETE pm FROM {$wpdb->postmeta} pm
             INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID
@@ -201,6 +206,7 @@ class Krefrm_Deactivation
         );
 
         // Clear any transients
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Cleanup query for plugin-owned options/transients at deactivation.
         $wpdb->query(
             "DELETE FROM {$wpdb->options}
             WHERE option_name LIKE '%kreebi_forms%' OR option_name LIKE '%krefrm_%'"

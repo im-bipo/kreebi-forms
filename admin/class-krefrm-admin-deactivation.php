@@ -22,12 +22,14 @@ class Krefrm_Admin_Deactivation
     private function is_deactivating_kreebi()
     {
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if (! isset($_GET['action']) || $_GET['action'] !== 'deactivate') {
+        $action = isset($_GET['action']) ? sanitize_text_field(wp_unslash($_GET['action'])) : '';
+        if ('deactivate' !== $action) {
             return false;
         }
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        if (! isset($_GET['plugin']) || strpos($_GET['plugin'], 'kreebi-forms') === false) {
+        $plugin = isset($_GET['plugin']) ? sanitize_text_field(wp_unslash($_GET['plugin'])) : '';
+        if ('' === $plugin || strpos($plugin, 'kreebi-forms') === false) {
             return false;
         }
 

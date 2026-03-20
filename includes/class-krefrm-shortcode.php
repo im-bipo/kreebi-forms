@@ -937,7 +937,7 @@ CSS;
         'krefrm-recaptcha-v3',
         'https://www.google.com/recaptcha/api.js?render=' . rawurlencode($captcha_settings['siteKey']),
         array(),
-        null,
+        '1.1.1',
         true
       );
     }

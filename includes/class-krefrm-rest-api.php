@@ -275,6 +275,7 @@ class Krefrm_Rest_Api
                 'post_type'      => 'krefrm_submission',
                 'post_status'    => 'publish',
                 'posts_per_page' => -1,
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Required for matching canonical and legacy form identifiers.
                 'meta_query'     => $meta_query,
             ));
             foreach ($submissions as $submission) {
@@ -584,6 +585,7 @@ class Krefrm_Rest_Api
                 'post_type' => 'krefrm_webhook_log',
                 'posts_per_page' => -1,
                 'fields' => 'ids',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Filtering webhook logs by form ID requires post meta lookup.
                 'meta_query' => array(
                     array(
                         'key' => '_krefrm_webhook_form_id',
@@ -645,7 +647,7 @@ class Krefrm_Rest_Api
 
         // Ensure the includes directory exists
         if (!is_dir(KREFRM_PLUGIN_DIR . 'includes')) {
-            mkdir(KREFRM_PLUGIN_DIR . 'includes', 0755, true);
+            wp_mkdir_p(KREFRM_PLUGIN_DIR . 'includes');
         }
 
         // Write file with proper file permissions
@@ -678,7 +680,7 @@ class Krefrm_Rest_Api
         $css = preg_replace('/<script[^>]*>.*?<\/script>/is', '', $css);
 
         // Remove any HTML tags
-        $css = strip_tags($css);
+        $css = wp_strip_all_tags($css);
 
         // Remove JavaScript event handlers (onclick, onerror, etc.)
         $css = preg_replace('/javascript:/is', '', $css);
@@ -714,7 +716,8 @@ class Krefrm_Rest_Api
             return array(
                 'valid' => false,
                 'error' => sprintf(
-                    __('Mismatched braces: %d opening, %d closing', 'kreebi-forms'),
+                    /* translators: 1: Number of opening braces, 2: Number of closing braces. */
+                    __('Mismatched braces: %1$d opening, %2$d closing', 'kreebi-forms'),
                     $open_braces,
                     $close_braces
                 ),
@@ -729,7 +732,8 @@ class Krefrm_Rest_Api
             return array(
                 'valid' => false,
                 'error' => sprintf(
-                    __('Mismatched parentheses: %d opening, %d closing', 'kreebi-forms'),
+                    /* translators: 1: Number of opening parentheses, 2: Number of closing parentheses. */
+                    __('Mismatched parentheses: %1$d opening, %2$d closing', 'kreebi-forms'),
                     $open_parens,
                     $close_parens
                 ),

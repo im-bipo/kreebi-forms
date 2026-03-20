@@ -110,6 +110,7 @@ class Krefrm_Submission_Handler
      */
     private function is_ajax_submission_request()
     {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only ajax response hint; value is unslashed and compared strictly.
         if (! empty($_POST['krefrm_ajax']) && '1' === (string) wp_unslash($_POST['krefrm_ajax'])) {
             return true;
         }
@@ -143,7 +144,8 @@ class Krefrm_Submission_Handler
     private function respond_error($message, $is_ajax)
     {
         // Write a server log entry for failure diagnosis.
-        if (function_exists('error_log')) {
+        if (defined('WP_DEBUG') && WP_DEBUG && function_exists('error_log')) {
+            // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- Debug-only logging for submission failures.
             error_log('[KREFRM] form submission error: ' . $message);
         }
 
@@ -196,21 +198,25 @@ class Krefrm_Submission_Handler
 
                 if ($required) {
                     if (is_array($value) && empty($value)) {
+                        /* translators: %s: Field label. */
                         return new WP_Error('krefrm_required', sprintf(__('%s is required.', 'kreebi-forms'), $label));
                     }
                     if (! is_array($value) && '' === trim((string) $value)) {
+                        /* translators: %s: Field label. */
                         return new WP_Error('krefrm_required', sprintf(__('%s is required.', 'kreebi-forms'), $label));
                     }
                 }
 
                 if ('email' === $type && ! empty($value)) {
                     if (! is_email((string) $value)) {
+                        /* translators: %s: Field label. */
                         return new WP_Error('krefrm_invalid_email', sprintf(__('%s must be a valid email address.', 'kreebi-forms'), $label));
                     }
                 }
 
                 if ('number' === $type && ! empty($value)) {
                     if (! is_numeric((string) $value)) {
+                        /* translators: %s: Field label. */
                         return new WP_Error('krefrm_invalid_number', sprintf(__('%s must be a valid number.', 'kreebi-forms'), $label));
                     }
                 }
@@ -605,7 +611,9 @@ class Krefrm_Submission_Handler
         }
 
         $token = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in handle_submission() before this method is called.
         if (isset($_POST['krefrm_recaptcha_token'])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce is verified in handle_submission() before this method is called.
             $token = sanitize_text_field(wp_unslash($_POST['krefrm_recaptcha_token']));
         }
         if ('' === $token) {
