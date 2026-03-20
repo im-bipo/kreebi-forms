@@ -102,6 +102,7 @@ class Krefrm_Shortcode
     }
 
     $html  = '<form class="' . esc_attr($form_class) . '" method="post" action="' . $action . '"';
+    $html .= ' data-krefrm-style-template="' . esc_attr($style_template) . '"';
     if ($is_multistep) {
       $html .= ' data-krefrm-steps="' . esc_attr($total_steps) . '"';
     }
@@ -266,6 +267,8 @@ class Krefrm_Shortcode
   }
 
   var submitButton = form.querySelector("button[type=\"submit\"], input[type=\"submit\"]");
+  var styleTemplate = form.getAttribute("data-krefrm-style-template") || "";
+  var isBlankTemplate = styleTemplate === "blank_dev";
 
   var feedback = form.querySelector(".krefrm-submit-feedback");
   if (!feedback) {
@@ -283,7 +286,15 @@ class Krefrm_Shortcode
       return;
     }
 
-    if (type === "loading") {
+    if (isBlankTemplate) {
+      if (type === "loading") {
+        feedback.className += " krefrm-loading";
+      } else if (type === "error") {
+        feedback.className += " krefrm-error";
+      } else {
+        feedback.className += " krefrm-success";
+      }
+    } else if (type === "loading") {
       feedback.className += " is-loading";
     } else if (type === "error") {
       feedback.className += " is-error";
@@ -724,7 +735,8 @@ class Krefrm_Shortcode
           color: #d63638;
         }
 
-        .krefrm-submit-feedback {
+        .krefrm-ui-style-1-form .krefrm-submit-feedback,
+        .krefrm-ui-style-2-form .krefrm-submit-feedback {
           margin-top: 12px;
           padding: 10px 12px;
           border-radius: 6px;
@@ -737,19 +749,22 @@ class Krefrm_Shortcode
           display: none;
         }
 
-        .krefrm-submit-feedback.is-loading {
+        .krefrm-ui-style-1-form .krefrm-submit-feedback.is-loading,
+        .krefrm-ui-style-2-form .krefrm-submit-feedback.is-loading {
           background: #f0f6fc;
           color: #1d4f91;
           border: 1px solid #b6d4fe;
         }
 
-        .krefrm-submit-feedback.is-error {
+        .krefrm-ui-style-1-form .krefrm-submit-feedback.is-error,
+        .krefrm-ui-style-2-form .krefrm-submit-feedback.is-error {
           background: #fcf0f1;
           color: #8a2424;
           border: 1px solid #f1b3b8;
         }
 
-        .krefrm-submit-feedback.is-success {
+        .krefrm-ui-style-1-form .krefrm-submit-feedback.is-success,
+        .krefrm-ui-style-2-form .krefrm-submit-feedback.is-success {
           background: #edf7ed;
           color: #1f5f31;
           border: 1px solid #9fd7a9;
