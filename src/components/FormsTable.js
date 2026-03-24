@@ -140,7 +140,7 @@ function FormCard({
                   setMenuOpen(false);
                 }}
               >
-                {__("Quick view", "kreebi-forms")}
+                {__("Quick Edit", "kreebi-forms")}
               </button>
               {enabledIntegrations &&
                 Object.keys(enabledIntegrations)
