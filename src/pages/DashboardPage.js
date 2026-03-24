@@ -1,12 +1,14 @@
 import { useEffect, useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
-import { Button, Spinner } from "@wordpress/components";
+import { Button } from "@wordpress/components";
+import { INTEGRATIONS, DEFAULT_ENABLED } from "../integrations/definitions";
 
 export default function DashboardPage({ navigate = () => {} }) {
   const [loading, setLoading] = useState(true);
   const [formsCount, setFormsCount] = useState(0);
   const [submissionsCount, setSubmissionsCount] = useState(0);
+  const [activeIntegrations, setActiveIntegrations] = useState(0);
 
   useEffect(() => {
     let isMounted = true;
@@ -14,12 +16,15 @@ export default function DashboardPage({ navigate = () => {} }) {
     Promise.allSettled([
       apiFetch({ path: "/kreebi-forms/v1/forms" }),
       apiFetch({ path: "/kreebi-forms/v1/submissions" }),
+      apiFetch({ path: "/kreebi-forms/v1/settings" }),
     ])
-      .then(([formsResult, submissionsResult]) => {
+      .then(([formsResult, submissionsResult, settingsResult]) => {
         if (!isMounted) return;
 
         if (formsResult.status === "fulfilled") {
-          const forms = Array.isArray(formsResult.value) ? formsResult.value : [];
+          const forms = Array.isArray(formsResult.value)
+            ? formsResult.value
+            : [];
           setFormsCount(forms.length);
         }
 
@@ -29,11 +34,22 @@ export default function DashboardPage({ navigate = () => {} }) {
             : [];
           setSubmissionsCount(submissions.length);
         }
+
+        if (settingsResult.status === "fulfilled") {
+          const settings = settingsResult.value || {};
+          const integrations = settings.integrations || {};
+
+          const defaults = Object.fromEntries(
+            DEFAULT_ENABLED.map((id) => [id, true]),
+          );
+
+          const allSettings = { ...defaults, ...integrations };
+          const activeCount = Object.values(allSettings).filter(Boolean).length;
+          setActiveIntegrations(activeCount);
+        }
       })
       .finally(() => {
-        if (isMounted) {
-          setLoading(false);
-        }
+        if (isMounted) setLoading(false);
       });
 
     return () => {
@@ -41,58 +57,107 @@ export default function DashboardPage({ navigate = () => {} }) {
     };
   }, []);
 
+  const featuredIntegrations = INTEGRATIONS.slice(0, 4);
+
   return (
     <div className="krefrm-dashboard-page">
-      <section className="krefrm-dashboard-hero">
-        <div>
-          <h2>{__("Dashboard", "kreebi-forms")}</h2>
+      <section className="krefrm-dashboard-welcome">
+        <div className="krefrm-dashboard-welcome__content">
+          <h2>{__("Welcome to Kreebi Forms", "kreebi-forms")}</h2>
           <p>
             {__(
-              "See your form activity at a glance and jump into key actions.",
+              "Quickly create forms, review submissions, and connect powerful integrations. Customize confirmations and share embeds in seconds to keep every interaction on brand.",
               "kreebi-forms",
             )}
           </p>
-        </div>
+          <p>
+            {__(
+              "Your active integrations are shown below. Activate or disable integrations from the integrations panel to keep your workflow lean and fast.",
+              "kreebi-forms",
+            )}
+          </p>
 
-        <Button variant="primary" onClick={() => navigate("form/create")}>
-          {__("Create New Form", "kreebi-forms")}
-        </Button>
-      </section>
+          <div className="krefrm-dashboard-quickcards">
+            <article className="krefrm-dashboard-quickcard">
+              <p>{__("Forms", "kreebi-forms")}</p>
+              <strong>{loading ? "..." : formsCount}</strong>
+            </article>
+            <article className="krefrm-dashboard-quickcard">
+              <p>{__("Submissions", "kreebi-forms")}</p>
+              <strong>{loading ? "..." : submissionsCount}</strong>
+            </article>
+            <article className="krefrm-dashboard-quickcard">
+              <p>{__("Active Integrations", "kreebi-forms")}</p>
+              <strong>{loading ? "..." : activeIntegrations}</strong>
+            </article>
+          </div>
 
-      {loading ? (
-        <div className="krefrm-loading">
-          <Spinner />
-        </div>
-      ) : (
-        <section className="krefrm-dashboard-stats" aria-label="Dashboard stats">
-          <article className="krefrm-dashboard-stat-card">
-            <h3>{__("Forms", "kreebi-forms")}</h3>
-            <strong>{formsCount}</strong>
-            <Button variant="secondary" onClick={() => navigate("form")}>
-              {__("Manage Forms", "kreebi-forms")}
+          <div className="krefrm-dashboard-welcome__actions">
+            <Button variant="primary" onClick={() => navigate("form")}>
+              {__("All Form", "kreebi-forms")}
             </Button>
-          </article>
 
-          <article className="krefrm-dashboard-stat-card">
-            <h3>{__("Submissions", "kreebi-forms")}</h3>
-            <strong>{submissionsCount}</strong>
             <Button variant="secondary" onClick={() => navigate("submission")}>
               {__("View Submissions", "kreebi-forms")}
             </Button>
-          </article>
+          </div>
+        </div>
 
-          <article className="krefrm-dashboard-stat-card">
-            <h3>{__("Integrations", "kreebi-forms")}</h3>
-            <strong>{__("Settings", "kreebi-forms")}</strong>
-            <Button
-              variant="secondary"
-              onClick={() => navigate("integrations")}
+        <div className="krefrm-dashboard-welcome__video-wrap">
+          <iframe
+            className="krefrm-dashboard-welcome__video"
+            src="https://www.youtube.com/embed/aqz-KE-bpKQ"
+            title={__("Kreebi Forms video", "kreebi-forms")}
+            loading="lazy"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerPolicy="strict-origin-when-cross-origin"
+            allowFullScreen
+          />
+        </div>
+      </section>
+
+      <section className="krefrm-dashboard-integrations">
+        <div className="krefrm-dashboard-integrations__head">
+          <h3>{__("Active Integrations", "kreebi-forms")}</h3>
+          <button
+            type="button"
+            className="krefrm-dashboard-link"
+            onClick={() => navigate("integrations")}
+          >
+            {__("View More Integrations", "kreebi-forms")}
+          </button>
+        </div>
+
+        <div
+          className="krefrm-dashboard-integrations__grid"
+          aria-label="Integrations"
+        >
+          {featuredIntegrations.map((integration) => (
+            <article
+              key={integration.id}
+              className="krefrm-dashboard-integration-card"
             >
-              {__("Configure", "kreebi-forms")}
-            </Button>
-          </article>
-        </section>
-      )}
+              <span className="krefrm-dashboard-integration-card__icon">
+                {integration.icon}
+              </span>
+              <div className="krefrm-dashboard-integration-card__content">
+                <h4>{integration.name}</h4>
+                <p>{integration.description}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="krefrm-dashboard-integrations__footer">
+          <button
+            type="button"
+            className="krefrm-dashboard-link"
+            onClick={() => navigate("integrations")}
+          >
+            {__("View More Integrations", "kreebi-forms")}
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
