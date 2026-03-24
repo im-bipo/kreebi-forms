@@ -1022,10 +1022,13 @@ CSS;
 
     $html = '<div class="' . $wrapper_classes . '">';
 
+    $required_marker = $required ? ' <span class="krefrm-required-star">*</span>' : '';
+    $label_text = esc_html($name) . $required_marker;
+
     // Handle checkbox, radio, and dropdown types
     if ($type === 'checkbox') {
       $html .= '<fieldset>';
-      $html .= '<legend' . $label_class . '>' . esc_html($name) . '</legend>';
+      $html .= '<legend' . $label_class . '>' . $label_text . '</legend>';
       foreach ($options as $opt) {
         $opt_value = isset($opt['value']) ? sanitize_text_field($opt['value']) : '';
         $opt_label = isset($opt['label']) ? sanitize_text_field($opt['label']) : '';
@@ -1042,7 +1045,7 @@ CSS;
       $html .= '</fieldset>';
     } elseif ($type === 'radio') {
       $html .= '<fieldset>';
-      $html .= '<legend' . $label_class . '>' . esc_html($name) . '</legend>';
+      $html .= '<legend' . $label_class . '>' . $label_text . '</legend>';
       foreach ($options as $opt) {
         $opt_value = isset($opt['value']) ? sanitize_text_field($opt['value']) : '';
         $opt_label = isset($opt['label']) ? sanitize_text_field($opt['label']) : '';
@@ -1058,7 +1061,7 @@ CSS;
       }
       $html .= '</fieldset>';
     } elseif ($type === 'dropdown') {
-      $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
+      $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . $label_text . '</label>';
       $html .= '<select id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']"' . $input_class;
       if ($required) {
         $html .= ' required';
@@ -1073,7 +1076,7 @@ CSS;
       $html .= '</select>';
     } else {
       // Text, email, password, number fields
-      $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . esc_html($name) . '</label>';
+      $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . $label_text . '</label>';
       $html .= '<input type="' . esc_attr($type) . '" id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"' . $input_class;
       if ($required) {
         $html .= ' required';

@@ -285,6 +285,24 @@
   max-width: 100%;
 }
 
+.krefrm-stl-preview-custom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .krefrm-stl-preview-custom-grid {
+    grid-template-columns: 1fr minmax(340px, 1fr);
+    align-items: start;
+  }
+
+  .krefrm-stl-preview-section,
+  .krefrm-custom-css-section {
+    margin-top: 0;
+  }
+}
+
 /* ─── Live preview host (uses the same classes as frontend render) ─── */
 
 .krefrm-stl-preview {
@@ -482,7 +500,7 @@
 /* ─── Custom CSS Section ─── */
 
 .krefrm-custom-css-section {
-  margin-top: 48px;
+  margin-top: 58px;
   padding: 24px;
   background: #ffffff;
   border: 1px solid #e0e0e0;

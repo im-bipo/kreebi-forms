@@ -358,80 +358,82 @@ export default function StyleTemplatePage() {
         })}
       </div>
 
-      {/* Live Preview */}
-      <div className="krefrm-stl-preview-section">
-        <h3 className="krefrm-stl-preview-section__title">
-          {__("Live Preview", "kreebi-forms")}
-        </h3>
-        <p className="krefrm-stl-preview-section__subtitle">
-          {__(
-            "See how your forms will look with the selected template.",
-            "kreebi-forms",
-          )}
-        </p>
-
-        <div className="krefrm-stl-preview-wrap">
-          <LivePreview
-            key={previewKey}
-            templateId={activeTemplate}
-            customCss={customCSS}
-          />
-        </div>
-      </div>
-
-      {/* Custom CSS Section */}
-      <div className="krefrm-custom-css-section">
-        <h3 className="krefrm-custom-css-section__title">
-          {__("Custom CSS", "kreebi-forms")}
-        </h3>
-        <p className="krefrm-custom-css-section__subtitle">
-          {__(
-            "Add additional CSS to customize your forms. Your CSS will be isolated within the Shadow DOM.",
-            "kreebi-forms",
-          )}
-        </p>
-
-        <div className="krefrm-custom-css-editor">
-          <textarea
-            className="krefrm-custom-css-textarea"
-            value={customCSS}
-            onChange={(e) => {
-              setCustomCSS(e.target.value);
-              setCssError("");
-            }}
-            placeholder={__(
-              "/* Example:\n.krefrm-frontend-form {\n  max-width: 600px;\n  margin: 0 auto;\n}\n*/",
+      <div className="krefrm-stl-preview-custom-grid">
+        {/* Live Preview */}
+        <div className="krefrm-stl-preview-section">
+          <h3 className="krefrm-stl-preview-section__title">
+            {__("Live Preview", "kreebi-forms")}
+          </h3>
+          <p className="krefrm-stl-preview-section__subtitle">
+            {__(
+              "See how your forms will look with the selected template.",
               "kreebi-forms",
             )}
-            rows="12"
-          />
+          </p>
 
-          {cssError && (
-            <div className="krefrm-custom-css-error">
-              <strong>{__("CSS Error:", "kreebi-forms")}</strong> {cssError}
-            </div>
-          )}
+          <div className="krefrm-stl-preview-wrap">
+            <LivePreview
+              key={previewKey}
+              templateId={activeTemplate}
+              customCss={customCSS}
+            />
+          </div>
+        </div>
 
-          {cssSaveMessage && (
-            <div className="krefrm-custom-css-success">{cssSaveMessage}</div>
-          )}
+        {/* Custom CSS Section */}
+        <div className="krefrm-custom-css-section">
+          <h3 className="krefrm-custom-css-section__title">
+            {__("Custom CSS", "kreebi-forms")}
+          </h3>
+          <p className="krefrm-custom-css-section__subtitle">
+            {__(
+              "Add additional CSS to customize your forms. Your CSS will be isolated within the Shadow DOM.",
+              "kreebi-forms",
+            )}
+          </p>
 
-          <div className="krefrm-custom-css-actions">
-            <Button
-              variant="primary"
-              onClick={handleSaveCustomCSS}
-              disabled={cssSaving}
-            >
-              {cssSaving
-                ? __("Saving…", "kreebi-forms")
-                : __("Save Custom CSS", "kreebi-forms")}
-            </Button>
-            <p className="krefrm-custom-css-help">
-              {__(
-                "Tip: CSS will be validated before saving. Only valid CSS and comments are allowed.",
+          <div className="krefrm-custom-css-editor">
+            <textarea
+              className="krefrm-custom-css-textarea"
+              value={customCSS}
+              onChange={(e) => {
+                setCustomCSS(e.target.value);
+                setCssError("");
+              }}
+              placeholder={__(
+                "/* Example:\n.krefrm-frontend-form {\n  max-width: 600px;\n  margin: 0 auto;\n}\n*/",
                 "kreebi-forms",
               )}
-            </p>
+              rows="12"
+            />
+
+            {cssError && (
+              <div className="krefrm-custom-css-error">
+                <strong>{__("CSS Error:", "kreebi-forms")}</strong> {cssError}
+              </div>
+            )}
+
+            {cssSaveMessage && (
+              <div className="krefrm-custom-css-success">{cssSaveMessage}</div>
+            )}
+
+            <div className="krefrm-custom-css-actions">
+              <Button
+                variant="primary"
+                onClick={handleSaveCustomCSS}
+                disabled={cssSaving}
+              >
+                {cssSaving
+                  ? __("Saving…", "kreebi-forms")
+                  : __("Save Custom CSS", "kreebi-forms")}
+              </Button>
+              <p className="krefrm-custom-css-help">
+                {__(
+                  "Tip: CSS will be validated before saving. Only valid CSS and comments are allowed.",
+                  "kreebi-forms",
+                )}
+              </p>
+            </div>
           </div>
         </div>
       </div>

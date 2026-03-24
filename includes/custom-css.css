@@ -1,4 +1,4 @@
-.krefrm-frontend-form {
-  /* max-width: 840px;  */
-  /* margin: 0 auto; */
+.krefrm-frontend-form button {
+  background-color: #1875e5; /* Blue Button color */
+  color: #ffff;
 }
