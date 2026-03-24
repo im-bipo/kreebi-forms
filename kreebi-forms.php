@@ -53,5 +53,8 @@ register_activation_hook(__FILE__, array('Krefrm_Activation', 'activate'));
 // Register deactivation hook
 register_deactivation_hook(__FILE__, array('Krefrm_Deactivation', 'deactivate'));
 
+// Load plugin action links helper
+require_once KREFRM_PLUGIN_DIR . 'includes/class-krefrm-plugin-action-links.php';
+
 // Initialize plugin
 Krefrm_Plugin::instance();
