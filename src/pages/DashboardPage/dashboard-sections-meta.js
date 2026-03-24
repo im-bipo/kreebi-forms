@@ -21,11 +21,10 @@ export const DASHBOARD_SECTIONS = [
     ],
   },
   {
-    id: "activeIntegrations",
-    label: "Active Integrations",
+    id: "formAnalytics",
+    label: "Form Analytics",
     defaultVisible: true,
-    defaultSize: DASHBOARD_SECTION_SIZE.MEDIUM,
-    quickLinks: [{ label: "View More Integrations", route: "integrations" }],
+    defaultSize: DASHBOARD_SECTION_SIZE.LARGE,
   },
   {
     id: "bestPerformingForm",
@@ -34,10 +33,11 @@ export const DASHBOARD_SECTIONS = [
     defaultSize: DASHBOARD_SECTION_SIZE.MEDIUM,
   },
   {
-    id: "formAnalytics",
-    label: "Form Analytics",
+    id: "activeIntegrations",
+    label: "Active Integrations",
     defaultVisible: true,
-    defaultSize: DASHBOARD_SECTION_SIZE.LARGE,
+    defaultSize: DASHBOARD_SECTION_SIZE.SMALL,
+    quickLinks: [{ label: "View More Integrations", route: "integrations" }],
   },
 ];
 
