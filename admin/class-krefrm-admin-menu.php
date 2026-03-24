@@ -39,10 +39,12 @@ class Krefrm_Admin_Menu
             admin_url('admin.php?page=krefrm_forms') . '#/'
         );
 
-        // Adjust the auto-created first submenu ("Kreebi Forms") to point to forms.
+        // Adjust the auto-created first submenu ("Kreebi Forms") to point to forms and then hide it.
         global $submenu;
         if (isset($submenu['krefrm_forms'][0])) {
             $submenu['krefrm_forms'][0][2] = admin_url('admin.php?page=krefrm_forms') . '#forms';
+            unset($submenu['krefrm_forms'][0]);
+            $submenu['krefrm_forms'] = array_values($submenu['krefrm_forms']);
         }
 
         // Submenu: All Forms

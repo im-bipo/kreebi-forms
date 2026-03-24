@@ -42,7 +42,7 @@ export default function Welcome({
 
         <div className="krefrm-dashboard-welcome__actions">
           <Button variant="primary" onClick={() => navigate("form")}>
-            {__("All Form", "kreebi-forms")}
+            {__("Create New Form", "kreebi-forms")}
           </Button>
 
           <Button variant="secondary" onClick={() => navigate("submission")}>

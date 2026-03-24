@@ -14,7 +14,7 @@ export default function ActiveIntegration({
           className="krefrm-dashboard-link"
           onClick={() => navigate("integrations")}
         >
-          {__("View More Integrations", "kreebi-forms")}
+          {__("View More Integrations Options", "kreebi-forms")}
         </button>
       </div>
 
@@ -75,16 +75,6 @@ export default function ActiveIntegration({
             </article>
           ))
         )}
-      </div>
-
-      <div className="krefrm-dashboard-integrations__footer">
-        <button
-          type="button"
-          className="krefrm-dashboard-link"
-          onClick={() => navigate("integrations")}
-        >
-          {__("Discover More Integrations", "kreebi-forms")}
-        </button>
       </div>
     </section>
   );

@@ -363,9 +363,33 @@
 
 .krefrm-dashboard-page {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: start;
   gap: 20px;
   margin: 0;
   padding-bottom: 0;
+}
+
+.krefrm-dashboard-section-shell {
+  min-width: 0;
+  display: grid;
+  gap: 0;
+  background: #fff;
+  border: 1px solid #dbe3ec;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.krefrm-dashboard-section-shell--span-1 {
+  grid-column: span 1;
+}
+
+.krefrm-dashboard-section-shell--span-2 {
+  grid-column: span 2;
+}
+
+.krefrm-dashboard-section-shell--span-3 {
+  grid-column: span 3;
 }
 
 .krefrm-dashboard-screen-options-fab {
@@ -465,6 +489,149 @@
   gap: 10px;
 }
 
+.krefrm-dashboard-section-header {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #e5edf5;
+  border-radius: 0;
+  min-height: 40px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: move;
+}
+
+.krefrm-dashboard-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.krefrm-dashboard-section-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.krefrm-dashboard-section-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.krefrm-dashboard-section-link {
+  border: 0;
+  background: transparent;
+  color: #2271b1;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  min-height: 28px;
+  padding: 0 6px;
+  cursor: pointer;
+}
+
+.krefrm-dashboard-section-link:hover,
+.krefrm-dashboard-section-link:focus {
+  color: #185f8a;
+  background: #eef5fb;
+}
+
+.krefrm-dashboard-section-header-actions {
+  position: relative;
+}
+
+.krefrm-dashboard-section-size-toggle {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  background: #f8fafc;
+  color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.krefrm-dashboard-section-size-toggle:hover,
+.krefrm-dashboard-section-size-toggle:focus {
+  background: #eef2f7;
+  border-color: #c5ced9;
+}
+
+.krefrm-dashboard-section-size-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  width: 126px;
+  background: #fff;
+  border: 1px solid #dbe3ec;
+  border-radius: 8px;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14);
+  z-index: 12;
+  display: grid;
+  padding: 6px;
+  gap: 4px;
+}
+
+.krefrm-dashboard-section-size-option {
+  border: 0;
+  background: transparent;
+  text-align: left;
+  border-radius: 6px;
+  min-height: 30px;
+  padding: 0 8px;
+  color: #1f2937;
+  cursor: pointer;
+}
+
+.krefrm-dashboard-section-size-option:hover,
+.krefrm-dashboard-section-size-option:focus {
+  background: #f1f5f9;
+}
+
+.krefrm-dashboard-section-size-option.is-active {
+  background: #eaf3fb;
+  color: #0f3d63;
+  font-weight: 600;
+}
+
+.krefrm-dashboard-section-content {
+  min-width: 0;
+}
+
+.krefrm-dashboard-section-content .krefrm-dashboard-welcome,
+.krefrm-dashboard-section-content .krefrm-dashboard-integrations {
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+}
+
+.krefrm-dashboard-section-content .krefrm-dashboard-integrations {
+  padding-top: 14px;
+}
+
+.krefrm-dashboard-section-content .krefrm-dashboard-integrations__head h3 {
+  display: none;
+}
+
+.krefrm-dashboard-section-content .krefrm-dashboard-integrations__head {
+  display: none;
+}
+
+.krefrm-dashboard-section-content .krefrm-dashboard-integrations {
+  gap: 12px;
+}
+
+.krefrm-dashboard-section-shell.is-dragging {
+  opacity: 0.85;
+}
+
 .krefrm-dashboard-screen-options-item {
   display: flex;
   align-items: center;
@@ -484,6 +651,7 @@
   padding: 20px;
   color: #50575e;
   font-size: 14px;
+  grid-column: 1 / -1;
 }
 
 .krefrm-dashboard-welcome,
@@ -757,6 +925,16 @@
 }
 
 @media (max-width: 640px) {
+  .krefrm-dashboard-page {
+    grid-template-columns: 1fr;
+  }
+
+  .krefrm-dashboard-section-shell--span-1,
+  .krefrm-dashboard-section-shell--span-2,
+  .krefrm-dashboard-section-shell--span-3 {
+    grid-column: span 1;
+  }
+
   .krefrm-dashboard-screen-options-fab {
     right: 14px;
     bottom: 16px;
