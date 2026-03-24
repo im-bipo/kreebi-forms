@@ -105,8 +105,16 @@ export default function ScreenOptionsModal({
                     type="checkbox"
                     checked={Boolean(visibility[section.id])}
                     onChange={() => onToggleSection(section.id)}
+                    disabled={section.id === "welcome"}
                   />
-                  <span>{__(section.label, "kreebi-forms")}</span>
+                  <span>
+                    {__(section.label, "kreebi-forms")}
+                    {section.id === "welcome" && (
+                      <small style={{ marginLeft: 8, color: "#6b7280" }}>
+                        {__("Required", "kreebi-forms")}
+                      </small>
+                    )}
+                  </span>
                 </label>
               );
             })}

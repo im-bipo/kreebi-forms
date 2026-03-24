@@ -307,6 +307,11 @@ export default function DashboardPage({ navigate = () => {} }) {
   };
 
   const handleToggleSection = (sectionKey) => {
+    if (sectionKey === "welcome") {
+      // 'Welcome' section is mandatory and should always stay visible.
+      return;
+    }
+
     setDashboardConfig((prev) => {
       const next = {
         ...prev,

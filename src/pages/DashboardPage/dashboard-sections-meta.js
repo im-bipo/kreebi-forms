@@ -106,6 +106,9 @@ export function normalizeDashboardConfig(input) {
         : section.defaultSize;
   });
 
+  // Enforce 'welcome' always visible.
+  visibility.welcome = true;
+
   return {
     visibility,
     order: normalizedOrder,
