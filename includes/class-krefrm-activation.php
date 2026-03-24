@@ -187,6 +187,76 @@ class Krefrm_Activation
         // If post creation succeeded, save the form data as meta
         if (! is_wp_error($post_id)) {
             update_post_meta($post_id, '_krefrm_form_data', $form_data);
+            self::seed_default_submissions($post_id, $form_data);
+        }
+    }
+
+    /**
+     * Seed default submissions for first-time demo data.
+     */
+    private static function seed_default_submissions($form_post_id, $form_data)
+    {
+        if (! is_array($form_data)) {
+            return;
+        }
+
+        $form_title = get_the_title($form_post_id);
+        $form_public_id = isset($form_data['id']) ? (string) $form_data['id'] : '';
+
+        $timezone = wp_timezone();
+        $today = new DateTimeImmutable('now', $timezone);
+
+        $seed_items = array(
+            array(
+                'days_ago' => 2,
+                'time'     => '13:00:00',
+                'data'     => array(
+                    'name'    => 'John Doe',
+                    'email'   => 'john@example.com',
+                    'message' => 'Interested in your services.',
+                ),
+            ),
+            array(
+                'days_ago' => 2,
+                'time'     => '15:00:00',
+                'data'     => array(
+                    'name'    => 'Sarah Lee',
+                    'email'   => 'sarah@example.com',
+                    'message' => 'Please contact me back.',
+                ),
+            ),
+            array(
+                'days_ago' => 5,
+                'time'     => '00:00:00',
+                'data'     => array(
+                    'name'    => 'Mike Ross',
+                    'email'   => 'mike@example.com',
+                    'message' => 'Can I get more details?',
+                ),
+            ),
+        );
+
+        foreach ($seed_items as $item) {
+            $day = $today->modify('-' . intval($item['days_ago']) . ' days')->format('Y-m-d');
+            $submission_local_dt = new DateTimeImmutable($day . ' ' . $item['time'], $timezone);
+            $post_date = $submission_local_dt->format('Y-m-d H:i:s');
+
+            $submission_post_id = wp_insert_post(array(
+                'post_type'     => 'krefrm_submission',
+                'post_status'   => 'publish',
+                'post_title'    => $form_title . ' — ' . $post_date,
+                'post_content'  => wp_json_encode($item['data']),
+                'post_date'     => $post_date,
+                'post_date_gmt' => get_gmt_from_date($post_date),
+            ), true);
+
+            if (is_wp_error($submission_post_id)) {
+                continue;
+            }
+
+            update_post_meta($submission_post_id, '_krefrm_form_id', $form_post_id);
+            update_post_meta($submission_post_id, '_krefrm_form_id_value', $form_public_id);
+            update_post_meta($submission_post_id, '_krefrm_data', $item['data']);
         }
     }
 
