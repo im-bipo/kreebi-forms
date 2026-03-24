@@ -18,6 +18,8 @@ import { CSS } from "@dnd-kit/utilities";
 import { INTEGRATIONS, DEFAULT_ENABLED } from "../integrations/definitions";
 import Welcome from "./DashboardPage/welcome";
 import ActiveIntegration from "./DashboardPage/active-integration";
+import BestPerformingForm from "./DashboardPage/best-performing-form";
+import FormAnalytics from "./DashboardPage/form-analytics";
 import ScreenOptionsModal from "./DashboardPage/ScreenOptionsModal";
 import {
   DASHBOARD_LAYOUT_STORAGE_KEY,
@@ -57,9 +59,17 @@ function SortableDashboardSection({
 
   const span = SIZE_TO_SPAN[size] || 1;
 
+  const normalizedTransform = transform
+    ? {
+        ...transform,
+        scaleX: 1,
+        scaleY: 1,
+      }
+    : null;
+
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
+    transform: CSS.Transform.toString(normalizedTransform),
+    transition: transition || "transform 220ms cubic-bezier(0.22, 1, 0.36, 1)",
     zIndex: isDragging ? 20 : "auto",
   };
 
@@ -180,6 +190,8 @@ export default function DashboardPage({ navigate = () => {} }) {
   const [submissionsCount, setSubmissionsCount] = useState(0);
   const [activeIntegrations, setActiveIntegrations] = useState(0);
   const [activeIntegrationList, setActiveIntegrationList] = useState([]);
+  const [forms, setForms] = useState([]);
+  const [submissions, setSubmissions] = useState([]);
   const [isScreenOptionsOpen, setIsScreenOptionsOpen] = useState(false);
   const [openSizeMenuSectionId, setOpenSizeMenuSectionId] = useState(null);
   const [dashboardConfig, setDashboardConfig] = useState(
@@ -237,6 +249,7 @@ export default function DashboardPage({ navigate = () => {} }) {
           const forms = Array.isArray(formsResult.value)
             ? formsResult.value
             : [];
+          setForms(forms);
           setFormsCount(forms.length);
         }
 
@@ -244,6 +257,7 @@ export default function DashboardPage({ navigate = () => {} }) {
           const submissions = Array.isArray(submissionsResult.value)
             ? submissionsResult.value
             : [];
+          setSubmissions(submissions);
           setSubmissionsCount(submissions.length);
         }
 
@@ -409,6 +423,26 @@ export default function DashboardPage({ navigate = () => {} }) {
                     loading={loading}
                     featuredIntegrations={featuredIntegrations}
                     navigate={navigate}
+                  />
+                );
+              }
+
+              if (sectionId === "bestPerformingForm") {
+                sectionContent = (
+                  <BestPerformingForm
+                    loading={loading}
+                    forms={forms}
+                    submissions={submissions}
+                  />
+                );
+              }
+
+              if (sectionId === "formAnalytics") {
+                sectionContent = (
+                  <FormAnalytics
+                    loading={loading}
+                    forms={forms}
+                    submissions={submissions}
                   />
                 );
               }

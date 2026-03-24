@@ -827,6 +827,7 @@ class Krefrm_Rest_Api
             'form_id'   => $form_uuid,
             'form_name' => $form_post ? $form_post->post_title : '—',
             'date'      => get_the_date('F j, Y g:i a', $post),
+            'timestamp' => get_post_time('c', false, $post),
             'data'      => is_array($data) ? $data : array(),
         );
     }

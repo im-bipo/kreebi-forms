@@ -27,6 +27,18 @@ export const DASHBOARD_SECTIONS = [
     defaultSize: DASHBOARD_SECTION_SIZE.MEDIUM,
     quickLinks: [{ label: "View More Integrations", route: "integrations" }],
   },
+  {
+    id: "bestPerformingForm",
+    label: "Best Performing Form",
+    defaultVisible: true,
+    defaultSize: DASHBOARD_SECTION_SIZE.MEDIUM,
+  },
+  {
+    id: "formAnalytics",
+    label: "Form Analytics",
+    defaultVisible: true,
+    defaultSize: DASHBOARD_SECTION_SIZE.LARGE,
+  },
 ];
 
 export function buildDefaultDashboardConfig() {
