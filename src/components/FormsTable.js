@@ -274,6 +274,7 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
     if (!restUrl) return;
 
     fetch(`${restUrl}/settings`, {
+      cache: "no-store",
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())

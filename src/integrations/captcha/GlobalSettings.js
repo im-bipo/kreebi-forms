@@ -26,6 +26,7 @@ export default function CaptchaGlobalSettings({ navigate }) {
 
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
+      cache: "no-store",
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())
@@ -66,13 +67,19 @@ export default function CaptchaGlobalSettings({ navigate }) {
 
     fetch(`${restUrl}/settings`, {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         "X-WP-Nonce": nonce,
       },
       body: JSON.stringify({ captcha: payload }),
     })
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error("Failed to save captcha settings");
+        }
+        return r.json();
+      })
       .then((data) => {
         const captcha = data?.captcha || {};
         setSettings((prev) => ({
@@ -83,6 +90,9 @@ export default function CaptchaGlobalSettings({ navigate }) {
         }));
         setSaved(true);
         setTimeout(() => setSaved(false), 2500);
+      })
+      .catch(() => {
+        // leave settings unchanged on failure
       })
       .finally(() => setSaving(false));
   };

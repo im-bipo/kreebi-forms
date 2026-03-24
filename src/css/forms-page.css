@@ -927,9 +927,7 @@
 .krefrm-dashboard-bestperform,
 .krefrm-dashboard-form-analytics {
   background: #fff;
-  border-radius: 16px;
   padding: 18px;
-  border: 1px solid #e5e7eb;
   display: grid;
   gap: 14px;
 }

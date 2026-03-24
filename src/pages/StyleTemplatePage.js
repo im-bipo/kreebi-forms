@@ -137,6 +137,7 @@ export default function StyleTemplatePage() {
   /* Load current settings on mount */
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
+      cache: "no-store",
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())
@@ -167,11 +168,16 @@ export default function StyleTemplatePage() {
     setActiveTemplate(tpl.id);
     fetch(`${restUrl}/settings`, {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         "X-WP-Nonce": nonce,
       },
       body: JSON.stringify({ styleTemplate: tpl.id }),
+    }).then((r) => {
+      if (!r.ok) {
+        throw new Error("Failed to update style template");
+      }
     });
   };
 

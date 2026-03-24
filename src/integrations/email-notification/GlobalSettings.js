@@ -37,6 +37,7 @@ export default function EmailNotificationGlobalSettings({
 
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
+      cache: "no-store",
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())
@@ -52,15 +53,22 @@ export default function EmailNotificationGlobalSettings({
     setSaving(true);
     fetch(`${restUrl}/settings`, {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         "X-WP-Nonce": nonce,
       },
       body: JSON.stringify({ emailNotification: settings }),
     })
-      .then(() => {
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error("Failed to save email notification settings");
+        }
         setSaved(true);
         setTimeout(() => setSaved(false), 2500);
+      })
+      .catch(() => {
+        // keep existing state when save fails
       })
       .finally(() => setSaving(false));
   };

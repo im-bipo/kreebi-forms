@@ -29,6 +29,8 @@ function bundle() {
         "!.prettierrc*",
         "!.eslintrc*",
         "!webpack.config.*",
+        "!debug.log",
+        "!README.md",
       ],
       {
         dot: true,

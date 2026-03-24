@@ -20,6 +20,7 @@ export default function IntegrationsPage({ route, navigate }) {
   /* Load saved integration states on mount */
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
+      cache: "no-store",
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())
@@ -47,15 +48,22 @@ export default function IntegrationsPage({ route, navigate }) {
 
     fetch(`${restUrl}/settings`, {
       method: "POST",
+      cache: "no-store",
       headers: {
         "Content-Type": "application/json",
         "X-WP-Nonce": nonce,
       },
       body: JSON.stringify({ integrations: next }),
-    }).catch(() => {
-      // Revert on failure
-      setEnabled((prev) => ({ ...prev, [integrationId]: !value }));
-    });
+    })
+      .then((r) => {
+        if (!r.ok) {
+          throw new Error("Failed to update integration state");
+        }
+      })
+      .catch(() => {
+        // Revert on failure
+        setEnabled((prev) => ({ ...prev, [integrationId]: !value }));
+      });
   };
 
   /* If route points to a sub-page, render it instead */

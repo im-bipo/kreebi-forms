@@ -45,6 +45,7 @@ export default function CreateFormView({
   /* Load integration settings so the editor knows which tabs to show */
   useEffect(() => {
     fetch(`${restUrl}/settings`, {
+      cache: "no-store",
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())

@@ -341,7 +341,7 @@ class Krefrm_Rest_Api
             $threshold = 1;
         }
 
-        return rest_ensure_response(array(
+        $response = rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
@@ -353,6 +353,12 @@ class Krefrm_Rest_Api
                 'v3Threshold' => $threshold,
             ),
         ));
+
+        $response->header('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->header('Pragma', 'no-cache');
+        $response->header('Expires', '0');
+
+        return $response;
     }
 
     public function update_settings($request)
@@ -486,7 +492,7 @@ class Krefrm_Rest_Api
             $threshold = 1;
         }
 
-        return rest_ensure_response(array(
+        $response = rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
@@ -498,6 +504,12 @@ class Krefrm_Rest_Api
                 'v3Threshold' => $threshold,
             ),
         ));
+
+        $response->header('Cache-Control', 'no-cache, no-store, must-revalidate');
+        $response->header('Pragma', 'no-cache');
+        $response->header('Expires', '0');
+
+        return $response;
     }
 
     /**
