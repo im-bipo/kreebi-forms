@@ -27,7 +27,7 @@ class Krefrm_Admin_Menu
             'krefrm_forms',
             array($this, 'render_page'),
             $icon_url,
-            90
+            59
         );
 
         // Submenu: Dashboard
