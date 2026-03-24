@@ -54,7 +54,7 @@ export default function Welcome({
       <div className="krefrm-dashboard-welcome__video-wrap">
         <iframe
           className="krefrm-dashboard-welcome__video"
-          src="https://www.youtube.com/embed/aqz-KE-bpKQ"
+          src="https://www.youtube.com/embed/FcTLMTyD2DU"
           title={__("Kreebi Forms video", "kreebi-forms")}
           loading="lazy"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

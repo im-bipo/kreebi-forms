@@ -368,6 +368,124 @@
   padding-bottom: 0;
 }
 
+.krefrm-dashboard-screen-options-fab {
+  position: fixed;
+  right: 22px;
+  bottom: 50px;
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 999px;
+  background: #2271b1;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.22);
+  z-index: 999;
+  transition:
+    transform 120ms ease,
+    background-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.krefrm-dashboard-screen-options-fab:hover,
+.krefrm-dashboard-screen-options-fab:focus {
+  background: #185f8a;
+  transform: translateY(-1px);
+}
+
+.krefrm-dashboard-screen-options-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 24, 39, 0.35);
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+}
+
+.krefrm-dashboard-screen-options-modal {
+  width: min(420px, 100%);
+  background: #fff;
+  border-radius: 12px;
+  border: 1px solid #dfe3e8;
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.2);
+  padding: 16px;
+  display: grid;
+  gap: 12px;
+}
+
+.krefrm-dashboard-screen-options-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.krefrm-dashboard-screen-options-modal-title {
+  margin: 0;
+  font-size: 18px;
+  color: #111827;
+}
+
+.krefrm-dashboard-screen-options-close {
+  border: 1px solid #d1d5db;
+  background: #f8fafc;
+  color: #374151;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.krefrm-dashboard-screen-options-close:hover,
+.krefrm-dashboard-screen-options-close:focus {
+  background: #edf2f7;
+  color: #111827;
+}
+
+.krefrm-dashboard-screen-options-title {
+  margin: 0;
+  font-size: 12px;
+  color: #646970;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.krefrm-dashboard-screen-options-modal-body {
+  display: grid;
+  gap: 10px;
+}
+
+.krefrm-dashboard-screen-options-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #1d2327;
+  font-size: 13px;
+}
+
+.krefrm-dashboard-screen-options-item input {
+  margin: 0;
+}
+
+.krefrm-dashboard-empty-state {
+  background: #fff;
+  border: 1px dashed #c3c4c7;
+  border-radius: 10px;
+  padding: 20px;
+  color: #50575e;
+  font-size: 14px;
+}
+
 .krefrm-dashboard-welcome,
 .krefrm-dashboard-integrations {
   margin-bottom: 0;
@@ -639,6 +757,15 @@
 }
 
 @media (max-width: 640px) {
+  .krefrm-dashboard-screen-options-fab {
+    right: 14px;
+    bottom: 16px;
+  }
+
+  .krefrm-dashboard-screen-options-modal {
+    padding: 14px;
+  }
+
   .krefrm-dashboard-welcome {
     grid-template-columns: 1fr;
     padding: 20px;
