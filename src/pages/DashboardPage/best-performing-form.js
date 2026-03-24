@@ -100,12 +100,7 @@ export default function BestPerformingForm({ loading, forms, submissions }) {
     <section className="krefrm-dashboard-bestperform">
       <div className="krefrm-dashboard-bestperform__head">
         <h3>{__("Best Performing Form", "kreebi-forms")}</h3>
-        <p>
-          {__(
-            "Forms x submissions. Highest submission count appears first.",
-            "kreebi-forms",
-          )}
-        </p>
+        <p>{__("Highest submission count appears first.", "kreebi-forms")}</p>
       </div>
 
       {loading ? (
