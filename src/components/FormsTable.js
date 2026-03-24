@@ -292,7 +292,7 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
   const navigateToTab = (form, tabName) => {
     const routeId = `form_id=${encodeURIComponent(form.form_id || "")}`;
     const tabSegment = tabName ? `/${encodeURIComponent(tabName)}` : "";
-    navigate(`forms/edit${tabSegment}?${routeId}`);
+    navigate(`form/edit${tabSegment}?${routeId}`);
   };
 
   const handleCopy = (text, id) => {

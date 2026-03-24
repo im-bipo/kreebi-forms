@@ -12,7 +12,8 @@ export default function PageHeader({ route, navigate }) {
 
   // Don't show tabs on upgrade page
   const showTabs = route !== "upgrade-to-pro";
-  const isFormsActive = route.startsWith("forms");
+  const isDashboardActive = route === "dashboard";
+  const isFormsActive = route.startsWith("form");
   const isSubmissionsActive = route.startsWith("submission");
   const isStyleTemplatesActive = route === "style-templates";
   const isIntegrationsActive = route.startsWith("integrations");
@@ -40,13 +41,25 @@ export default function PageHeader({ route, navigate }) {
         {showTabs && (
           <nav className="krefrm-header__nav">
             <a
-              href="#forms"
+              href="#"
+              className={`krefrm-header__nav-link ${
+                isDashboardActive ? "is-active" : ""
+              }`}
+              onClick={(e) => {
+                e.preventDefault();
+                navigate("");
+              }}
+            >
+              {__("Dashboard", "kreebi-forms")}
+            </a>
+            <a
+              href="#form"
               className={`krefrm-header__nav-link ${
                 isFormsActive ? "is-active" : ""
               }`}
               onClick={(e) => {
                 e.preventDefault();
-                navigate("forms");
+                navigate("form");
               }}
             >
               {__("Forms", "kreebi-forms")}

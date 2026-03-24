@@ -30,13 +30,28 @@ class Krefrm_Admin_Menu
             90
         );
 
+        // Submenu: Dashboard
+        add_submenu_page(
+            'krefrm_forms',
+            __('Dashboard', 'kreebi-forms'),
+            __('Dashboard', 'kreebi-forms'),
+            'manage_options',
+            admin_url('admin.php?page=krefrm_forms') . '#/'
+        );
+
+        // Adjust the auto-created first submenu ("Kreebi Forms") to point to forms.
+        global $submenu;
+        if (isset($submenu['krefrm_forms'][0])) {
+            $submenu['krefrm_forms'][0][2] = admin_url('admin.php?page=krefrm_forms') . '#forms';
+        }
+
         // Submenu: All Forms
         add_submenu_page(
             'krefrm_forms',
             __('All Forms', 'kreebi-forms'),
             __('All Forms', 'kreebi-forms'),
             'manage_options',
-            admin_url('admin.php?page=krefrm_forms') . '#forms'
+            admin_url('admin.php?page=krefrm_forms') . '#form'
         );
 
 

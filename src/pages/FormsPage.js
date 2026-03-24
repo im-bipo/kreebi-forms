@@ -106,22 +106,22 @@ const TEMPLATES = [
   },
 ];
 
-// Legacy helper: extract post ID from route params (e.g., "forms/edit?id=123")
+// Legacy helper: extract post ID from route params (e.g., "form/edit?id=123")
 function getPostIdFromRoute(route) {
   const match = route.match(/[?&]id=(\d+)/);
   return match ? parseInt(match[1], 10) : null;
 }
 
-// Preferred helper: extract public form ID (e.g., "forms/edit?form_id=001")
+// Preferred helper: extract public form ID (e.g., "form/edit?form_id=001")
 function getPublicFormIdFromRoute(route) {
   const match = route.match(/[?&]form_id=([^&]+)/);
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-// Extract tab from path segment (e.g., "forms/edit/email-notification?form_id=001").
+// Extract tab from path segment (e.g., "form/edit/email-notification?form_id=001").
 // Backward-compatible with legacy "tab" query parameter.
 function getTabFromRoute(route) {
-  const pathMatch = route.match(/^forms\/edit\/([^?]+)/);
+  const pathMatch = route.match(/^form\/edit\/([^?]+)/);
   if (pathMatch) {
     const pathValue = decodeURIComponent(pathMatch[1]);
     return pathValue.split("/")[0] || null;
@@ -131,7 +131,7 @@ function getTabFromRoute(route) {
   return queryMatch ? decodeURIComponent(queryMatch[1]) : null;
 }
 
-export default function FormsPage({ route = "forms", navigate = () => {} }) {
+export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -146,9 +146,9 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
   const [showPicker, setShowPicker] = useState(false);
   const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
 
-  const showCreatePage = route === "forms/create";
-  const showQuickBuilder = route === "forms/quick-builder";
-  const showEditPage = route.startsWith("forms/edit");
+  const showCreatePage = route === "form/create";
+  const showQuickBuilder = route === "form/quick-builder";
+  const showEditPage = route.startsWith("form/edit");
 
   const fetchForms = useCallback(async () => {
     setLoading(true);
@@ -220,7 +220,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
       data: parsed,
     });
     setSuccess(__("Form created successfully!", "kreebi-forms"));
-    navigate("forms");
+    navigate("form");
     fetchForms();
   };
 
@@ -269,9 +269,9 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
       : `id=${editFormId}`;
 
     if (newTab) {
-      navigate(`forms/edit/${encodeURIComponent(newTab)}?${routeId}`);
+      navigate(`form/edit/${encodeURIComponent(newTab)}?${routeId}`);
     } else {
-      navigate(`forms/edit?${routeId}`);
+      navigate(`form/edit?${routeId}`);
     }
   };
 
@@ -290,7 +290,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
         initialData={templateData || {}}
         onSubmit={handleCreate}
         onCancel={() => {
-          navigate("forms");
+          navigate("form");
           setTemplateData(null);
         }}
         formId=""
@@ -326,7 +326,7 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
         <CreateFormView
           initialData={editFormData}
           onSubmit={handleUpdate}
-          onCancel={() => navigate("forms")}
+          onCancel={() => navigate("form")}
           isEditing={true}
           formId={currentFormId}
           initialTab={currentTab}
@@ -361,16 +361,16 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
             __("Form created! Shortcode copied to clipboard.", "kreebi-forms"),
           );
           setTemplateData(null);
-          navigate("forms");
+          navigate("form");
           fetchForms();
         }}
         onAdvanced={(jsonData) => {
           setTemplateData(jsonData);
-          navigate("forms/create");
+          navigate("form/create");
         }}
         onCancel={() => {
           setTemplateData(null);
-          navigate("forms");
+          navigate("form");
         }}
       />
     );
@@ -384,9 +384,9 @@ export default function FormsPage({ route = "forms", navigate = () => {} }) {
     const data = tpl.data || {};
     setTemplateData(Object.keys(data).length ? data : {});
     if (useAdvanceEditor) {
-      navigate("forms/create");
+      navigate("form/create");
     } else {
-      navigate("forms/quick-builder");
+      navigate("form/quick-builder");
     }
   };
 

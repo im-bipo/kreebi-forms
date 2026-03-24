@@ -536,7 +536,7 @@ class Krefrm_Submission_Handler
         $button_text = isset($email_settings['buttonText']) ? sanitize_text_field($email_settings['buttonText']) : '';
         $button_url = isset($email_settings['buttonUrl']) ? esc_url($email_settings['buttonUrl']) : '';
         if ('' === $button_url) {
-            $button_url = esc_url(admin_url('admin.php?page=krefrm_forms#forms'));
+            $button_url = esc_url(admin_url('admin.php?page=krefrm_forms#form'));
         }
         $button_html = '';
         if ('' !== trim($button_text)) {

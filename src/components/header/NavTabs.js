@@ -13,7 +13,8 @@ export default function NavTabs({ route, navigate }) {
     return null;
   }
 
-  const isFormsActive = route.startsWith("forms");
+  const isDashboardActive = route === "dashboard";
+  const isFormsActive = route.startsWith("form");
   const isSubmissionsActive = route === "submission";
   const isStyleTemplatesActive = route.startsWith("style-templates");
   const isIntegrationsActive = route.startsWith("integrations");
@@ -21,11 +22,21 @@ export default function NavTabs({ route, navigate }) {
   return (
     <nav className="krefrm-tabs">
       <a
-        href="#forms"
+        href="#"
+        className={`krefrm-tab ${isDashboardActive ? "active" : ""}`}
+        onClick={(e) => {
+          e.preventDefault();
+          navigate("");
+        }}
+      >
+        {__("Dashboard", "kreebi-forms")}
+      </a>
+      <a
+        href="#form"
         className={`krefrm-tab ${isFormsActive ? "active" : ""}`}
         onClick={(e) => {
           e.preventDefault();
-          navigate("forms");
+          navigate("form");
         }}
       >
         {__("Forms", "kreebi-forms")}

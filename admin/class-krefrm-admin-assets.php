@@ -84,15 +84,47 @@ class Krefrm_Admin_Assets
             wp_add_inline_script(
                 'krefrm-admin',
                 '(function() {
+                    function shouldHandleAsClientNav(anchor) {
+                        try {
+                            var target = new URL(anchor.href, window.location.origin);
+                            var current = new URL(window.location.href, window.location.origin);
+                            var sameBase = target.pathname === current.pathname && target.search === current.search;
+                            var isKreebiPage = target.search.indexOf("page=krefrm_forms") !== -1;
+                            var hasHash = !!target.hash;
+                            return sameBase && isKreebiPage && !hasHash;
+                        } catch (e) {
+                            return false;
+                        }
+                    }
+
+                    function bindClientSideMenuNavigation() {
+                        var items = document.querySelectorAll("#adminmenu a[href*=\"page=krefrm_forms\"]");
+                        items.forEach(function(a) {
+                            a.addEventListener("click", function(e) {
+                                if (!shouldHandleAsClientNav(a)) {
+                                    return;
+                                }
+
+                                e.preventDefault();
+                                window.location.hash = "dashboard";
+                            });
+                        });
+                    }
+
                     function syncKrefrmMenu() {
                         var hash = window.location.hash.replace(/^#\/?/, "");
+                        if (hash.indexOf("forms") === 0) {
+                            hash = hash.replace(/^forms\b/, "form");
+                        }
                         var items = document.querySelectorAll("#adminmenu a[href*=\"krefrm_forms\"]");
                         items.forEach(function(a) {
                             var li = a.parentElement;
                             var itemHash = (a.href.split("#")[1] || "").replace(/^\//, "");
                             var isActive = false;
-                            if (itemHash === "forms/create") {
-                                isActive = (hash === "forms/create");
+                            if (itemHash === "form") {
+                                isActive = hash.startsWith("form");
+                            } else if (itemHash === "form/create") {
+                                isActive = (hash === "form/create");
                             } else if (itemHash === "submission") {
                                 // Allow additional params after `submission` (e.g. `#submission?formid=123`)
                                 isActive = hash.startsWith("submission");
@@ -102,9 +134,9 @@ class Krefrm_Admin_Assets
                                 isActive = (hash.startsWith("integrations"));
                             } else if (itemHash === "upgrade-to-pro") {
                                 isActive = (hash === "upgrade-to-pro");
-                            } else if (itemHash === "forms") {
-                                // default to forms if nothing else matches
-                                isActive = (hash !== "forms/create" && !hash.startsWith("submission") && hash !== "style-templates" && !hash.startsWith("integrations") && hash !== "upgrade-to-pro");
+                            } else if (itemHash === "" || itemHash === "dashboard") {
+                                // default to dashboard when no explicit section hash is selected
+                                isActive = (hash === "" || hash === "dashboard");
                             }
                             if (isActive) {
                                 li.classList.add("current");
@@ -115,6 +147,7 @@ class Krefrm_Admin_Assets
                             }
                         });
                     }
+                    bindClientSideMenuNavigation();
                     document.addEventListener("DOMContentLoaded", syncKrefrmMenu);
                     window.addEventListener("hashchange", syncKrefrmMenu);
                 })();'

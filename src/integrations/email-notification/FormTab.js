@@ -42,7 +42,7 @@ export default function EmailNotificationFormTab({
 
   const isStyleEditorRoute =
     typeof window !== "undefined" &&
-    window.location.hash.includes("forms/edit/email-notification/edit-style?");
+    window.location.hash.includes("form/edit/email-notification/edit-style?");
 
   useEffect(() => {
     if (!isStyleEditorRoute || typeof window === "undefined") return;
@@ -87,14 +87,14 @@ export default function EmailNotificationFormTab({
 
   const openStyleEditor = () => {
     const targetFormId = formId || "";
-    window.location.hash = `forms/edit/email-notification/edit-style?form_id=${encodeURIComponent(
+    window.location.hash = `form/edit/email-notification/edit-style?form_id=${encodeURIComponent(
       targetFormId,
     )}&layout=${encodeURIComponent(selectedStyle)}`;
   };
 
   const closeStyleEditor = () => {
     const targetFormId = formId || "";
-    window.location.hash = `forms/edit?form_id=${encodeURIComponent(
+    window.location.hash = `form/edit?form_id=${encodeURIComponent(
       targetFormId,
     )}&tab=email-notification`;
   };
