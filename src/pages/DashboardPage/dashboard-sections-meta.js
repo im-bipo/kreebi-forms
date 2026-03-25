@@ -18,6 +18,7 @@ export const DASHBOARD_SECTIONS = [
     quickLinks: [
       { label: "Create New Forms", route: "form" },
       { label: "View Submissions", route: "submission" },
+      { label: "Open Style Templates", route: "style-templates" },
     ],
   },
   {

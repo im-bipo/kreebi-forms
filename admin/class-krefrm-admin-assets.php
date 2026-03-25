@@ -70,13 +70,16 @@ class Krefrm_Admin_Assets
 
             wp_add_inline_script(
                 'krefrm-admin',
-                'window.krefrmAdmin = ' . wp_json_encode(array(
-                    'page'      => $page,
-                    'restUrl'   => esc_url_raw(rest_url('kreebi-forms/v1')),
-                    'nonce'     => wp_create_nonce('wp_rest'),
-                    'pluginUrl' => KREFRM_PLUGIN_URL,
-                    'siteTitle' => get_bloginfo('name'),
-                    'adminEmail' => get_option('admin_email'),
+                'window.krefrmAdmin = ' . wp_json_encode(array_merge(
+                    array(
+                        'page'      => $page,
+                        'restUrl'   => esc_url_raw(rest_url('kreebi-forms/v1')),
+                        'nonce'     => wp_create_nonce('wp_rest'),
+                        'pluginUrl' => KREFRM_PLUGIN_URL,
+                        'siteTitle' => get_bloginfo('name'),
+                        'adminEmail' => get_option('admin_email'),
+                    ),
+                    Krefrm_Plugin_Config::get_admin_config()
                 )) . ';',
                 'before'
             );
@@ -128,6 +131,8 @@ class Krefrm_Admin_Assets
                             } else if (itemHash === "submission") {
                                 // Allow additional params after `submission` (e.g. `#submission?formid=123`)
                                 isActive = hash.startsWith("submission");
+                            } else if (itemHash === "addons") {
+                                isActive = (hash === "addons");
                             } else if (itemHash === "style-templates") {
                                 isActive = (hash === "style-templates");
                             } else if (itemHash.startsWith("integrations")) {

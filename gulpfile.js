@@ -31,6 +31,7 @@ function bundle() {
         "!webpack.config.*",
         "!debug.log",
         "!README.md",
+        "!test-docs.md",
       ],
       {
         dot: true,

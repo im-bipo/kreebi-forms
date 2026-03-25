@@ -84,6 +84,15 @@ class Krefrm_Admin_Menu
             admin_url('admin.php?page=krefrm_forms') . '#integrations'
         );
 
+        // Submenu: Addons
+        add_submenu_page(
+            'krefrm_forms',
+            __('Addons', 'kreebi-forms'),
+            __('Addons', 'kreebi-forms'),
+            'manage_options',
+            admin_url('admin.php?page=krefrm_forms') . '#addons'
+        );
+
         // Submenu: Upgrade to Pro (calls attention)
         add_submenu_page(
             'krefrm_forms',

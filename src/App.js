@@ -4,6 +4,7 @@ import FormsPage from "./pages/FormsPage";
 import SubmissionsPage from "./pages/SubmissionsPage";
 import StyleTemplatePage from "./pages/StyleTemplatePage";
 import IntegrationsPage from "./pages/IntegrationsPage";
+import AddonsPage from "./pages/AddonsPage";
 import UpgradePage from "./pages/UpgradePage";
 import PageHeader from "./components/header/PageHeader";
 import "./style.css";
@@ -11,6 +12,7 @@ import "./style.css";
 function getHashRoute() {
   const hash = window.location.hash.replace(/^#\/?/, "");
   if (!hash || hash === "dashboard") return "dashboard";
+  if (hash === "addons") return "addons";
   if (hash === "upgrade-to-pro") return "upgrade-to-pro";
   if (hash === "style-templates") return "style-templates";
   if (hash.startsWith("integrations")) return hash;
@@ -43,6 +45,7 @@ export default function App() {
           <FormsPage route={route} navigate={navigate} />
         )}
         {route.startsWith("submission") && <SubmissionsPage />}
+        {route === "addons" && <AddonsPage navigate={navigate} />}
         {route === "style-templates" && <StyleTemplatePage />}
         {route.startsWith("integrations") && (
           <IntegrationsPage route={route} navigate={navigate} />
