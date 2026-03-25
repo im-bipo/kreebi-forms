@@ -90,6 +90,17 @@ class Krefrm_Activation
             $settings['emailNotification']['bodyTemplate'] = self::DEFAULT_EMAIL_TEMPLATE;
         }
 
+        // Set default custom CSS if not already set
+        if (! isset($settings['customCss']) || '' === trim($settings['customCss'])) {
+            $default_css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+            if (file_exists($default_css_file)) {
+                $settings['customCss'] = file_get_contents($default_css_file);
+            } else {
+                // Minimal built-in fallback in case file is missing
+                $settings['customCss'] = ".krefrm-frontend-form button,\n.krefrm-frontend-form button:hover {\n  /* background-color: #1875e5;  */\n  /* color: #ffff; */\n}\n";
+            }
+        }
+
         update_option('krefrm_settings', $settings);
     }
 

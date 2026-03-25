@@ -911,10 +911,11 @@ class Krefrm_Shortcode
 CSS;
 
     // Append custom CSS saved via the admin panel (if present)
-    $custom_css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+    $settings = get_option('krefrm_settings', array());
     $custom_css = '';
-    if (file_exists($custom_css_file)) {
-      $custom_css = file_get_contents($custom_css_file);
+
+    if (is_array($settings) && isset($settings['customCss'])) {
+      $custom_css = $settings['customCss'];
     }
 
     return $base_css . "\n\n/* Custom CSS (saved via admin settings) */\n" . $custom_css;
@@ -935,16 +936,17 @@ CSS;
       $version
     );
 
-    // Enqueue custom CSS if it exists
-    $custom_css_path = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
-    if (file_exists($custom_css_path)) {
-      $custom_css_version = filemtime($custom_css_path);
-      wp_enqueue_style(
-        'krefrm-custom-css',
-        KREFRM_PLUGIN_URL . 'includes/custom-css.css',
-        array('krefrm-frontend'),
-        $custom_css_version
-      );
+    // Append custom CSS from settings if present.
+    // Use inline style so there's no dependency on a physical custom-css.css file.
+    $settings = get_option('krefrm_settings', array());
+    $custom_css = '';
+
+    if (is_array($settings) && isset($settings['customCss']) && '' !== trim($settings['customCss'])) {
+      $custom_css = $settings['customCss'];
+    }
+
+    if ('' !== trim($custom_css)) {
+      wp_add_inline_style('krefrm-frontend', "\n/* Custom CSS (saved via admin settings) */\n" . $custom_css);
     }
 
     if (! empty($captcha_settings['enabled']) && ! empty($captcha_settings['siteKey'])) {

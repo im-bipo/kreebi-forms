@@ -379,6 +379,7 @@ class Krefrm_Rest_Api
                 'hasSecretKey' => ! empty($captcha['secretKey']),
                 'v3Threshold' => $threshold,
             ),
+            'customCss' => isset($settings['customCss']) ? $settings['customCss'] : '',
         ));
 
         $response->header('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -907,11 +908,11 @@ class Krefrm_Rest_Api
 
     public function get_custom_css()
     {
-        $css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
+        $settings = get_option('krefrm_settings', array());
         $css_content = '';
 
-        if (file_exists($css_file)) {
-            $css_content = file_get_contents($css_file);
+        if (is_array($settings) && isset($settings['customCss'])) {
+            $css_content = $settings['customCss'];
         }
 
         return rest_ensure_response(array(
@@ -937,24 +938,13 @@ class Krefrm_Rest_Api
             );
         }
 
-        // Save to file
-        $css_file = KREFRM_PLUGIN_DIR . 'includes/custom-css.css';
-
-        // Ensure the includes directory exists
-        if (!is_dir(KREFRM_PLUGIN_DIR . 'includes')) {
-            wp_mkdir_p(KREFRM_PLUGIN_DIR . 'includes');
+        $settings = get_option('krefrm_settings', array());
+        if (! is_array($settings)) {
+            $settings = array();
         }
 
-        // Write file with proper file permissions
-        $result = file_put_contents($css_file, $css, LOCK_EX);
-
-        if ($result === false) {
-            return new WP_Error(
-                'file_write_error',
-                __('Could not save custom CSS file.', 'kreebi-forms'),
-                array('status' => 500)
-            );
-        }
+        $settings['customCss'] = $css;
+        update_option('krefrm_settings', $settings);
 
         return rest_ensure_response(array(
             'success' => true,
