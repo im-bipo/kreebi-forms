@@ -128,6 +128,15 @@ class Krefrm_Rest_Api
             ),
         ));
 
+        // Integrations definitions endpoint
+        register_rest_route(self::NAMESPACE, '/integrations', array(
+            array(
+                'methods'             => 'GET',
+                'callback'            => array($this, 'get_integrations'),
+                'permission_callback' => array($this, 'check_admin_permission'),
+            ),
+        ));
+
         register_rest_route(self::NAMESPACE, '/submissions/(?P<id>\d+)', array(
             array(
                 'methods'             => 'DELETE',
@@ -528,6 +537,48 @@ class Krefrm_Rest_Api
         $response->header('Expires', '0');
 
         return $response;
+    }
+
+    /* ─── Integrations ─── */
+
+    public function get_integrations()
+    {
+        $integrations = array(
+            array(
+                'id' => 'email-notification',
+                'name' => __('Email Notification', 'kreebi-forms'),
+                'description' => __('Send an email notification to one or more recipients every time a form is submitted. Configure the sender, subject line, and message body to match your workflow.', 'kreebi-forms'),
+            ),
+            array(
+                'id' => 'json-view',
+                'name' => __('JSON View', 'kreebi-forms'),
+                'description' => __('Add a JSON View tab inside the advanced form editor. Inspect or directly edit the raw JSON structure of any form — useful for bulk changes, debugging, or copying form structures.', 'kreebi-forms'),
+            ),
+            array(
+                'id' => 'webhook',
+                'name' => __('Webhook & Zapier', 'kreebi-forms'),
+                'description' => __('Send form data to external services via webhooks or integrate with Zapier for thousands of app integrations.', 'kreebi-forms'),
+            ),
+            array(
+                'id' => 'captcha',
+                'name' => __('Captcha Protection', 'kreebi-forms'),
+                'description' => __('Add Google reCAPTCHA v3 to protect every form submission from spam and automated bots.', 'kreebi-forms'),
+            ),
+            array(
+                'id' => 'google-sheet',
+                'name' => __('Google Sheets', 'kreebi-forms'),
+                'description' => __('Automatically save form submissions directly to a Google Sheet. Perfect for tracking, analysis, and sharing responses with your team.', 'kreebi-forms'),
+                'isPremium' => true,
+            ),
+            array(
+                'id' => 'payment',
+                'name' => __('Payment Processing', 'kreebi-forms'),
+                'description' => __('Accept payments directly through your forms with Stripe or PayPal integration. Secure, reliable, and PCI compliant.', 'kreebi-forms'),
+                'isPremium' => true,
+            ),
+        );
+
+        return rest_ensure_response($integrations);
     }
 
     /**

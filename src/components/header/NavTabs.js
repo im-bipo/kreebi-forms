@@ -13,7 +13,6 @@ export default function NavTabs({ route, navigate }) {
     return null;
   }
 
-  const isDashboardActive = route === "dashboard";
   const isFormsActive = route.startsWith("form");
   const isSubmissionsActive = route === "submission";
   const isStyleTemplatesActive = route.startsWith("style-templates");
@@ -21,16 +20,6 @@ export default function NavTabs({ route, navigate }) {
 
   return (
     <nav className="krefrm-tabs">
-      <a
-        href="#"
-        className={`krefrm-tab ${isDashboardActive ? "active" : ""}`}
-        onClick={(e) => {
-          e.preventDefault();
-          navigate("");
-        }}
-      >
-        {__("Dashboard", "kreebi-forms")}
-      </a>
       <a
         href="#form"
         className={`krefrm-tab ${isFormsActive ? "active" : ""}`}

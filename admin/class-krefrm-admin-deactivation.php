@@ -29,7 +29,10 @@ class Krefrm_Admin_Deactivation
 
         // phpcs:ignore WordPress.Security.NonceVerification.Recommended
         $plugin = isset($_GET['plugin']) ? sanitize_text_field(wp_unslash($_GET['plugin'])) : '';
-        if ('' === $plugin || strpos($plugin, 'kreebi-forms') === false) {
+        $plugin = rawurldecode($plugin);
+
+        // Only show the survey when deactivating the main Kreebi Forms plugin.
+        if ('' === $plugin || 'kreebi-forms/kreebi-forms.php' !== $plugin) {
             return false;
         }
 
@@ -160,11 +163,18 @@ class Krefrm_Admin_Deactivation
             "
             (function(){
                 'use strict';
+                var pluginSlug = 'kreebi-forms/kreebi-forms.php';
+                var encodedPluginSlug = encodeURIComponent(pluginSlug);
                 // Add event listener directly to intercept clicks before anything else
                 document.addEventListener('click', function(e) {
-                    var href = e.target.href || (e.target.closest('a') && e.target.closest('a').href);
-                    if (href && href.indexOf('action=deactivate') !== -1 && href.indexOf('kreebi-forms') !== -1) {
-                        if (!e.target.closest('a').getAttribute('data-krefrm-approved')) {
+                    var anchor = e.target.closest('a');
+                    if (!anchor) {
+                        return;
+                    }
+
+                    var href = anchor.href || '';
+                    if (href.indexOf('action=deactivate') !== -1 && (href.indexOf(pluginSlug) !== -1 || href.indexOf(encodedPluginSlug) !== -1)) {
+                        if (!anchor.getAttribute('data-krefrm-approved')) {
                             e.preventDefault();
                             e.stopPropagation();
                             var modal = document.getElementById('krefrm-deactivation-modal');

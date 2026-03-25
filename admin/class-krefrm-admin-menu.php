@@ -30,22 +30,8 @@ class Krefrm_Admin_Menu
             59
         );
 
-        // Submenu: Dashboard
-        add_submenu_page(
-            'krefrm_forms',
-            __('Dashboard', 'kreebi-forms'),
-            __('Dashboard', 'kreebi-forms'),
-            'manage_options',
-            admin_url('admin.php?page=krefrm_forms') . '#/'
-        );
-
-        // Adjust the auto-created first submenu ("Kreebi Forms") to point to forms and then hide it.
-        global $submenu;
-        if (isset($submenu['krefrm_forms'][0])) {
-            $submenu['krefrm_forms'][0][2] = admin_url('admin.php?page=krefrm_forms') . '#forms';
-            unset($submenu['krefrm_forms'][0]);
-            $submenu['krefrm_forms'] = array_values($submenu['krefrm_forms']);
-        }
+        // Remove the auto-generated "Kreebi Forms" submenu item (keep only explicit items below).
+        remove_submenu_page('krefrm_forms', 'krefrm_forms');
 
         // Submenu: All Forms
         add_submenu_page(
@@ -101,6 +87,20 @@ class Krefrm_Admin_Menu
             'manage_options',
             admin_url('admin.php?page=krefrm_forms') . '#upgrade-to-pro'
         );
+
+        // Remove leftover entry "Kreebi Forms" from submenu list
+        remove_submenu_page('krefrm_forms', 'krefrm_forms');
+
+        // Ensure no duplicate label remains
+        global $submenu;
+        if (! empty($submenu['krefrm_forms'])) {
+            foreach ($submenu['krefrm_forms'] as $index => $item) {
+                if (isset($item[0]) && $item[0] === __('Kreebi Forms', 'kreebi-forms')) {
+                    unset($submenu['krefrm_forms'][$index]);
+                }
+            }
+            $submenu['krefrm_forms'] = array_values($submenu['krefrm_forms']);
+        }
     }
 
     public function render_page()

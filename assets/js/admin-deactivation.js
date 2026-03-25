@@ -3,8 +3,21 @@ jQuery(document).ready(function ($) {
 
   var deactivateLink = null;
 
-  // Store reference to the deactivation link for later use
-  var $deactivateLink = $('a[href*="action=deactivate"][href*="kreebi-forms"]');
+  // Store reference to the deactivation link for later use, handling encoded and plain plugin slugs
+  var pluginSlug = 'kreebi-forms/kreebi-forms.php';
+  var encodedPluginSlug = encodeURIComponent(pluginSlug);
+
+  var $deactivateLink = $('a[href*="action=deactivate"]').filter(function () {
+    var href = this.href || '';
+    try {
+      href = decodeURIComponent(href);
+    } catch (e) {
+      // ignore malformed URI
+    }
+
+    return href.indexOf(pluginSlug) !== -1 || href.indexOf(encodedPluginSlug) !== -1;
+  });
+
   if ($deactivateLink.length) {
     deactivateLink = $deactivateLink[0];
   }

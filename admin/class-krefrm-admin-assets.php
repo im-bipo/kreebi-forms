@@ -109,7 +109,7 @@ class Krefrm_Admin_Assets
                                 }
 
                                 e.preventDefault();
-                                window.location.hash = "dashboard";
+                                window.location.hash = "form";
                             });
                         });
                     }
@@ -137,11 +137,13 @@ class Krefrm_Admin_Assets
                                 isActive = (hash === "style-templates");
                             } else if (itemHash.startsWith("integrations")) {
                                 isActive = (hash.startsWith("integrations"));
+                            } else if (itemHash === "dashboard") {
+                                isActive = (hash === "dashboard");
                             } else if (itemHash === "upgrade-to-pro") {
                                 isActive = (hash === "upgrade-to-pro");
-                            } else if (itemHash === "" || itemHash === "dashboard") {
-                                // default to dashboard when no explicit section hash is selected
-                                isActive = (hash === "" || hash === "dashboard");
+                            } else if (itemHash === "") {
+                                // default to forms when no explicit section hash is selected
+                                isActive = (hash === "" || hash === "form");
                             }
                             if (isActive) {
                                 li.classList.add("current");
