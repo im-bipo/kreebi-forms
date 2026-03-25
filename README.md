@@ -423,6 +423,16 @@ Contributions and bug reports are welcome. Please open issues or PRs on the repo
 
 ## Changelog
 
+= 1.1.4 =
+
+- Fixed deactivation survey modal not opening when plugin slug is URL-encoded in admin deactivation link.
+- Improved deactivation flow to support both encoded and plain plugin slug values.
+
+= 1.1.3 =
+
+- Added safer deactivation link interception using `closest('a')` and numeric form flow.
+- Enhanced survey AJAX handling and fallback on deactivation approval.
+
 = 1.0.0 =
 
 - Initial release.

@@ -4,7 +4,7 @@ Tags: form builder, contact form, custom forms, submission management, integrati
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.3
+Stable tag: 1.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Repository: https://github.com/im-bipo/kreebi-forms
@@ -132,19 +132,16 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 5. *Style Template Page* : choose or customise visual templates to style your forms without touching code.
 6. *Integrations Page* : connect fields to third‑party services like email, CRM, or webhooks with ease.
 
-== Upgrade Notice ==
-
-
-= 1.1.1 =
-* Improved integrations coverage, stronger configuration defaults, and stability enhancements.
-
-= 1.1.0 =
-* Minor enhancements and additional bug fixes.
-
-= 1.0.1 =
-* Bug fixes and security tweaks.
 
 == Changelog ==
+
+= 1.1.4 =
+* Fixed deactivation survey modal not opening when plugin slug is URL-encoded in admin deactivation link handling.
+* Improved admin deactivation flow by supporting both encoded and plain plugin slug values.
+
+= 1.1.3 =
+* Added safer link interception logic for the deactivation survey modal, using anchor closest traversal and encoded slug matching.
+* Updated deactivation survey data handling and nonce security checks in admin mode.
 
 = 1.1.2 =
 * Added reCAPTCHA v3 integration support and verification flow.
