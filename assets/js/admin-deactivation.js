@@ -4,18 +4,20 @@ jQuery(document).ready(function ($) {
   var deactivateLink = null;
 
   // Store reference to the deactivation link for later use, handling encoded and plain plugin slugs
-  var pluginSlug = 'kreebi-forms/kreebi-forms.php';
+  var pluginSlug = "kreebi-forms/kreebi-forms.php";
   var encodedPluginSlug = encodeURIComponent(pluginSlug);
 
   var $deactivateLink = $('a[href*="action=deactivate"]').filter(function () {
-    var href = this.href || '';
+    var href = this.href || "";
     try {
       href = decodeURIComponent(href);
     } catch (e) {
       // ignore malformed URI
     }
 
-    return href.indexOf(pluginSlug) !== -1 || href.indexOf(encodedPluginSlug) !== -1;
+    return (
+      href.indexOf(pluginSlug) !== -1 || href.indexOf(encodedPluginSlug) !== -1
+    );
   });
 
   if ($deactivateLink.length) {
