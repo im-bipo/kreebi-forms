@@ -5,8 +5,9 @@
  * Clicking selects it; the Settings Panel shows its properties.
  */
 
+import { useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { Button } from "@wordpress/components";
+import { Button, Modal } from "@wordpress/components";
 
 export default function SortableFieldCard({
   field,
@@ -19,6 +20,21 @@ export default function SortableFieldCard({
   canMoveUp,
   canMoveDown,
 }) {
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const handleDeleteClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setIsDeleteModalOpen(false);
+    onRemove();
+  };
+
+  const handleCancelDelete = () => {
+    setIsDeleteModalOpen(false);
+  };
+
   return (
     <div
       className={`krefrm-field-card ${isSelected ? "is-selected" : ""}`}
@@ -93,13 +109,7 @@ export default function SortableFieldCard({
           className="krefrm-field-card__remove"
           onClick={(e) => {
             e.stopPropagation();
-            if (
-              window.confirm(
-                __("Remove this field? This cannot be undone.", "kreebi-forms"),
-              )
-            ) {
-              onRemove();
-            }
+            handleDeleteClick();
           }}
           title={__("Remove field", "kreebi-forms")}
           aria-label={__("Remove field", "kreebi-forms")}
@@ -123,6 +133,45 @@ export default function SortableFieldCard({
           </svg>
         </Button>
       </div>
+
+      {isDeleteModalOpen && (
+        <Modal
+          title={__("Remove Field", "kreebi-forms")}
+          onRequestClose={handleCancelDelete}
+          isDismissible={true}
+          shouldCloseOnClickOutside={false}
+        >
+          <div style={{ textAlign: "center", padding: "16px 0" }}>
+            <p style={{ marginBottom: "24px" }}>
+              {__(
+                "Remove this field? This cannot be undone.",
+                "kreebi-forms",
+              )}
+            </p>
+            <div
+              style={{
+                display: "flex",
+                gap: "12px",
+                justifyContent: "center",
+              }}
+            >
+              <Button
+                variant="secondary"
+                onClick={handleCancelDelete}
+              >
+                {__("Cancel", "kreebi-forms")}
+              </Button>
+              <Button
+                variant="primary"
+                isDestructive
+                onClick={handleConfirmDelete}
+              >
+                {__("Remove", "kreebi-forms")}
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }
