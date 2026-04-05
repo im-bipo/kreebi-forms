@@ -169,8 +169,8 @@ export default function useFormBuilder(initial = {}) {
           Array.isArray(rest.options) && rest.options.length > 0
             ? rest.options
             : [
-                { label: "Option 1", value: "opt1" },
-                { label: "Option 2", value: "opt2" },
+                { label: "Option 1", value: "Option 1" },
+                { label: "Option 2", value: "Option 2" },
               ],
       };
     }

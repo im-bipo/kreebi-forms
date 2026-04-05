@@ -61,8 +61,8 @@ const FIELD_TYPES = [
       name: "Checkbox Field",
       type: "checkbox",
       options: [
-        { label: "Option 1", value: "opt1" },
-        { label: "Option 2", value: "opt2" },
+        { label: "Option 1", value: "Option 1" },
+        { label: "Option 2", value: "Option 2" },
       ],
       required: false,
       wrapper: { class: "", id: "" },
@@ -76,8 +76,8 @@ const FIELD_TYPES = [
       name: "Radio Button Field",
       type: "radio",
       options: [
-        { label: "Option 1", value: "opt1" },
-        { label: "Option 2", value: "opt2" },
+        { label: "Option 1", value: "Option 1" },
+        { label: "Option 2", value: "Option 2" },
       ],
       required: false,
       wrapper: { class: "", id: "" },
@@ -91,8 +91,8 @@ const FIELD_TYPES = [
       name: "Dropdown Field",
       type: "dropdown",
       options: [
-        { label: "Option 1", value: "opt1" },
-        { label: "Option 2", value: "opt2" },
+        { label: "Option 1", value: "Option 1" },
+        { label: "Option 2", value: "Option 2" },
       ],
       required: false,
       wrapper: { class: "", id: "" },

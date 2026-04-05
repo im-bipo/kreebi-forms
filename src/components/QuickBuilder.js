@@ -108,8 +108,8 @@ function newBlankField(type = "text") {
     required: false,
     options: hasOptions
       ? [
-          { label: "Option 1", value: "opt1" },
-          { label: "Option 2", value: "opt2" },
+          { label: "Option 1", value: "Option 1" },
+          { label: "Option 2", value: "Option 2" },
         ]
       : [],
   };
@@ -225,8 +225,8 @@ export default function QuickBuilder({
           Array.isArray(rest.options) && rest.options.length > 0
             ? rest.options
             : [
-                { label: "Option 1", value: "opt1" },
-                { label: "Option 2", value: "opt2" },
+                { label: "Option 1", value: "Option 1" },
+                { label: "Option 2", value: "Option 2" },
               ],
       };
     }
@@ -449,28 +449,11 @@ export default function QuickBuilder({
                             >
                               <input
                                 type="text"
-                                placeholder={__("Label", "kreebi-forms")}
-                                value={opt.label || ""}
+                                placeholder={__("Option", "kreebi-forms")}
+                                value={opt.label || opt.value || ""}
                                 onChange={(e) => {
                                   const newOpts = [...field.options];
                                   newOpts[optIdx].label = e.target.value;
-                                  updateField(field._uid, { options: newOpts });
-                                }}
-                                onClick={(e) => e.stopPropagation()}
-                                style={{
-                                  flex: 1,
-                                  padding: "6px 8px",
-                                  fontSize: "12px",
-                                  border: "1px solid #ddd",
-                                  borderRadius: "3px",
-                                }}
-                              />
-                              <input
-                                type="text"
-                                placeholder={__("Value", "kreebi-forms")}
-                                value={opt.value || ""}
-                                onChange={(e) => {
-                                  const newOpts = [...field.options];
                                   newOpts[optIdx].value = e.target.value;
                                   updateField(field._uid, { options: newOpts });
                                 }}
@@ -512,7 +495,7 @@ export default function QuickBuilder({
                             const newOpts = [...(field.options || [])];
                             newOpts.push({
                               label: `Option ${newOpts.length + 1}`,
-                              value: `opt${newOpts.length + 1}`,
+                              value: `Option ${newOpts.length + 1}`,
                             });
                             updateField(field._uid, { options: newOpts });
                           }}

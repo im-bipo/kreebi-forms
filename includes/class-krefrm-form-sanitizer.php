@@ -106,18 +106,6 @@ class Krefrm_Form_Sanitizer
             $sanitized_field['placeholder'] = isset($field['placeholder']) ? sanitize_text_field($field['placeholder']) : '';
         }
 
-        // Layout (colSpan for grid width)
-        $col_span = 12; // default full width
-        if (! empty($field['layout']) && is_array($field['layout'])) {
-            if (isset($field['layout']['colSpan'])) {
-                $span = absint($field['layout']['colSpan']);
-                if (in_array($span, array(4, 6, 8, 12), true)) {
-                    $col_span = $span;
-                }
-            }
-        }
-        $sanitized_field['layout'] = array('colSpan' => $col_span);
-
         // Handle choice-based fields (checkbox, radio, dropdown)
         if (in_array($type, array('checkbox', 'radio', 'dropdown'), true)) {
             $sanitized_field['options'] = array();

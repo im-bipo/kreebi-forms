@@ -194,9 +194,9 @@ Example form JSON structure with all field types:
       "type": "dropdown",
       "required": true,
       "options": [
-        { "label": "Product A", "value": "prod_a" },
-        { "label": "Product B", "value": "prod_b" },
-        { "label": "Product C", "value": "prod_c" }
+        { "label": "Product A", "value": "Product A" },
+        { "label": "Product B", "value": "Product B" },
+        { "label": "Product C", "value": "Product C" }
       ]
     },
     {
@@ -204,10 +204,10 @@ Example form JSON structure with all field types:
       "type": "radio",
       "required": true,
       "options": [
-        { "label": "Google Search", "value": "google" },
-        { "label": "Social Media", "value": "social" },
-        { "label": "Referral", "value": "referral" },
-        { "label": "Other", "value": "other" }
+        { "label": "Google Search", "value": "Google Search" },
+        { "label": "Social Media", "value": "Social Media" },
+        { "label": "Referral", "value": "Referral" },
+        { "label": "Other", "value": "Other" }
       ]
     },
     {
@@ -286,9 +286,9 @@ Example form JSON structure with all field types:
   "type": "dropdown",
   "required": true,
   "options": [
-    { "label": "Option 1", "value": "opt1" },
-    { "label": "Option 2", "value": "opt2" },
-    { "label": "Option 3", "value": "opt3" }
+    { "label": "Option 1", "value": "Option 1" },
+    { "label": "Option 2", "value": "Option 2" },
+    { "label": "Option 3", "value": "Option 3" }
   ]
 }
 ```
@@ -301,9 +301,9 @@ Example form JSON structure with all field types:
   "type": "radio",
   "required": true,
   "options": [
-    { "label": "Option A", "value": "opt_a" },
-    { "label": "Option B", "value": "opt_b" },
-    { "label": "Option C", "value": "opt_c" }
+    { "label": "Option A", "value": "Option A" },
+    { "label": "Option B", "value": "Option B" },
+    { "label": "Option C", "value": "Option C" }
   ]
 }
 ```
@@ -316,9 +316,9 @@ Example form JSON structure with all field types:
   "type": "checkbox",
   "required": false,
   "options": [
-    { "label": "Item 1", "value": "item1" },
-    { "label": "Item 2", "value": "item2" },
-    { "label": "Item 3", "value": "item3" }
+    { "label": "Item 1", "value": "Item 1" },
+    { "label": "Item 2", "value": "Item 2" },
+    { "label": "Item 3", "value": "Item 3" }
   ]
 }
 ```

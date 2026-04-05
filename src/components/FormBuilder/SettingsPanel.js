@@ -108,20 +108,11 @@ export default function SettingsPanel({
                   style={{ marginBottom: "8px", display: "flex", gap: "8px" }}
                 >
                   <TextControl
-                    placeholder={__("Label", "kreebi-forms")}
-                    value={opt.label || ""}
+                    placeholder={__("Option", "kreebi-forms")}
+                    value={opt.label || opt.value || ""}
                     onChange={(val) => {
                       const newOpts = [...field.options];
                       newOpts[optIdx].label = val;
-                      update({ options: newOpts });
-                    }}
-                    style={{ flex: 1 }}
-                  />
-                  <TextControl
-                    placeholder={__("Value", "kreebi-forms")}
-                    value={opt.value || ""}
-                    onChange={(val) => {
-                      const newOpts = [...field.options];
                       newOpts[optIdx].value = val;
                       update({ options: newOpts });
                     }}
@@ -149,7 +140,7 @@ export default function SettingsPanel({
                 const newOpts = [...(field.options || [])];
                 newOpts.push({
                   label: `Option ${newOpts.length + 1}`,
-                  value: `opt${newOpts.length + 1}`,
+                  value: `Option ${newOpts.length + 1}`,
                 });
                 update({ options: newOpts });
               }}
