@@ -208,6 +208,13 @@
   color: #00a32a;
 }
 
+.krefrm-integration-settings__error {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b32d2e;
+}
+
 .krefrm-integration-settings__subtitle {
   margin: 6px 0 0;
   font-size: 14px;

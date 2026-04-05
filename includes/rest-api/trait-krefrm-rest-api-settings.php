@@ -163,6 +163,11 @@ trait Krefrm_Rest_Api_Settings
                     $sanitized_captcha['v3Threshold'] = $threshold;
                 }
 
+                $captcha_validation = $this->validate_captcha_settings_before_save($sanitized_captcha, $incoming_captcha);
+                if (is_wp_error($captcha_validation)) {
+                    return $captcha_validation;
+                }
+
                 $settings['captcha'] = $sanitized_captcha;
             }
         }
@@ -198,6 +203,122 @@ trait Krefrm_Rest_Api_Settings
         $response->header('Expires', '0');
 
         return $response;
+    }
+
+    private function validate_captcha_settings_before_save($captcha_settings, $incoming_captcha)
+    {
+        $site_key = isset($captcha_settings['siteKey']) ? sanitize_text_field($captcha_settings['siteKey']) : '';
+        $secret_key = isset($captcha_settings['secretKey']) ? sanitize_text_field($captcha_settings['secretKey']) : '';
+        $has_keys = ('' !== $site_key) || ('' !== $secret_key);
+        $is_enabled = ! empty($captcha_settings['enabled']);
+
+        error_log('[Kreebi Forms] Captcha validation started: enabled=' . ($is_enabled ? 'true' : 'false') . ', has_keys=' . ($has_keys ? 'true' : 'false'));
+
+        if (! $is_enabled && ! $has_keys) {
+            error_log('[Kreebi Forms] Captcha validation skipped: not enabled and no keys provided');
+            return true;
+        }
+
+        if ('' === $site_key || '' === $secret_key) {
+            return new WP_Error(
+                'captcha_keys_required',
+                __('Please provide both reCAPTCHA site and secret keys before saving.', 'kreebi-forms'),
+                array('status' => 400)
+            );
+        }
+
+        $token = isset($incoming_captcha['validationToken'])
+            ? sanitize_text_field($incoming_captcha['validationToken'])
+            : '';
+
+        if ('' === $token) {
+            return new WP_Error(
+                'captcha_validation_token_missing',
+                __('Validation failed: No captcha token received. Please try saving again.', 'kreebi-forms'),
+                array('status' => 400)
+            );
+        }
+
+        $remote_ip = '';
+        if (! empty($_SERVER['REMOTE_ADDR'])) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized immediately below.
+            $remote_ip = sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR']));
+        }
+
+        $body = array(
+            'secret' => $secret_key,
+            'response' => $token,
+        );
+
+        if ('' !== $remote_ip) {
+            $body['remoteip'] = $remote_ip;
+        }
+
+        $response = wp_remote_post('https://www.google.com/recaptcha/api/siteverify', array(
+            'timeout' => 10,
+            'body' => $body,
+        ));
+
+        if (is_wp_error($response)) {
+            return new WP_Error(
+                'captcha_validation_unreachable',
+                __('Unable to reach Google reCAPTCHA API. Please check your connection and try again.', 'kreebi-forms'),
+                array('status' => 400)
+            );
+        }
+
+        $response_body = wp_remote_retrieve_body($response);
+        $payload = json_decode($response_body, true);
+
+        if (! is_array($payload)) {
+            return new WP_Error(
+                'captcha_validation_invalid_response',
+                __('Invalid response from reCAPTCHA. Please try again.', 'kreebi-forms'),
+                array('status' => 400)
+            );
+        }
+
+        if (empty($payload['success'])) {
+            $error_codes = isset($payload['error-codes']) && is_array($payload['error-codes'])
+                ? $payload['error-codes']
+                : array();
+
+            return new WP_Error(
+                'captcha_invalid_keys',
+                $this->get_captcha_validation_error_message($error_codes),
+                array(
+                    'status' => 400,
+                    'errorCodes' => $error_codes,
+                )
+            );
+        }
+
+        if (! isset($payload['action']) || 'krefrm_settings_validation' !== (string) $payload['action']) {
+            return new WP_Error(
+                'captcha_invalid_action',
+                __('Captcha validation failed because the token action was invalid. Please try again.', 'kreebi-forms'),
+                array('status' => 400)
+            );
+        }
+
+        return true;
+    }
+
+    private function get_captcha_validation_error_message($error_codes)
+    {
+        if (in_array('invalid-input-secret', $error_codes, true) || in_array('missing-input-secret', $error_codes, true)) {
+            return __('The reCAPTCHA secret key is invalid. Please check the key and try again.', 'kreebi-forms');
+        }
+
+        if (in_array('invalid-input-response', $error_codes, true) || in_array('missing-input-response', $error_codes, true)) {
+            return __('The reCAPTCHA site key appears invalid or could not generate a valid token. Please check the site key and try again.', 'kreebi-forms');
+        }
+
+        if (in_array('bad-request', $error_codes, true)) {
+            return __('The captcha validation request was rejected by Google. Please verify both keys.', 'kreebi-forms');
+        }
+
+        return __('reCAPTCHA validation failed. Please verify your site key and secret key.', 'kreebi-forms');
     }
 
     /* ─── Integrations ─── */
