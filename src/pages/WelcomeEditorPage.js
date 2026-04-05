@@ -235,7 +235,10 @@ export default function WelcomeEditorPage({ navigate = () => {} }) {
                       : __("Save and Continue", "kreebi-forms")}
                   </Button>
                   <p className="krefrm-welcome-editor__consent-text">
-                    {__("By installing this plugin, you accept the", "kreebi-forms")}{" "}
+                    {__(
+                      "By installing this plugin, you accept the",
+                      "kreebi-forms",
+                    )}{" "}
                     <a
                       href="https://kreebiforms.com/terms-and-condition"
                       target="_blank"
