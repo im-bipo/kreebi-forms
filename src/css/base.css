@@ -68,3 +68,7 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
+
+.components-notice {
+  margin-bottom: 10px;
+}

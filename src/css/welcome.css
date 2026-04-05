@@ -3,160 +3,235 @@
    ============================================================ */
 
 .krefrm-welcome-editor {
-  min-height: calc(100vh - 140px);
+  min-height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px 12px 40px;
-  background: #f8f9fb;
+  padding: 40px 16px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #f9fafc 100%);
 }
 
-.krefrm-welcome-editor__panel {
+.krefrm-welcome-editor__container {
   width: 100%;
-  max-width: 1040px;
-  background: #ffffff;
-  border-radius: 24px;
-  padding: 40px;
-  box-shadow: 0 26px 70px rgba(15, 23, 42, 0.08);
+  max-width: 900px;
 }
 
-.krefrm-welcome-editor__eyebrow {
-  margin: 0 0 10px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #2271b1;
+.krefrm-welcome-editor__header {
+  text-align: center;
+  margin-bottom: 56px;
+  padding: 20px 16px 0;
 }
 
-.krefrm-welcome-editor__title {
-  margin: 0;
-  font-size: 34px;
+.krefrm-welcome-editor__main-title {
+  margin: 0 0 12px;
+  font-size: 48px;
+  font-weight: 800;
   line-height: 1.1;
-  color: #111827;
+  color: #0f1419;
+  letter-spacing: -0.45px;
 }
 
-.krefrm-welcome-editor__subtitle {
-  margin: 16px 0 0;
-  font-size: 16px;
-  color: #4b5563;
-  max-width: 720px;
+.krefrm-welcome-editor__main-subtitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #5a6370;
+}
+
+.krefrm-welcome-editor__content {
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
 }
 
 .krefrm-welcome-editor__loading {
-  padding: 28px 0;
+  min-height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.krefrm-welcome-editor__grid {
+.krefrm-welcome-editor__options {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  margin: 32px 0 22px;
+  gap: 20px;
 }
 
-.krefrm-welcome-editor-card {
-  border: 1px solid #e5e7eb;
-  border-radius: 20px;
+.krefrm-welcome-editor__option {
   background: #ffffff;
-  text-align: left;
-  padding: 18px;
+  border: 2px solid #e3e6ed;
+  border-radius: 14px;
+  padding: 28px 24px;
   cursor: pointer;
-  transition:
-    border-color 180ms ease,
-    box-shadow 180ms ease,
-    transform 180ms ease;
+  transition: all 240ms cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
   display: flex;
   flex-direction: column;
-  min-height: 100%;
+  gap: 18px;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
 }
 
-.krefrm-welcome-editor-card:hover {
-  border-color: #2271b1;
-  box-shadow: 0 16px 36px rgba(34, 113, 177, 0.12);
+.krefrm-welcome-editor__option:hover:not(.is-selected) {
+  border-color: #b8c4d6;
+  box-shadow:
+    0 8px 20px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(15, 23, 42, 0.05);
   transform: translateY(-2px);
 }
 
-.krefrm-welcome-editor-card.is-selected {
+.krefrm-welcome-editor__option.is-selected {
   border-color: #2271b1;
-  box-shadow: 0 18px 42px rgba(34, 113, 177, 0.16);
-  background: #f7fbff;
+  background: linear-gradient(135deg, #f8fbfe 0%, #ffffff 100%);
+  box-shadow:
+    0 0 0 1px rgba(34, 113, 177, 0.15),
+    0 12px 32px rgba(34, 113, 177, 0.12);
 }
 
-.krefrm-welcome-editor-card__image-wrap {
+.krefrm-welcome-editor__option:focus-visible {
+  outline: 2px solid #2271b1;
+  outline-offset: 2px;
+}
+
+.krefrm-welcome-editor__option-visual {
   width: 100%;
-  aspect-ratio: 2 / 1;
-  border-radius: 16px;
+  aspect-ratio: 2.4 / 1;
+  border-radius: 10px;
   overflow: hidden;
-  background: #f0f0f1;
-  border: 1px solid #e2e8f0;
+  background: #f7f8fb;
+  border: 1px solid #e8ecf3;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.krefrm-welcome-editor-card__image {
+.krefrm-welcome-editor__option-image {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center center;
+  object-position: center;
 }
 
-.krefrm-welcome-editor-card__body {
-  margin-top: 16px;
+.krefrm-welcome-editor__option-info {
   flex: 1;
 }
 
-.krefrm-welcome-editor-card__title {
+.krefrm-welcome-editor__option-title {
   margin: 0;
-  font-size: 18px;
-  color: #111827;
+  font-size: 20px;
   font-weight: 700;
+  color: #0f1419;
+  line-height: 1.3;
 }
 
-.krefrm-welcome-editor-card__description {
-  margin: 10px 0 0;
+.krefrm-welcome-editor__option-description {
+  margin: 8px 0 0;
   font-size: 14px;
-  color: #6b7280;
-  line-height: 1.6;
+  font-weight: 400;
+  color: #626d7a;
+  line-height: 1.5;
 }
 
-.krefrm-welcome-editor__actions {
-  margin-top: 24px;
+.krefrm-welcome-editor__option-check {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  background: #2271b1;
+  color: #ffffff;
+  border-radius: 50%;
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
 }
 
-.krefrm-welcome-editor__actions .components-button {
-  min-width: 132px;
+.krefrm-welcome-editor__footer {
+  padding: 0 16px;
+  border-top: 1px solid #e3e6ed;
+  padding-top: 40px;
 }
 
-@media (max-width: 900px) {
-  .krefrm-welcome-editor__panel {
-    padding: 28px;
+.krefrm-welcome-editor__footer-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  text-align: center;
+}
+
+.krefrm-welcome-editor__footer-text {
+  margin: 0;
+  font-size: 15px;
+  color: #626d7a;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.krefrm-welcome-editor__submit-btn {
+  min-width: 160px;
+  height: 44px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 15px;
+}
+
+/* Mobile / Tablet */
+@media (max-width: 768px) {
+  .krefrm-welcome-editor {
+    padding: 32px 16px;
   }
 
-  .krefrm-welcome-editor__title {
-    font-size: 28px;
+  .krefrm-welcome-editor__header {
+    margin-bottom: 42px;
+    padding: 16px 8px 0;
   }
 
-  .krefrm-welcome-editor__grid {
+  .krefrm-welcome-editor__main-title {
+    font-size: 36px;
+    letter-spacing: -0.35px;
+  }
+
+  .krefrm-welcome-editor__main-subtitle {
+    font-size: 16px;
+  }
+
+  .krefrm-welcome-editor__content {
+    gap: 40px;
+  }
+
+  .krefrm-welcome-editor__options {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
-  .krefrm-welcome-editor-card__image-wrap {
-    aspect-ratio: 2 / 1;
+  .krefrm-welcome-editor__option {
+    padding: 24px 20px;
+    gap: 16px;
   }
 
-  .krefrm-welcome-editor__actions {
-    flex-direction: column;
-    align-items: stretch;
+  .krefrm-welcome-editor__option-visual {
+    aspect-ratio: 2.2 / 1;
   }
 
-  .krefrm-welcome-editor__actions .components-button {
+  .krefrm-welcome-editor__option-title {
+    font-size: 18px;
+  }
+
+  .krefrm-welcome-editor__footer {
+    padding-top: 34px;
+  }
+
+  .krefrm-welcome-editor__footer-content {
+    gap: 16px;
+  }
+
+  .krefrm-welcome-editor__submit-btn {
     width: 100%;
   }
 }

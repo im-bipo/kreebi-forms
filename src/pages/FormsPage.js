@@ -1,221 +1,19 @@
-import { useState, useEffect, useCallback } from "@wordpress/element";
+import { useState, useEffect, useCallback, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
-import { Notice, Spinner, Modal, Button } from "@wordpress/components";
+import { Notice, Spinner } from "@wordpress/components";
 import FormsTable from "../components/FormsTable";
-import CreateFormView from "../components/CreateFormView";
-import QuickBuilder from "../components/QuickBuilder";
-
-// ─── Templates ───
-const TEMPLATES = [
-  {
-    key: "contact",
-    label: __("Contact Form", "kreebi-forms"),
-    data: {
-      name: "",
-      fields: [
-        {
-          name: "Name",
-          type: "text",
-          placeholder: "Your name",
-          required: true,
-        },
-        {
-          name: "Email",
-          type: "email",
-          placeholder: "you@example.com",
-          required: true,
-        },
-        {
-          name: "Message",
-          type: "text",
-          placeholder: "Write your message…",
-          required: false,
-        },
-      ],
-    },
-  },
-  {
-    key: "rsvp",
-    label: __("RSVP Form", "kreebi-forms"),
-    data: {
-      name: "",
-      fields: [
-        {
-          name: "Full Name",
-          type: "text",
-          placeholder: "Your full name",
-          required: true,
-        },
-        {
-          name: "Email",
-          type: "email",
-          placeholder: "you@example.com",
-          required: true,
-        },
-        {
-          name: "Will you attend?",
-          type: "select",
-          options: ["Yes", "No", "Maybe"],
-          required: true,
-        },
-      ],
-    },
-  },
-  {
-    key: "event",
-    label: __("Event Registration", "kreebi-forms"),
-    data: {
-      name: "",
-      fields: [
-        {
-          name: "Name",
-          type: "text",
-          placeholder: "Full name",
-          required: true,
-        },
-        {
-          name: "Email",
-          type: "email",
-          placeholder: "you@example.com",
-          required: true,
-        },
-        {
-          name: "Number of Guests",
-          type: "number",
-          placeholder: "1",
-          required: false,
-        },
-      ],
-    },
-  },
-  {
-    key: "blank",
-    label: __("Blank Form", "kreebi-forms"),
-    data: { name: "", fields: [] },
-  },
-];
-
-const TEMPLATE_ICONS = {
-  contact: (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        x="3"
-        y="6"
-        width="18"
-        height="12"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path d="M3 6L12 13L21 6" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  ),
-  rsvp: (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M4 17L8 3L12 17H4Z" fill="currentColor" />
-      <path d="M15 7L20 11L16 16L12 12L15 7Z" fill="currentColor" />
-      <path
-        d="M8 21L18 21"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-  event: (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <rect
-        x="4"
-        y="5"
-        width="16"
-        height="15"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      />
-      <path d="M4 9H20" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M8 3V7"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M16 3V7"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-  blank: (
-    <svg
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
-      <path
-        d="M12 8V16"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <path
-        d="M8 12H16"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  ),
-};
-
-// Legacy helper: extract post ID from route params (e.g., "form/edit?id=123")
-function getPostIdFromRoute(route) {
-  const match = route.match(/[?&]id=(\d+)/);
-  return match ? parseInt(match[1], 10) : null;
-}
-
-// Preferred helper: extract public form ID (e.g., "form/edit?form_id=001")
-function getPublicFormIdFromRoute(route) {
-  const match = route.match(/[?&]form_id=([^&]+)/);
-  return match ? decodeURIComponent(match[1]) : null;
-}
-
-// Extract tab from path segment (e.g., "form/edit/email-notification?form_id=001").
-// Backward-compatible with legacy "tab" query parameter.
-function getTabFromRoute(route) {
-  const pathMatch = route.match(/^form\/edit\/([^?]+)/);
-  if (pathMatch) {
-    const pathValue = decodeURIComponent(pathMatch[1]);
-    return pathValue.split("/")[0] || null;
-  }
-
-  const queryMatch = route.match(/[?&]tab=([^&]+)/);
-  return queryMatch ? decodeURIComponent(queryMatch[1]) : null;
-}
+import FormsCreatePage from "./forms/components/FormsCreatePage";
+import FormsEditPage from "./forms/components/FormsEditPage";
+import FormsQuickCreatePage from "./forms/components/FormsQuickCreatePage";
+import TemplatePickerModal from "./forms/components/TemplatePickerModal";
+import DeleteFormModal from "./forms/components/DeleteFormModal";
+import {
+  getPostIdFromRoute,
+  getPublicFormIdFromRoute,
+  getTabFromRoute,
+  buildEditRouteForCreatedForm,
+} from "./forms/route-helpers";
 
 export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
@@ -233,10 +31,30 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
   const [savingEditorPreference, setSavingEditorPreference] = useState(false);
   const [lastSavedCreateForm, setLastSavedCreateForm] = useState(null);
+  const createTabRef = useRef(null);
 
   const showCreatePage = route === "form/create";
   const showQuickBuilder = route === "form/quick-builder";
   const showEditPage = route.startsWith("form/edit");
+
+  useEffect(() => {
+    if (showCreatePage) {
+      createTabRef.current = null;
+    }
+  }, [showCreatePage]);
+
+  const navigateToCreatedForm = useCallback(
+    (createdForm, tabName = null) => {
+      const nextRoute = buildEditRouteForCreatedForm(createdForm, tabName);
+      navigate(nextRoute);
+      // Fallback for rare hash-update race conditions.
+      if (window.location.hash.replace(/^#\/?/, "") !== nextRoute) {
+        window.location.hash = nextRoute;
+      }
+      return nextRoute;
+    },
+    [navigate],
+  );
 
   const fetchForms = useCallback(async () => {
     setLoading(true);
@@ -333,6 +151,8 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
       formId: createdForm?.form_id || "",
       postId: createdForm?.post_id || null,
     });
+
+    navigateToCreatedForm(createdForm, createTabRef.current);
     fetchForms();
     return createdForm;
   };
@@ -429,7 +249,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   /* ─── Advance form builder (create) ─── */
   if (showCreatePage) {
     return (
-      <CreateFormView
+      <FormsCreatePage
         initialData={templateData || {}}
         onSubmit={handleCreate}
         onCancel={() => {
@@ -441,7 +261,9 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         canViewForm={Boolean(
           lastSavedCreateForm?.formId || lastSavedCreateForm?.postId,
         )}
-        formId=""
+        onCreateTabChange={(tabName) => {
+          createTabRef.current = tabName;
+        }}
         defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
         onSetDefaultEditor={setDefaultEditorPreference}
         isSavingDefaultEditor={savingEditorPreference}
@@ -451,51 +273,32 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
 
   /* ─── Advance form builder (edit) ─── */
   if (showEditPage) {
-    if (loading || !editFormData) {
-      return (
-        <div className="krefrm-loading">
-          <Spinner />
-        </div>
-      );
-    }
     return (
-      <div>
-        {error && (
-          <Notice status="error" isDismissible onDismiss={() => setError("")}>
-            {error}
-          </Notice>
-        )}
-        {success && (
-          <Notice
-            status="success"
-            isDismissible
-            onDismiss={() => setSuccess("")}
-          >
-            {success}
-          </Notice>
-        )}
-        <CreateFormView
-          initialData={editFormData}
-          onSubmit={handleUpdate}
-          onCancel={() => navigate("form")}
-          onViewForm={() => navigate("form")}
-          canViewForm={Boolean(currentFormId || editFormId)}
-          isEditing={true}
-          formId={currentFormId}
-          initialTab={currentTab}
-          onTabChange={handleTabChange}
-          defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
-          onSetDefaultEditor={setDefaultEditorPreference}
-          isSavingDefaultEditor={savingEditorPreference}
-        />
-      </div>
+      <FormsEditPage
+        loading={loading}
+        error={error}
+        success={success}
+        onDismissError={() => setError("")}
+        onDismissSuccess={() => setSuccess("")}
+        initialData={editFormData}
+        onSubmit={handleUpdate}
+        onCancel={() => navigate("form")}
+        onViewForm={() => navigate("form")}
+        canViewForm={Boolean(currentFormId || editFormId)}
+        formId={currentFormId}
+        initialTab={currentTab}
+        onTabChange={handleTabChange}
+        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
+        onSetDefaultEditor={setDefaultEditorPreference}
+        isSavingDefaultEditor={savingEditorPreference}
+      />
     );
   }
 
   /* ─── Quick builder (create) ─── */
   if (showQuickBuilder) {
     return (
-      <QuickBuilder
+      <FormsQuickCreatePage
         initialData={templateData || {}}
         isDefaultEditor={!useAdvanceEditor}
         onSetDefaultEditor={() => setDefaultEditorPreference("quick")}
@@ -527,8 +330,8 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
             formId: res?.form_id || "",
             postId: res?.post_id || null,
           });
-          setTemplateData(null);
           fetchForms();
+          navigateToCreatedForm(res, "quick-edit");
           return res;
         }}
         onAdvanced={(jsonData) => {
@@ -580,62 +383,18 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
       />
 
-      {showPicker && (
-        <Modal
-          title={__("Choose a template", "kreebi-forms")}
-          onRequestClose={() => setShowPicker(false)}
-          className="krefrm-picker-modal"
-        >
-          <p className="krefrm-picker-subtitle">
-            {__(
-              "Pick a template to start quickly, or create a blank form.",
-              "kreebi-forms",
-            )}
-          </p>
-          <div className="krefrm-picker-grid">
-            {TEMPLATES.map((tpl) => (
-              <button
-                key={tpl.key}
-                className="krefrm-picker-card"
-                onClick={() => handlePickTemplate(tpl)}
-              >
-                <span className="krefrm-picker-card__icon" aria-hidden="true">
-                  {TEMPLATE_ICONS[tpl.key]}
-                </span>
-                <span className="krefrm-picker-card__label">{tpl.label}</span>
-              </button>
-            ))}
-          </div>
-          <div className="krefrm-picker-divider" aria-hidden="true" />
-        </Modal>
-      )}
+      <TemplatePickerModal
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onPickTemplate={handlePickTemplate}
+      />
 
-      {deleteTarget && (
-        <Modal
-          title={__("Delete form", "kreebi-forms")}
-          onRequestClose={() => setDeleteTarget(null)}
-        >
-          <p>
-            {__(
-              "Deleting this form will permanently remove the form and all of its submissions. This cannot be undone.",
-              "kreebi-forms",
-            )}
-          </p>
-          <div className="krefrm-modal-actions">
-            <Button onClick={() => setDeleteTarget(null)}>
-              {__("Cancel", "kreebi-forms")}
-            </Button>
-            <Button
-              variant="primary"
-              isDestructive
-              isBusy={isDeleting}
-              onClick={handleForceDelete}
-            >
-              {__("Force Delete", "kreebi-forms")}
-            </Button>
-          </div>
-        </Modal>
-      )}
+      <DeleteFormModal
+        deleteTarget={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onForceDelete={handleForceDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

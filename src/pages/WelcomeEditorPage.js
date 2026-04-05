@@ -133,96 +133,114 @@ export default function WelcomeEditorPage({ navigate = () => {} }) {
 
   return (
     <div className="krefrm-welcome-editor">
-      <div className="krefrm-welcome-editor__panel">
-        <p className="krefrm-welcome-editor__eyebrow">
-          {__("Welcome to Kreebi Forms", "kreebi-forms")}
-        </p>
-        <h2 className="krefrm-welcome-editor__title">
-          {__("Choose your default editor", "kreebi-forms")}
-        </h2>
-        <p className="krefrm-welcome-editor__subtitle">
-          {__(
-            "Pick the editor that should open first when creating a new form.",
-            "kreebi-forms",
-          )}
-        </p>
+      <div className="krefrm-welcome-editor__container">
+        <div className="krefrm-welcome-editor__header">
+          <h1 className="krefrm-welcome-editor__main-title">
+            {__("Welcome to Kreebi Forms", "kreebi-forms")}
+          </h1>
+          <p className="krefrm-welcome-editor__main-subtitle">
+            {__("Pick your preferred editor to get started", "kreebi-forms")}
+          </p>
+        </div>
 
-        {loading ? (
-          <div className="krefrm-welcome-editor__loading">
-            <Spinner />
-          </div>
-        ) : (
-          <>
-            <div className="krefrm-welcome-editor__grid">
-              {EDITOR_OPTIONS.map((option) => {
-                const sources = editorImages[option.id] || [];
-                const sourceIndex = imageFallbackIndex[option.id] || 0;
-                const imageSrc =
-                  sources[
-                    Math.min(sourceIndex, Math.max(sources.length - 1, 0))
-                  ] || `${pluginUrl}assets/photos/kreebi-forms.png`;
-                const canFallback = sourceIndex < sources.length - 1;
-                const isSelected = selectedEditor === option.id;
+        <div className="krefrm-welcome-editor__content">
+          {loading ? (
+            <div className="krefrm-welcome-editor__loading">
+              <Spinner />
+            </div>
+          ) : (
+            <>
+              <div className="krefrm-welcome-editor__options">
+                {EDITOR_OPTIONS.map((option) => {
+                  const sources = editorImages[option.id] || [];
+                  const sourceIndex = imageFallbackIndex[option.id] || 0;
+                  const imageSrc =
+                    sources[
+                      Math.min(sourceIndex, Math.max(sources.length - 1, 0))
+                    ] || `${pluginUrl}assets/photos/kreebi-forms.png`;
+                  const canFallback = sourceIndex < sources.length - 1;
+                  const isSelected = selectedEditor === option.id;
 
-                return (
-                  <button
-                    key={option.id}
-                    type="button"
-                    className={`krefrm-welcome-editor-card ${
-                      isSelected ? "is-selected" : ""
-                    }`}
-                    onClick={() => setSelectedEditor(option.id)}
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      className={`krefrm-welcome-editor__option ${
+                        isSelected ? "is-selected" : ""
+                      }`}
+                      onClick={() => setSelectedEditor(option.id)}
+                    >
+                      <div className="krefrm-welcome-editor__option-visual">
+                        <img
+                          className="krefrm-welcome-editor__option-image"
+                          src={imageSrc}
+                          alt={option.title}
+                          onError={
+                            canFallback
+                              ? () =>
+                                  handleImageError(option.id, sources.length)
+                              : undefined
+                          }
+                        />
+                      </div>
+                      <div className="krefrm-welcome-editor__option-info">
+                        <h3 className="krefrm-welcome-editor__option-title">
+                          {option.title}
+                        </h3>
+                        <p className="krefrm-welcome-editor__option-description">
+                          {option.description}
+                        </p>
+                      </div>
+                      {isSelected && (
+                        <div className="krefrm-welcome-editor__option-check">
+                          ✓
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="krefrm-welcome-editor__footer">
+                {error && (
+                  <Notice
+                    status="error"
+                    isDismissible
+                    onDismiss={() => setError("")}
                   >
-                    <div className="krefrm-welcome-editor-card__image-wrap">
-                      <img
-                        className="krefrm-welcome-editor-card__image"
-                        src={imageSrc}
-                        alt={option.title}
-                        onError={
-                          canFallback
-                            ? () => handleImageError(option.id, sources.length)
-                            : undefined
-                        }
-                      />
-                    </div>
-                    <div className="krefrm-welcome-editor-card__body">
-                      <h3 className="krefrm-welcome-editor-card__title">
-                        {option.title}
-                      </h3>
-                      <p className="krefrm-welcome-editor-card__description">
-                        {option.description}
-                      </p>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+                    {error}
+                  </Notice>
+                )}
 
-            {error && (
-              <Notice
-                status="error"
-                isDismissible
-                onDismiss={() => setError("")}
-              >
-                {error}
-              </Notice>
-            )}
+                {savedMessage && (
+                  <Notice status="success" isDismissible={false}>
+                    {savedMessage}
+                  </Notice>
+                )}
 
-            {savedMessage && (
-              <Notice status="success" isDismissible={false}>
-                {savedMessage}
-              </Notice>
-            )}
-
-            <div className="krefrm-welcome-editor__actions">
-              <Button variant="primary" onClick={handleSave} disabled={saving}>
-                {saving
-                  ? __("Saving…", "kreebi-forms")
-                  : __("Save and Continue", "kreebi-forms")}
-              </Button>
-            </div>
-          </>
-        )}
+                <div className="krefrm-welcome-editor__footer-content">
+                  <p className="krefrm-welcome-editor__footer-text">
+                    {__(
+                      "You can switch editors later from the forms screen.",
+                      "kreebi-forms",
+                    )}
+                  </p>
+                  <Button
+                    variant="primary"
+                    size="large"
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="krefrm-welcome-editor__submit-btn"
+                  >
+                    {saving
+                      ? __("Saving…", "kreebi-forms")
+                      : __("Save and Continue", "kreebi-forms")}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

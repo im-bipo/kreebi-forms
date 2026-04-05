@@ -6,8 +6,6 @@ if (! defined('ABSPATH')) {
 
 /**
  * Plugin Activation Handler
- *
- * Creates default contact form on plugin activation
  */
 class Krefrm_Activation
 {
@@ -21,16 +19,6 @@ class Krefrm_Activation
     {
         self::ensure_default_global_settings();
         self::mark_welcome_screen_for_redirect();
-
-        // Check if contact form already exists to prevent duplicates
-        if (self::contact_form_exists()) {
-            self::send_slack_activation_log();
-            return;
-        }
-
-        // Create the default contact form
-        self::create_contact_form();
-
         self::send_slack_activation_log();
     }
 
@@ -151,150 +139,6 @@ class Krefrm_Activation
         ));
     }
 
-    /**
-     * Check if contact form already exists
-     */
-    private static function contact_form_exists()
-    {
-        $posts = get_posts(array(
-            'post_type'      => 'krefrm_form',
-            'post_status'    => 'publish',
-            'posts_per_page' => 1,
-            's'              => 'Contact Form',
-        ));
-
-        foreach ($posts as $post) {
-            if ($post->post_title === 'Contact Form') {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Create the default contact form
-     */
-    private static function create_contact_form()
-    {
-        // Form data structure
-        $form_data = array(
-            'name'          => 'Contact Form',
-            'description'   => '',
-            'styleTemplate' => 'kreebi_style_1',
-            'fields'        => array(
-                array(
-                    'name'        => 'Name',
-                    'type'        => 'text',
-                    'placeholder' => 'Your name',
-                    'required'    => true,
-                    'options'     => array(),
-                ),
-                array(
-                    'name'        => 'Email',
-                    'type'        => 'email',
-                    'placeholder' => 'you@example.com',
-                    'required'    => true,
-                    'options'     => array(),
-                ),
-                array(
-                    'name'        => 'Message',
-                    'type'        => 'text',
-                    'placeholder' => 'Write your message…',
-                    'required'    => false,
-                    'options'     => array(),
-                ),
-            ),
-        );
-
-        // Get next form ID
-        $form_id = self::get_next_form_id();
-        $form_data['id'] = $form_id;
-
-        // Insert the post
-        $post_id = wp_insert_post(array(
-            'post_type'    => 'krefrm_form',
-            'post_status'  => 'publish',
-            'post_title'   => $form_data['name'],
-            'post_content' => $form_data['description'],
-            'post_name'    => $form_id,
-        ), true);
-
-        // If post creation succeeded, save the form data as meta
-        if (! is_wp_error($post_id)) {
-            update_post_meta($post_id, '_krefrm_form_data', $form_data);
-            self::seed_default_submissions($post_id, $form_data);
-        }
-    }
-
-    /**
-     * Seed default submissions for first-time demo data.
-     */
-    private static function seed_default_submissions($form_post_id, $form_data)
-    {
-        if (! is_array($form_data)) {
-            return;
-        }
-
-        $form_title = get_the_title($form_post_id);
-        $form_public_id = isset($form_data['id']) ? (string) $form_data['id'] : '';
-
-        $timezone = wp_timezone();
-        $today = new DateTimeImmutable('now', $timezone);
-
-        $seed_items = array(
-            array(
-                'days_ago' => 2,
-                'time'     => '13:00:00',
-                'data'     => array(
-                    'name'    => 'John Doe',
-                    'email'   => 'john@example.com',
-                    'message' => 'Interested in your services.',
-                ),
-            ),
-            array(
-                'days_ago' => 2,
-                'time'     => '15:00:00',
-                'data'     => array(
-                    'name'    => 'Sarah Lee',
-                    'email'   => 'sarah@example.com',
-                    'message' => 'Please contact me back.',
-                ),
-            ),
-            array(
-                'days_ago' => 5,
-                'time'     => '00:00:00',
-                'data'     => array(
-                    'name'    => 'Mike Ross',
-                    'email'   => 'mike@example.com',
-                    'message' => 'Can I get more details?',
-                ),
-            ),
-        );
-
-        foreach ($seed_items as $item) {
-            $day = $today->modify('-' . intval($item['days_ago']) . ' days')->format('Y-m-d');
-            $submission_local_dt = new DateTimeImmutable($day . ' ' . $item['time'], $timezone);
-            $post_date = $submission_local_dt->format('Y-m-d H:i:s');
-
-            $submission_post_id = wp_insert_post(array(
-                'post_type'     => 'krefrm_submission',
-                'post_status'   => 'publish',
-                'post_title'    => $form_title . ' — ' . $post_date,
-                'post_content'  => wp_json_encode($item['data']),
-                'post_date'     => $post_date,
-                'post_date_gmt' => get_gmt_from_date($post_date),
-            ), true);
-
-            if (is_wp_error($submission_post_id)) {
-                continue;
-            }
-
-            update_post_meta($submission_post_id, '_krefrm_form_id', $form_post_id);
-            update_post_meta($submission_post_id, '_krefrm_form_id_value', $form_public_id);
-            update_post_meta($submission_post_id, '_krefrm_data', $item['data']);
-        }
-    }
 
     /**
      * Get the next sequential form ID (001, 002, 003, etc.)
