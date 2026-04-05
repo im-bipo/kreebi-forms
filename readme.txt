@@ -135,6 +135,21 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 
 == Changelog ==
 
+= 1.1.6 =
+* Added consent text and refined the Welcome Editor onboarding flow for plugin installation acceptance.
+* Updated the default editor to drag-and-drop and improved editor selection behavior.
+* Added custom Shadow DOM focus styles for the form wrapper.
+* Refactored Forms page components and improved the welcome editor UI.
+* Added View Form support and expanded editor options in CreateFormView, FormBuilder, and QuickBuilder.
+
+= 1.1.5 =
+* Added the Welcome Editor page and its associated styles.
+* Improved FormsTable empty-state styling and messaging.
+* Added form name validation with user feedback and error handling in FormBuilder and QuickBuilder.
+* Normalized form JSON option values to match labels for consistency.
+* Improved style template saving feedback and error handling.
+* Improved reCAPTCHA settings validation and error handling in CaptchaGlobalSettings.
+
 = 1.1.4 =
 * Fixed deactivation survey modal not opening when plugin slug is URL-encoded in admin deactivation link handling.
 * Improved admin deactivation flow by supporting both encoded and plain plugin slug values.
