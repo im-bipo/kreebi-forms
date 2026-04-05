@@ -143,10 +143,7 @@ export default function SortableFieldCard({
         >
           <div style={{ textAlign: "center", padding: "16px 0" }}>
             <p style={{ marginBottom: "24px" }}>
-              {__(
-                "Remove this field? This cannot be undone.",
-                "kreebi-forms",
-              )}
+              {__("Remove this field? This cannot be undone.", "kreebi-forms")}
             </p>
             <div
               style={{
@@ -155,10 +152,7 @@ export default function SortableFieldCard({
                 justifyContent: "center",
               }}
             >
-              <Button
-                variant="secondary"
-                onClick={handleCancelDelete}
-              >
+              <Button variant="secondary" onClick={handleCancelDelete}>
                 {__("Cancel", "kreebi-forms")}
               </Button>
               <Button
