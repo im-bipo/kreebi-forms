@@ -434,6 +434,11 @@
   width: 100%;
   min-width: 0;
   min-height: 64px;
+  cursor: grab;
+}
+
+.krefrm-field-card:active {
+  cursor: grabbing;
 }
 
 .krefrm-field-card:hover {
@@ -561,6 +566,36 @@
   padding: 16px;
   overflow-y: auto;
   min-height: 0;
+}
+
+.krefrm-settings-panel.is-attention-active {
+  animation: krefrm-settings-vibrate 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+  box-shadow: 0 0 0 3px rgba(34, 113, 177, 0.18);
+}
+
+@keyframes krefrm-settings-vibrate {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  15% {
+    transform: translateX(-5px);
+  }
+  30% {
+    transform: translateX(5px);
+  }
+  45% {
+    transform: translateX(-4px);
+  }
+  60% {
+    transform: translateX(4px);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  90% {
+    transform: translateX(2px);
+  }
 }
 
 .krefrm-settings-panel__title {

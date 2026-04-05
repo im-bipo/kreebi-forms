@@ -12,6 +12,7 @@ export default function SortableFieldCard({
   field,
   isSelected,
   onSelect,
+  onRequestSettingsAttention,
   onRemove,
   onMoveUp,
   onMoveDown,
@@ -24,6 +25,14 @@ export default function SortableFieldCard({
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
+        if (isSelected) {
+          onRequestSettingsAttention?.();
+        }
+      }}
+      onDoubleClick={(e) => {
+        e.stopPropagation();
+        onSelect();
+        onRequestSettingsAttention?.();
       }}
     >
       {/* Drag handle */}

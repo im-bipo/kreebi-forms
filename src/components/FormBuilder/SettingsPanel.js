@@ -22,6 +22,7 @@ const TYPE_OPTIONS = FIELD_TYPES.map((ft) => ({
 }));
 
 export default function SettingsPanel({
+  isAttentionActive = false,
   selection,
   steps,
   onUpdateStep,
@@ -31,7 +32,11 @@ export default function SettingsPanel({
 }) {
   if (!selection) {
     return (
-      <div className="krefrm-settings-panel">
+      <div
+        className={`krefrm-settings-panel ${
+          isAttentionActive ? "is-attention-active" : ""
+        }`}
+      >
         <div className="krefrm-settings-panel__empty">
           {__("Select a step or field to edit its settings.", "kreebi-forms")}
         </div>
@@ -42,7 +47,11 @@ export default function SettingsPanel({
   /* Step settings removed — step editing is handled inline in the preview */
   if (selection.type === "step") {
     return (
-      <div className="krefrm-settings-panel">
+      <div
+        className={`krefrm-settings-panel ${
+          isAttentionActive ? "is-attention-active" : ""
+        }`}
+      >
         <div className="krefrm-settings-panel__empty">
           {__("Select a step or field to edit its settings.", "kreebi-forms")}
         </div>
@@ -59,7 +68,11 @@ export default function SettingsPanel({
       onUpdateField(selection.stepIndex, selection.fieldIndex, patch);
 
     return (
-      <div className="krefrm-settings-panel">
+      <div
+        className={`krefrm-settings-panel ${
+          isAttentionActive ? "is-attention-active" : ""
+        }`}
+      >
         <h3 className="krefrm-settings-panel__title">
           {__("Field Settings", "kreebi-forms")}
         </h3>

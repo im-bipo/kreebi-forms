@@ -15,6 +15,7 @@ export default function FormPreview({
   steps,
   currentStepIndex,
   selection,
+  onRequestSettingsAttention,
   onSelectField,
   onSelectStep,
   onRemoveField,
@@ -58,6 +59,7 @@ export default function FormPreview({
                     selection?.fieldIndex === idx
                   }
                   onSelect={() => onSelectField(currentStepIndex, idx)}
+                  onRequestSettingsAttention={onRequestSettingsAttention}
                   onRemove={() => onRemoveField(currentStepIndex, idx)}
                   onMoveUp={() => onMoveFieldBy(currentStepIndex, idx, -1)}
                   onMoveDown={() => onMoveFieldBy(currentStepIndex, idx, 1)}

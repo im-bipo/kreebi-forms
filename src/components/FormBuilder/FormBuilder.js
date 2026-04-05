@@ -14,7 +14,7 @@
  *  isEditing    {Boolean}  whether we're editing an existing form
  */
 
-import { useState, useCallback, useEffect } from "@wordpress/element";
+import { useState, useCallback, useEffect, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
 import Sortable from "sortablejs";
@@ -71,6 +71,9 @@ export default function FormBuilder({
   const [view, setView] = useState(getInitialView()); // "quick" | "visual" | "json" | "settings"
   const [nameError, setNameError] = useState("");
   const [shakeNameInput, setShakeNameInput] = useState(false);
+  const [settingsAttention, setSettingsAttention] = useState(false);
+  const settingsAttentionTimeoutRef = useRef(null);
+  const settingsAttentionLastTriggerRef = useRef(0);
   const isDragDropDefaultEditor = defaultEditor === "drag_drop";
 
   // Function for integrations to trigger form save with current state
@@ -129,6 +132,15 @@ export default function FormBuilder({
     return () => clearTimeout(timer);
   }, [shakeNameInput]);
 
+  useEffect(
+    () => () => {
+      if (settingsAttentionTimeoutRef.current) {
+        clearTimeout(settingsAttentionTimeoutRef.current);
+      }
+    },
+    [],
+  );
+
   /* Auto-select first field when none selected */
   useEffect(() => {
     if (view !== "visual") return;
@@ -179,7 +191,8 @@ export default function FormBuilder({
       animation: 180,
       easing: "cubic-bezier(0.2, 0, 0, 1)",
       draggable: ".krefrm-field-item",
-      handle: ".krefrm-field-card__handle",
+      filter: ".krefrm-field-card__actions, .krefrm-field-card__actions *",
+      preventOnFilter: false,
       emptyInsertThreshold: 18,
       forceFallback: true,
       fallbackTolerance: 8,
@@ -265,6 +278,37 @@ export default function FormBuilder({
       stepIndex: builder.currentStepIndex,
     });
   }, [builder]);
+
+  const triggerSettingsAttention = useCallback(() => {
+    const now = Date.now();
+    if (now - settingsAttentionLastTriggerRef.current < 180) {
+      return;
+    }
+    settingsAttentionLastTriggerRef.current = now;
+
+    if (
+      typeof navigator !== "undefined" &&
+      typeof navigator.vibrate === "function"
+    ) {
+      navigator.vibrate([18, 30, 18]);
+    }
+
+    setSettingsAttention(false);
+    if (typeof window !== "undefined" && window.requestAnimationFrame) {
+      window.requestAnimationFrame(() => setSettingsAttention(true));
+    } else {
+      setSettingsAttention(true);
+    }
+
+    if (settingsAttentionTimeoutRef.current) {
+      clearTimeout(settingsAttentionTimeoutRef.current);
+    }
+
+    settingsAttentionTimeoutRef.current = setTimeout(() => {
+      setSettingsAttention(false);
+      settingsAttentionTimeoutRef.current = null;
+    }, 360);
+  }, []);
 
   /* ─── Integration tab helpers ─── */
 
@@ -476,6 +520,7 @@ export default function FormBuilder({
             currentStepIndex={builder.currentStepIndex}
             selection={builder.selection}
             onSelectField={selectField}
+            onRequestSettingsAttention={triggerSettingsAttention}
             onSelectStep={selectStep}
             onUpdateStep={builder.updateStep}
             onRemoveField={builder.removeField}
@@ -483,6 +528,7 @@ export default function FormBuilder({
           />
 
           <SettingsPanel
+            isAttentionActive={settingsAttention}
             selection={builder.selection}
             steps={builder.steps}
             onUpdateStep={builder.updateStep}
