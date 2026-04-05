@@ -1,12 +1,7 @@
 import { useState, useEffect, useCallback } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
-import {
-  Notice,
-  Spinner,
-  Modal,
-  Button,
-} from "@wordpress/components";
+import { Notice, Spinner, Modal, Button } from "@wordpress/components";
 import FormsTable from "../components/FormsTable";
 import CreateFormView from "../components/CreateFormView";
 import QuickBuilder from "../components/QuickBuilder";

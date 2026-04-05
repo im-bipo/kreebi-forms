@@ -329,7 +329,7 @@ export default function FormsTable({
   if (forms.length === 0) {
     return (
       <div className="krefrm-forms-section krefrm-forms-section--empty">
-        <div className="krefrm-section-head">
+        <div className="krefrm-section-head krefrm-section-head--empty">
           <div className="krefrm-section-head__title">
             <h2>{__("Your forms", "kreebi-forms")}</h2>
             <p>{__("No forms yet. Create your first form.", "kreebi-forms")}</p>
@@ -342,6 +342,18 @@ export default function FormsTable({
           >
             {__("Create new form", "kreebi-forms")}
           </Button>
+        </div>
+
+        <div className="krefrm-empty-state">
+          <h3 className="krefrm-empty-state__title">
+            {__("No Forms Available", "kreebi-forms")}
+          </h3>
+          <p className="krefrm-empty-state__subtitle">
+            {__(
+              "Create a form to start collecting responses. Use a template or begin with a blank form.",
+              "kreebi-forms",
+            )}
+          </p>
         </div>
       </div>
     );
