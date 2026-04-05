@@ -61,14 +61,12 @@ export default function WelcomeEditorPage({ navigate = () => {} }) {
       headers: { "X-WP-Nonce": nonce },
     })
       .then((r) => r.json())
-      .then((data) => {
+      .then(() => {
         if (!isMounted) {
           return;
         }
 
-        const defaultEditor =
-          data?.defaultEditor === "quick" ? "quick" : "drag_drop";
-        setSelectedEditor(defaultEditor);
+        setSelectedEditor("drag_drop");
       })
       .catch(() => {
         if (isMounted) {
@@ -236,6 +234,25 @@ export default function WelcomeEditorPage({ navigate = () => {} }) {
                       ? __("Saving…", "kreebi-forms")
                       : __("Save and Continue", "kreebi-forms")}
                   </Button>
+                  <p className="krefrm-welcome-editor__consent-text">
+                    {__("By installing this plugin, you accept the", "kreebi-forms")}{" "}
+                    <a
+                      href="https://kreebiforms.com/terms-and-condition"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {__("Terms and Conditions", "kreebi-forms")}
+                    </a>{" "}
+                    {__("and", "kreebi-forms")}{" "}
+                    <a
+                      href="https://kreebiforms.com/pravicy-policy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {__("Privacy Policy", "kreebi-forms")}
+                    </a>{" "}
+                    {__("of Kreebi Forms.", "kreebi-forms")}
+                  </p>
                 </div>
               </div>
             </>

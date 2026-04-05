@@ -15,7 +15,7 @@ trait Krefrm_Rest_Api_Settings
         $allowed = array('quick', 'drag_drop');
 
         if (! in_array($editor, $allowed, true)) {
-            return 'quick';
+            return 'drag_drop';
         }
 
         return $editor;
@@ -30,7 +30,7 @@ trait Krefrm_Rest_Api_Settings
 
         $default_editor = isset($settings['defaultEditor'])
             ? $this->normalize_default_editor($settings['defaultEditor'])
-            : 'quick';
+            : 'drag_drop';
 
         $captcha = isset($settings['captcha']) && is_array($settings['captcha'])
             ? $settings['captcha']
@@ -208,7 +208,7 @@ trait Krefrm_Rest_Api_Settings
 
         $default_editor = isset($settings['defaultEditor'])
             ? $this->normalize_default_editor($settings['defaultEditor'])
-            : 'quick';
+            : 'drag_drop';
 
         $response = rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),

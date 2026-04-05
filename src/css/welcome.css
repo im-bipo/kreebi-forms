@@ -181,6 +181,24 @@
   font-size: 15px;
 }
 
+.krefrm-welcome-editor__consent-text {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #7a8593;
+  line-height: 1.5;
+}
+
+.krefrm-welcome-editor__consent-text a {
+  color: #2271b1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.krefrm-welcome-editor__consent-text a:hover,
+.krefrm-welcome-editor__consent-text a:focus-visible {
+  color: #135e96;
+}
+
 /* Mobile / Tablet */
 @media (max-width: 768px) {
   .krefrm-welcome-editor {
