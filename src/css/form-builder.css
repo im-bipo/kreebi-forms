@@ -88,6 +88,14 @@
   flex-wrap: wrap;
 }
 
+.krefrm-builder__name-field {
+  flex: 1;
+  min-width: 260px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .krefrm-builder__name-input,
 .krefrm-builder__desc-input {
   padding: 8px 12px;
@@ -97,12 +105,47 @@
 }
 
 .krefrm-builder__name-input {
-  flex: 1;
+  width: 100%;
+  font-weight: 600;
+}
+
+.krefrm-builder__name-input.is-invalid {
+  border-color: #d63638;
+  box-shadow: 0 0 0 1px rgba(214, 54, 56, 0.14);
+}
+
+.krefrm-builder__name-input.is-shaking {
+  animation: krefrm-form-name-shake 0.32s ease-in-out;
+}
+
+.krefrm-builder__name-error {
+  margin: 0;
+  color: #d63638;
+  font-size: 12px;
   font-weight: 600;
 }
 
 .krefrm-builder__desc-input {
   flex: 2;
+}
+
+@keyframes krefrm-form-name-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
 }
 
 /* ─── Three-column layout ─── */

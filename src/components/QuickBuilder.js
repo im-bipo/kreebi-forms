@@ -133,6 +133,8 @@ export default function QuickBuilder({
   const [closingField, setClosingField] = useState(null);
   const [showAddFields, setShowAddFields] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [nameError, setNameError] = useState("");
+  const [shakeNameInput, setShakeNameInput] = useState(false);
 
   /* ─── Drag state ─── */
   const dragItem = useRef(null);
@@ -165,6 +167,13 @@ export default function QuickBuilder({
       document.removeEventListener("click", handleClickOutside);
     };
   }, [expandedField]);
+
+  useEffect(() => {
+    if (!shakeNameInput) return undefined;
+    const timer = setTimeout(() => setShakeNameInput(false), 320);
+    return () => clearTimeout(timer);
+  }, [shakeNameInput]);
+
   const toggleFieldExpanded = useCallback(
     (uid) => {
       if (expandedField === uid) {
@@ -256,14 +265,41 @@ export default function QuickBuilder({
     setShowAddFields(false);
   }, []);
 
+  const triggerNameValidationFeedback = useCallback(() => {
+    setShakeNameInput(false);
+    if (typeof window !== "undefined" && window.requestAnimationFrame) {
+      window.requestAnimationFrame(() => setShakeNameInput(true));
+      return;
+    }
+    setShakeNameInput(true);
+  }, []);
+
+  const handleFormNameChange = useCallback(
+    (value) => {
+      setFormName(value);
+      if (nameError && value.trim()) {
+        setNameError("");
+      }
+    },
+    [nameError],
+  );
+
   /* ─── Build JSON ─── */
   const buildJson = () => {
     const cleanFields = fields.map(({ _uid, ...rest }) => rest);
-    return { name: formName, fields: cleanFields };
+    return { name: formName.trim(), fields: cleanFields };
   };
 
   /* ─── Save ─── */
   const handleSave = async () => {
+    const trimmedName = formName.trim();
+    if (!trimmedName) {
+      setNameError(__("Form name cannot be empty", "kreebi-forms"));
+      triggerNameValidationFeedback();
+      return;
+    }
+
+    setNameError("");
     setSaving(true);
     try {
       const jsonToSave = buildJson();
@@ -306,12 +342,16 @@ export default function QuickBuilder({
       {/* Form name */}
       <div className="krefrm-qb__section">
         <TextControl
+          className={`krefrm-qb__form-name-control ${
+            nameError ? "is-invalid" : ""
+          } ${shakeNameInput ? "is-shaking" : ""}`}
           label={__("Form Name", "kreebi-forms")}
           value={formName}
-          onChange={setFormName}
+          onChange={handleFormNameChange}
           placeholder={__("e.g. Contact Form", "kreebi-forms")}
           __nextHasNoMarginBottom
         />
+        {nameError && <p className="krefrm-qb__form-name-error">{nameError}</p>}
       </div>
 
       {/* Fields */}
@@ -564,7 +604,7 @@ export default function QuickBuilder({
           variant="primary"
           onClick={handleSave}
           isBusy={saving}
-          disabled={saving || !formName.trim()}
+          disabled={saving}
         >
           {saving
             ? __("Saving…", "kreebi-forms")

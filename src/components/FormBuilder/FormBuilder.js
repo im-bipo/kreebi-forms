@@ -75,6 +75,8 @@ export default function FormBuilder({
   const [view, setView] = useState(getInitialView()); // "quick" | "visual" | "json" | "settings"
   const [activeDrag, setActiveDrag] = useState(null);
   const [insertIndex, setInsertIndex] = useState(null);
+  const [nameError, setNameError] = useState("");
+  const [shakeNameInput, setShakeNameInput] = useState(false);
   const isDragDropDefaultEditor = defaultEditor === "drag_drop";
 
   // Function for integrations to trigger form save with current state
@@ -113,6 +115,32 @@ export default function FormBuilder({
     },
     [onTabChange],
   );
+
+  const triggerNameValidationFeedback = useCallback(() => {
+    setShakeNameInput(false);
+    if (typeof window !== "undefined" && window.requestAnimationFrame) {
+      window.requestAnimationFrame(() => setShakeNameInput(true));
+      return;
+    }
+    setShakeNameInput(true);
+  }, []);
+
+  const handleFormNameChange = useCallback(
+    (event) => {
+      const value = event.target.value;
+      builder.setFormName(value);
+      if (nameError && value.trim()) {
+        setNameError("");
+      }
+    },
+    [builder, nameError],
+  );
+
+  useEffect(() => {
+    if (!shakeNameInput) return undefined;
+    const timer = setTimeout(() => setShakeNameInput(false), 320);
+    return () => clearTimeout(timer);
+  }, [shakeNameInput]);
 
   /* Auto-select first field when none selected */
   useEffect(() => {
@@ -241,10 +269,22 @@ export default function FormBuilder({
   /* ─── Save ─── */
 
   const handleSave = useCallback(() => {
-    if (onSave) {
-      onSave(builder.getJson());
+    const trimmedName = (builder.formName || "").trim();
+    if (!trimmedName) {
+      setNameError(__("Form name cannot be empty", "kreebi-forms"));
+      if (view !== "visual") {
+        handleViewChange("visual");
+      }
+      triggerNameValidationFeedback();
+      return;
     }
-  }, [onSave, builder]);
+
+    setNameError("");
+    const jsonToSave = { ...builder.getJson(), name: trimmedName };
+    if (onSave) {
+      onSave(jsonToSave);
+    }
+  }, [onSave, builder, view, handleViewChange, triggerNameValidationFeedback]);
 
   /* ─── Selection helpers ─── */
 
@@ -375,13 +415,20 @@ export default function FormBuilder({
       {/* ─── Form name / desc (visual only) ─── */}
       {view === "visual" && (
         <div className="krefrm-builder__meta">
-          <input
-            type="text"
-            className="krefrm-builder__name-input"
-            placeholder={__("Form Name", "kreebi-forms")}
-            value={builder.formName}
-            onChange={(e) => builder.setFormName(e.target.value)}
-          />
+          <div className="krefrm-builder__name-field">
+            <input
+              type="text"
+              className={`krefrm-builder__name-input ${
+                nameError ? "is-invalid" : ""
+              } ${shakeNameInput ? "is-shaking" : ""}`}
+              placeholder={__("Form Name", "kreebi-forms")}
+              value={builder.formName}
+              onChange={handleFormNameChange}
+            />
+            {nameError && (
+              <p className="krefrm-builder__name-error">{nameError}</p>
+            )}
+          </div>
           <input
             type="text"
             className="krefrm-builder__desc-input"

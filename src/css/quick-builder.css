@@ -294,6 +294,41 @@
   box-sizing: border-box;
 }
 
+.krefrm-qb__form-name-control.is-invalid .components-text-control__input {
+  border-color: #d63638;
+  box-shadow: 0 0 0 1px rgba(214, 54, 56, 0.14);
+}
+
+.krefrm-qb__form-name-control.is-shaking .components-text-control__input {
+  animation: krefrm-qb-form-name-shake 0.32s ease-in-out;
+}
+
+.krefrm-qb__form-name-error {
+  margin: 8px 0 0;
+  color: #d63638;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@keyframes krefrm-qb-form-name-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(3px);
+  }
+}
+
 /* Options editor styling */
 
 .krefrm-qb .krefrm-options-editor {

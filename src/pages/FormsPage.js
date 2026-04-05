@@ -6,7 +6,6 @@ import {
   Spinner,
   Modal,
   Button,
-  ToggleControl,
 } from "@wordpress/components";
 import FormsTable from "../components/FormsTable";
 import CreateFormView from "../components/CreateFormView";
@@ -17,9 +16,8 @@ const TEMPLATES = [
   {
     key: "contact",
     label: __("Contact Form", "kreebi-forms"),
-    icon: "📧",
     data: {
-      name: "Contact Form",
+      name: "",
       fields: [
         {
           name: "Name",
@@ -45,9 +43,8 @@ const TEMPLATES = [
   {
     key: "rsvp",
     label: __("RSVP Form", "kreebi-forms"),
-    icon: "🎉",
     data: {
-      name: "RSVP Form",
+      name: "",
       fields: [
         {
           name: "Full Name",
@@ -73,9 +70,8 @@ const TEMPLATES = [
   {
     key: "event",
     label: __("Event Registration", "kreebi-forms"),
-    icon: "📅",
     data: {
-      name: "Event Registration",
+      name: "",
       fields: [
         {
           name: "Name",
@@ -101,10 +97,105 @@ const TEMPLATES = [
   {
     key: "blank",
     label: __("Blank Form", "kreebi-forms"),
-    icon: "＋",
-    data: { name: "Kreebi Form", fields: [] },
+    data: { name: "", fields: [] },
   },
 ];
+
+const TEMPLATE_ICONS = {
+  contact: (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="3"
+        y="6"
+        width="18"
+        height="12"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path d="M3 6L12 13L21 6" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  ),
+  rsvp: (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M4 17L8 3L12 17H4Z" fill="currentColor" />
+      <path d="M15 7L20 11L16 16L12 12L15 7Z" fill="currentColor" />
+      <path
+        d="M8 21L18 21"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  event: (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect
+        x="4"
+        y="5"
+        width="16"
+        height="15"
+        rx="2"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <path d="M4 9H20" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M8 3V7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M16 3V7"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+  blank: (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5" />
+      <path
+        d="M12 8V16"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M8 12H16"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  ),
+};
 
 // Legacy helper: extract post ID from route params (e.g., "form/edit?id=123")
 function getPostIdFromRoute(route) {
@@ -313,10 +404,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     }
   };
 
-  const handleDefaultEditorToggle = async (value) => {
-    await setDefaultEditorPreference(value ? "drag_drop" : "quick");
-  };
-
   // Handle tab changes in the editor
   const handleTabChange = (newTab) => {
     setCurrentTab(newTab);
@@ -446,8 +533,8 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     setShowPicker(false);
     // Respect the user's preference: if Use Advance Editor is enabled,
     // open the advance builder directly; otherwise open the quick builder.
-    const data = tpl.data || {};
-    setTemplateData(Object.keys(data).length ? data : {});
+    const data = { ...(tpl.data || {}), name: "" };
+    setTemplateData(data);
     if (useAdvanceEditor) {
       navigate("form/create");
     } else {
@@ -495,20 +582,14 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
                 className="krefrm-picker-card"
                 onClick={() => handlePickTemplate(tpl)}
               >
-                <span className="krefrm-picker-card__icon">{tpl.icon}</span>
+                <span className="krefrm-picker-card__icon" aria-hidden="true">
+                  {TEMPLATE_ICONS[tpl.key]}
+                </span>
                 <span className="krefrm-picker-card__label">{tpl.label}</span>
               </button>
             ))}
           </div>
           <div className="krefrm-picker-divider" aria-hidden="true" />
-          <div style={{ margin: "12px 0 6px" }}>
-            <ToggleControl
-              label={__("Use Advance Editor", "kreebi-forms")}
-              checked={useAdvanceEditor}
-              onChange={handleDefaultEditorToggle}
-              disabled={savingEditorPreference}
-            />
-          </div>
         </Modal>
       )}
 
