@@ -8,6 +8,8 @@
  *  onAdvanced   {Function} called with form JSON to open in the advance builder
  *  onCancel     {Function} called when user wants to go back
  *  saveLabel    {string}   label for the save button (defaults to "Save")
+ *  onViewForm   {Function} called when user clicks "View Form"
+ *  canViewForm  {boolean}  whether "View Form" button should be shown
  *  isDefaultEditor {boolean} true when quick editor is the global default
  *  onSetDefaultEditor {Function|null} sets quick editor as default
  *  isSettingDefaultEditor {boolean} true while default editor preference saves
@@ -121,6 +123,8 @@ export default function QuickBuilder({
   onAdvanced,
   onCancel,
   saveLabel,
+  onViewForm = null,
+  canViewForm = false,
   isDefaultEditor = false,
   onSetDefaultEditor = null,
   isSettingDefaultEditor = false,
@@ -600,16 +604,24 @@ export default function QuickBuilder({
           {__("Edit in Advance Builder", "kreebi-forms")}
         </Button>
 
-        <Button
-          variant="primary"
-          onClick={handleSave}
-          isBusy={saving}
-          disabled={saving}
-        >
-          {saving
-            ? __("Saving…", "kreebi-forms")
-            : saveLabel || __("Save", "kreebi-forms")}
-        </Button>
+        <div className="krefrm-qb__footer-actions">
+          {canViewForm && onViewForm && (
+            <Button variant="secondary" onClick={onViewForm}>
+              {__("View Form", "kreebi-forms")}
+            </Button>
+          )}
+
+          <Button
+            variant="primary"
+            onClick={handleSave}
+            isBusy={saving}
+            disabled={saving}
+          >
+            {saving
+              ? __("Saving…", "kreebi-forms")
+              : saveLabel || __("Save", "kreebi-forms")}
+          </Button>
+        </div>
       </div>
     </div>
   );

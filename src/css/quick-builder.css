@@ -279,6 +279,12 @@
   padding: 16px 0 8px;
 }
 
+.krefrm-qb__footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Quick Builder inputs */
 
 .krefrm-qb input,
@@ -400,5 +406,24 @@
   .krefrm-qb__header .components-button {
     width: 100%;
     justify-content: center;
+  }
+
+  .krefrm-qb__footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .krefrm-qb__footer .components-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .krefrm-qb__footer-actions {
+    width: 100%;
+  }
+
+  .krefrm-qb__footer-actions .components-button {
+    flex: 1;
   }
 }

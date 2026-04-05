@@ -125,11 +125,22 @@ function FormCard({
                 className="krefrm-form-card__menu-item"
                 role="menuitem"
                 onClick={() => {
-                  onEdit();
+                  onEdit("quick");
                   setMenuOpen(false);
                 }}
               >
-                {__("Edit", "kreebi-forms")}
+                {__("Quick edit", "kreebi-forms")}
+              </button>
+              <button
+                type="button"
+                className="krefrm-form-card__menu-item"
+                role="menuitem"
+                onClick={() => {
+                  onEdit("advanced");
+                  setMenuOpen(false);
+                }}
+              >
+                {__("Drag & drop edit", "kreebi-forms")}
               </button>
               {enabledIntegrations &&
                 Object.keys(enabledIntegrations)
@@ -292,9 +303,16 @@ export default function FormsTable({
     navigate(`form/edit${tabSegment}?${routeId}`);
   };
 
-  const handleEdit = (form) => {
-    const defaultTab = defaultEditor === "drag_drop" ? null : "quick-edit";
-    navigateToTab(form, defaultTab);
+  const handleEdit = (form, editorType = null) => {
+    let chosenTab = null;
+    if (editorType === "quick") {
+      chosenTab = "quick-edit";
+    } else if (editorType === "advanced") {
+      chosenTab = null;
+    } else {
+      chosenTab = defaultEditor === "drag_drop" ? null : "quick-edit";
+    }
+    navigateToTab(form, chosenTab);
   };
 
   const handleCopy = (text, id) => {
@@ -388,7 +406,7 @@ export default function FormsTable({
             onCopy={handleCopy}
             onDelete={onDelete}
             onNavigateTab={navigateToTab}
-            onEdit={() => handleEdit(form)}
+            onEdit={(editorType) => handleEdit(form, editorType)}
           />
         ))}
       </div>

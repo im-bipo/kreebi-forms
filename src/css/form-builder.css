@@ -695,6 +695,23 @@
     justify-content: center;
   }
 
+  .krefrm-builder__topbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .krefrm-builder__toggle {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .krefrm-builder__topbar-actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
   .krefrm-builder__columns {
     grid-template-areas:
       "library"

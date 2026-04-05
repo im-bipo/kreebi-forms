@@ -232,6 +232,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [showPicker, setShowPicker] = useState(false);
   const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
   const [savingEditorPreference, setSavingEditorPreference] = useState(false);
+  const [lastSavedCreateForm, setLastSavedCreateForm] = useState(null);
 
   const showCreatePage = route === "form/create";
   const showQuickBuilder = route === "form/quick-builder";
@@ -322,14 +323,18 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   }, [route, showEditPage, forms]);
 
   const handleCreate = async (parsed) => {
-    await apiFetch({
+    const createdForm = await apiFetch({
       path: "/kreebi-forms/v1/forms",
       method: "POST",
       data: parsed,
     });
     setSuccess(__("Form created successfully!", "kreebi-forms"));
-    navigate("form");
+    setLastSavedCreateForm({
+      formId: createdForm?.form_id || "",
+      postId: createdForm?.post_id || null,
+    });
     fetchForms();
+    return createdForm;
   };
 
   const handleDelete = (postId) => {
@@ -430,7 +435,12 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         onCancel={() => {
           navigate("form");
           setTemplateData(null);
+          setLastSavedCreateForm(null);
         }}
+        onViewForm={() => navigate("form")}
+        canViewForm={Boolean(
+          lastSavedCreateForm?.formId || lastSavedCreateForm?.postId,
+        )}
         formId=""
         defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
         onSetDefaultEditor={setDefaultEditorPreference}
@@ -468,6 +478,8 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           initialData={editFormData}
           onSubmit={handleUpdate}
           onCancel={() => navigate("form")}
+          onViewForm={() => navigate("form")}
+          canViewForm={Boolean(currentFormId || editFormId)}
           isEditing={true}
           formId={currentFormId}
           initialTab={currentTab}
@@ -488,6 +500,10 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         isDefaultEditor={!useAdvanceEditor}
         onSetDefaultEditor={() => setDefaultEditorPreference("quick")}
         isSettingDefaultEditor={savingEditorPreference}
+        onViewForm={() => navigate("form")}
+        canViewForm={Boolean(
+          lastSavedCreateForm?.formId || lastSavedCreateForm?.postId,
+        )}
         onSave={async (parsed) => {
           const res = await apiFetch({
             path: "/kreebi-forms/v1/forms",
@@ -507,9 +523,13 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           setSuccess(
             __("Form created! Shortcode copied to clipboard.", "kreebi-forms"),
           );
+          setLastSavedCreateForm({
+            formId: res?.form_id || "",
+            postId: res?.post_id || null,
+          });
           setTemplateData(null);
-          navigate("form");
           fetchForms();
+          return res;
         }}
         onAdvanced={(jsonData) => {
           setTemplateData(jsonData);
@@ -517,6 +537,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         }}
         onCancel={() => {
           setTemplateData(null);
+          setLastSavedCreateForm(null);
           navigate("form");
         }}
       />
@@ -530,6 +551,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     // open the advance builder directly; otherwise open the quick builder.
     const data = { ...(tpl.data || {}), name: "" };
     setTemplateData(data);
+    setLastSavedCreateForm(null);
     if (useAdvanceEditor) {
       navigate("form/create");
     } else {
