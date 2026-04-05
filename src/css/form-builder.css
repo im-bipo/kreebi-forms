@@ -219,6 +219,7 @@
   transition:
     box-shadow 0.15s,
     border-color 0.15s;
+  touch-action: none;
 }
 
 .krefrm-field-type:hover {
@@ -287,6 +288,14 @@
   overflow-x: hidden;
   background: #fafafa;
   align-content: start;
+  scroll-behavior: smooth;
+}
+
+.krefrm-form-preview__sortable-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
 }
 
 .krefrm-form-preview__fields.is-drag-over {
@@ -338,17 +347,10 @@
   color: #6b6f73;
 }
 
-.krefrm-drop-placeholder {
-  height: 2px;
-  background: #2271b1;
-  border-radius: 2px;
-  box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.12);
-  margin: 2px 0;
-}
-
 .krefrm-field-item {
   display: block;
   width: 100%;
+  will-change: transform;
 }
 
 /* ─── Step Navigation Bar ─── */
@@ -426,7 +428,8 @@
   background: #fff;
   transition:
     border-color 0.15s,
-    box-shadow 0.15s;
+    box-shadow 0.15s,
+    transform 0.18s cubic-bezier(0.2, 0, 0, 1);
   cursor: default;
   width: 100%;
   min-width: 0;
@@ -442,13 +445,19 @@
   box-shadow: 0 0 0 1px #2271b1;
 }
 
-.krefrm-field-card.is-dragging {
+.krefrm-field-type.is-sortable-chosen,
+.krefrm-field-card.is-sortable-chosen {
+  box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.2);
+}
+
+.krefrm-field-type.is-sortable-ghost,
+.krefrm-field-item.is-sortable-ghost {
   opacity: 0.4;
 }
 
-.krefrm-field-card--overlay {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #2271b1;
+.krefrm-field-type.is-sortable-drag,
+.krefrm-field-item.is-sortable-drag {
+  opacity: 0.95;
 }
 
 .krefrm-field-card__handle {
@@ -458,6 +467,7 @@
   user-select: none;
   line-height: 1;
   flex-shrink: 0;
+  touch-action: none;
 }
 
 .krefrm-field-card__handle:hover {

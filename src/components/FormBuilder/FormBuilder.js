@@ -4,7 +4,7 @@
  * Provides:
  *  - Toggle between Visual Editor and JSON View.
  *  - Three-column layout: FieldLibrary | FormPreview | SettingsPanel.
- *  - Drag-and-drop context via @dnd-kit.
+ *  - Drag-and-drop powered by SortableJS.
  *
  * Props:
  *  initialData  {Object}   optional initial form JSON (for editing)
@@ -14,25 +14,17 @@
  *  isEditing    {Boolean}  whether we're editing an existing form
  */
 
-import { useState, useCallback } from "@wordpress/element";
-import { useEffect } from "@wordpress/element";
+import { useState, useCallback, useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
-import {
-  DndContext,
-  DragOverlay,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  closestCenter,
-} from "@dnd-kit/core";
+import Sortable from "sortablejs";
 
 import useFormBuilder from "./useFormBuilder";
 import FieldLibrary from "./FieldLibrary";
 import FormPreview from "./FormPreview";
 import SettingsPanel from "./SettingsPanel";
 import JsonEditor from "./JsonEditor";
-import DragOverlayCard from "./DragOverlayCard";
+import FIELD_TYPES from "./fieldTypes";
 import QuickBuilder from "../QuickBuilder"; // used as additional view
 import { getIntegration } from "../../integrations/registry";
 
@@ -77,8 +69,6 @@ export default function FormBuilder({
   };
 
   const [view, setView] = useState(getInitialView()); // "quick" | "visual" | "json" | "settings"
-  const [activeDrag, setActiveDrag] = useState(null);
-  const [insertIndex, setInsertIndex] = useState(null);
   const [nameError, setNameError] = useState("");
   const [shakeNameInput, setShakeNameInput] = useState(false);
   const isDragDropDefaultEditor = defaultEditor === "drag_drop";
@@ -89,13 +79,6 @@ export default function FormBuilder({
       onSave(builder.getJson());
     }
   }, [onSave, builder]);
-
-  // Require a small move before activating drag (avoids accidental drag on click)
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 5 },
-    }),
-  );
 
   // Helper to change view and notify parent about tab changes
   const handleViewChange = useCallback(
@@ -161,114 +144,91 @@ export default function FormBuilder({
     }
   }, [view, builder.steps, builder.currentStepIndex, builder.selection]);
 
-  /* ─── Drag handlers ─── */
+  useEffect(() => {
+    if (view !== "visual") return undefined;
 
-  const handleDragStart = useCallback((event) => {
-    setActiveDrag(event.active);
-    setInsertIndex(null);
-  }, []);
+    const libraryList = document.querySelector(".krefrm-field-library__list");
+    const previewList = document.querySelector(
+      ".krefrm-form-preview__sortable-list",
+    );
 
-  const handleDragOver = useCallback(
-    (event) => {
-      const { active, over } = event;
-      if (!over) {
-        setInsertIndex(null);
-        return;
-      }
+    if (!libraryList || !previewList) return undefined;
 
-      const step = builder.steps[builder.currentStepIndex];
-      const fields = step?.fields || [];
+    const fieldDefaultsByType = FIELD_TYPES.reduce((acc, fieldType) => {
+      acc[fieldType.type] = fieldType.defaults;
+      return acc;
+    }, {});
 
-      if (over.id === "form-preview-droppable") {
-        setInsertIndex(fields.length);
-        return;
-      }
+    const librarySortable = Sortable.create(libraryList, {
+      group: { name: "krefrm-fields", pull: "clone", put: false },
+      sort: false,
+      animation: 180,
+      easing: "cubic-bezier(0.2, 0, 0, 1)",
+      draggable: ".krefrm-field-type",
+      filter: ".krefrm-field-type__add",
+      preventOnFilter: false,
+      forceFallback: true,
+      fallbackTolerance: 8,
+      ghostClass: "is-sortable-ghost",
+      chosenClass: "is-sortable-chosen",
+      dragClass: "is-sortable-drag",
+    });
 
-      const overIndex = fields.findIndex((f) => f._uid === over.id);
-      if (overIndex === -1) {
-        setInsertIndex(fields.length);
-        return;
-      }
+    const previewSortable = Sortable.create(previewList, {
+      group: { name: "krefrm-fields", pull: false, put: true },
+      animation: 180,
+      easing: "cubic-bezier(0.2, 0, 0, 1)",
+      draggable: ".krefrm-field-item",
+      handle: ".krefrm-field-card__handle",
+      emptyInsertThreshold: 18,
+      forceFallback: true,
+      fallbackTolerance: 8,
+      ghostClass: "is-sortable-ghost",
+      chosenClass: "is-sortable-chosen",
+      dragClass: "is-sortable-drag",
+      onAdd: (event) => {
+        if (event.from !== libraryList) return;
+        const fieldType = event.item.getAttribute("data-field-type");
+        const defaults = fieldDefaultsByType[fieldType];
 
-      const overRect = over.rect;
-      const activeRect =
-        active.rect.current?.translated || active.rect.current?.initial;
-
-      if (!overRect || !activeRect) {
-        setInsertIndex(overIndex);
-        return;
-      }
-
-      // For single-column layout, only consider vertical (Y-axis) positioning
-      const activeCenterY = activeRect.top + activeRect.height / 2;
-      const overCenterY = overRect.top + overRect.height / 2;
-
-      const shouldInsertAfter = activeCenterY > overCenterY;
-      setInsertIndex(overIndex + (shouldInsertAfter ? 1 : 0));
-    },
-    [builder.steps, builder.currentStepIndex],
-  );
-
-  const handleDragEnd = useCallback(
-    (event) => {
-      setActiveDrag(null);
-      const { active, over } = event;
-      const step = builder.steps[builder.currentStepIndex];
-      const fields = step?.fields || [];
-
-      if (!over) {
-        setInsertIndex(null);
-        return;
-      }
-
-      const activeData = active.data.current;
-      const targetIndex =
-        typeof insertIndex === "number"
-          ? insertIndex
-          : fields.findIndex((f) => f._uid === over.id);
-
-      // --- Dropped from the library onto the preview ---
-      if (activeData?.origin === "library") {
-        const safeIndex =
-          typeof targetIndex === "number" && targetIndex >= 0
-            ? targetIndex
-            : fields.length;
-        builder.insertFieldAt(
-          { ...activeData.fieldDefaults },
-          builder.currentStepIndex,
-          safeIndex,
-        );
-        setInsertIndex(null);
-        return;
-      }
-
-      // --- Reordering existing fields ---
-      if (active.id !== over.id) {
-        if (!step) return;
-        const oldIndex = step.fields.findIndex((f) => f._uid === active.id);
-        const newIndex =
-          typeof targetIndex === "number" && targetIndex >= 0
-            ? targetIndex
-            : step.fields.findIndex((f) => f._uid === over.id);
-
-        if (oldIndex !== -1 && newIndex !== -1) {
-          builder.moveFieldToIndex(
+        if (defaults) {
+          builder.insertFieldAt(
+            { ...defaults },
             builder.currentStepIndex,
-            oldIndex,
-            newIndex,
+            event.newIndex || 0,
           );
         }
-      }
 
-      setInsertIndex(null);
-    },
-    [builder, insertIndex],
-  );
+        event.item.remove();
+      },
+      onEnd: (event) => {
+        if (event.from !== previewList || event.to !== previewList) return;
+        if (
+          typeof event.oldIndex !== "number" ||
+          typeof event.newIndex !== "number"
+        ) {
+          return;
+        }
+        if (event.oldIndex === event.newIndex) return;
 
-  const handleDragCancel = useCallback(() => {
-    setActiveDrag(null);
-    setInsertIndex(null);
-  }, []);
+        builder.moveFieldToIndex(
+          builder.currentStepIndex,
+          event.oldIndex,
+          event.newIndex,
+        );
+      },
+    });
+
+    return () => {
+      librarySortable.destroy();
+      previewSortable.destroy();
+    };
+  }, [
+    view,
+    builder.currentStepIndex,
+    builder.insertFieldAt,
+    builder.moveFieldToIndex,
+  ]);
 
   /* ─── Save ─── */
 
@@ -508,53 +468,29 @@ export default function FormBuilder({
         })()}
 
       {view === "visual" && (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragOver={handleDragOver}
-          onDragEnd={handleDragEnd}
-          onDragCancel={handleDragCancel}
-        >
-          <div className="krefrm-builder__columns">
-            <FieldLibrary onAdd={(defaults) => builder.addField(defaults)} />
+        <div className="krefrm-builder__columns">
+          <FieldLibrary onAdd={(defaults) => builder.addField(defaults)} />
 
-            <FormPreview
-              steps={builder.steps}
-              currentStepIndex={builder.currentStepIndex}
-              selection={builder.selection}
-              insertIndex={insertIndex}
-              onSelectField={selectField}
-              onSelectStep={selectStep}
-              onUpdateStep={builder.updateStep}
-              onRemoveField={builder.removeField}
-              onMoveFieldBy={builder.moveFieldBy}
-            />
+          <FormPreview
+            steps={builder.steps}
+            currentStepIndex={builder.currentStepIndex}
+            selection={builder.selection}
+            onSelectField={selectField}
+            onSelectStep={selectStep}
+            onUpdateStep={builder.updateStep}
+            onRemoveField={builder.removeField}
+            onMoveFieldBy={builder.moveFieldBy}
+          />
 
-            <SettingsPanel
-              selection={builder.selection}
-              steps={builder.steps}
-              onUpdateStep={builder.updateStep}
-              onRemoveStep={builder.removeStep}
-              onUpdateField={builder.updateField}
-              onRemoveField={builder.removeField}
-            />
-          </div>
-
-          <DragOverlay dropAnimation={null} adjustScale={false}>
-            {activeDrag ? (
-              <DragOverlayCard
-                field={
-                  activeDrag.data.current?.origin === "library"
-                    ? activeDrag.data.current.fieldDefaults
-                    : builder.steps[builder.currentStepIndex]?.fields?.find(
-                        (f) => f._uid === activeDrag.id,
-                      )
-                }
-              />
-            ) : null}
-          </DragOverlay>
-        </DndContext>
+          <SettingsPanel
+            selection={builder.selection}
+            steps={builder.steps}
+            onUpdateStep={builder.updateStep}
+            onRemoveStep={builder.removeStep}
+            onUpdateField={builder.updateField}
+            onRemoveField={builder.removeField}
+          />
+        </div>
       )}
     </div>
   );

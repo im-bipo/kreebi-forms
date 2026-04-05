@@ -1,18 +1,15 @@
 /**
  * SortableFieldCard – a single field rendered inside the form preview.
  *
- * Wraps each field in @dnd-kit/sortable so it can be reordered.
+ * Used as a SortableJS item so it can be reordered by drag handle.
  * Clicking selects it; the Settings Panel shows its properties.
  */
 
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 
 export default function SortableFieldCard({
   field,
-  fieldIndex,
   isSelected,
   onSelect,
   onRemove,
@@ -21,34 +18,9 @@ export default function SortableFieldCard({
   canMoveUp,
   canMoveDown,
 }) {
-  const animateLayoutChanges = ({ isSorting, wasDragging }) =>
-    isSorting || wasDragging;
-
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
-    id: field._uid,
-    animateLayoutChanges,
-  });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  };
-
   return (
     <div
-      ref={setNodeRef}
-      style={style}
-      className={`krefrm-field-card ${isSelected ? "is-selected" : ""} ${
-        isDragging ? "is-dragging" : ""
-      }`}
+      className={`krefrm-field-card ${isSelected ? "is-selected" : ""}`}
       onClick={(e) => {
         e.stopPropagation();
         onSelect();
@@ -57,8 +29,6 @@ export default function SortableFieldCard({
       {/* Drag handle */}
       <span
         className="krefrm-field-card__handle"
-        {...attributes}
-        {...listeners}
         title={__("Drag to reorder", "kreebi-forms")}
       >
         ⠿

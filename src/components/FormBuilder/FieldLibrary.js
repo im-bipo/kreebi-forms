@@ -2,32 +2,18 @@
  * FieldLibrary – left sidebar listing available field types.
  *
  * Each field type can be:
- *  - Dragged onto the form preview (handled by @dnd-kit).
+ *  - Dragged onto the form preview (handled by SortableJS).
  *  - Clicked via "Add" to append to the current step.
  */
 
 import { useState } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
-import { useDraggable } from "@dnd-kit/core";
 import FIELD_TYPES from "./fieldTypes";
 
-function DraggableFieldType({ fieldType, onAdd }) {
-  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
-    id: `library-${fieldType.type}`,
-    data: {
-      origin: "library",
-      fieldDefaults: fieldType.defaults,
-    },
-  });
-
+function LibraryFieldType({ fieldType, onAdd }) {
   return (
-    <div
-      ref={setNodeRef}
-      className={`krefrm-field-type ${isDragging ? "is-dragging" : ""}`}
-      {...listeners}
-      {...attributes}
-    >
+    <div className="krefrm-field-type" data-field-type={fieldType.type}>
       <span className="krefrm-field-type__icon">{fieldType.icon}</span>
       <span className="krefrm-field-type__label">{fieldType.label}</span>
       <Button
@@ -64,7 +50,7 @@ export default function FieldLibrary({ onAdd }) {
       </button>
       <div className="krefrm-field-library__list">
         {FIELD_TYPES.map((ft) => (
-          <DraggableFieldType key={ft.type} fieldType={ft} onAdd={onAdd} />
+          <LibraryFieldType key={ft.type} fieldType={ft} onAdd={onAdd} />
         ))}
       </div>
     </div>
