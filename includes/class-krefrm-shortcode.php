@@ -237,6 +237,15 @@ class Krefrm_Shortcode
 
     // Create Shadow DOM wrapper with embedded HTML
     $shadow_dom_html = '
+<style>
+  #' . esc_attr($element_id) . ',
+  #' . esc_attr($element_id) . ':focus,
+  #' . esc_attr($element_id) . ':focus-visible,
+  #' . esc_attr($element_id) . ':focus-within {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+</style>
 <div id="' . esc_attr($element_id) . '" class="krefrm-shadow-wrapper"></div>
 <script id="' . esc_attr($element_id) . '-setup">
 (function() {
