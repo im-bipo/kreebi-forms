@@ -9,7 +9,6 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Activation
 {
-    const SLACK_WEBHOOK_URL = 'REDACTED_SLACK_WEBHOOK';
     const DEFAULT_EMAIL_TEMPLATE = "Hello,\n\nYou have received a new form submission.\n\nSubmitted Data:\n{fields}\n\n---\nThis is an automated email. Please do not reply.";
 
     /**
@@ -19,7 +18,6 @@ class Krefrm_Activation
     {
         self::ensure_default_global_settings();
         self::mark_welcome_screen_for_redirect();
-        self::send_slack_activation_log();
     }
 
     /**
@@ -116,29 +114,6 @@ class Krefrm_Activation
 
         update_option('krefrm_settings', $settings);
     }
-
-    /**
-     * Send activation log to Slack
-     */
-    private static function send_slack_activation_log()
-    {
-        $payload = array(
-            'text' => sprintf(
-                "*Kreebi Forms Activated*\n• Site: %s\n• Date: %s",
-                site_url(),
-                date_i18n('Y-m-d H:i:s')
-            ),
-        );
-
-        wp_remote_post(self::SLACK_WEBHOOK_URL, array(
-            'method'      => 'POST',
-            'body'        => wp_json_encode($payload),
-            'headers'     => array('Content-Type' => 'application/json'),
-            'timeout'     => 5,
-            'data_format' => 'body',
-        ));
-    }
-
 
     /**
      * Get the next sequential form ID (001, 002, 003, etc.)

@@ -11,8 +11,6 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Deactivation
 {
-    const SLACK_WEBHOOK_URL = 'REDACTED_SLACK_WEBHOOK';
-
     /**
      * Deactivation hook callback
      */
@@ -53,48 +51,12 @@ class Krefrm_Deactivation
         // Send survey data to email
         self::send_survey_email($survey_data);
 
-        // Send log to Slack
-        self::send_slack_log(array(
-            'reason'      => $survey_data['reason'],
-            'feedback'    => $survey_data['feedback'],
-            'email'       => $survey_data['email'],
-            'delete_data' => ('true' === $delete_data) ? 'Yes' : 'No',
-            'site'        => $survey_data['site_url'],
-            'datetime'    => $survey_data['timestamp'],
-        ));
-
         // Delete all data if checkbox is checked
         if ('true' === $delete_data) {
             self::delete_all_data();
         }
 
         wp_send_json_success(array('message' => 'Survey submitted successfully'));
-    }
-
-    /**
-     * Send log to Slack
-     */
-    private static function send_slack_log($data)
-    {
-        $payload = array(
-            'text' => sprintf(
-                "*Kreebi Forms Deactivation*\n• Site: %s\n• Date: %s\n• Reason: %s\n• Email: %s\n• Delete data: %s\n• Feedback: %s",
-                $data['site'],
-                $data['datetime'],
-                $data['reason'] ?: '(none)',
-                $data['email'] ?: '(none)',
-                $data['delete_data'],
-                $data['feedback'] ?: '(none)'
-            ),
-        );
-
-        wp_remote_post(self::SLACK_WEBHOOK_URL, array(
-            'method'      => 'POST',
-            'body'        => wp_json_encode($payload),
-            'headers'     => array('Content-Type' => 'application/json'),
-            'timeout'     => 5,
-            'data_format' => 'body',
-        ));
     }
 
     /**
