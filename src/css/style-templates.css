@@ -9,14 +9,21 @@
 }
 
 .krefrm-stl-page__header {
-  display: block;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
   margin-bottom: 24px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 }
 
 .krefrm-stl-page__title {
   margin: 0;
-  font-size: 24px;
-  font-weight: 700;
+  font-size: 20px;
+  font-weight: 650;
   color: #1d2327;
   line-height: 1.2;
 }
@@ -29,11 +36,22 @@
 }
 
 .krefrm-stl-page__actions {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
 }
 
 .krefrm-stl-page__saved-notice {
-  display: none;
+  font-size: 13px;
+  font-weight: 600;
+  color: #00a32a;
+}
+
+.krefrm-stl-page__error {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b32d2e;
 }
 
 /* ─── Template Cards row ─── */
@@ -594,6 +612,11 @@
   .krefrm-stl-page__header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .krefrm-stl-page__actions {
+    align-items: flex-start;
+    width: 100%;
   }
 
   .krefrm-stl-cards {

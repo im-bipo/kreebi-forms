@@ -126,11 +126,15 @@ function LivePreview({ templateId, customCss }) {
 
 export default function StyleTemplatePage() {
   const [activeTemplate, setActiveTemplate] = useState("kreebi_style_1");
+  const [savedTemplate, setSavedTemplate] = useState("kreebi_style_1");
   const [loading, setLoading] = useState(true);
   const [customCSS, setCustomCSS] = useState("");
   const [cssError, setCssError] = useState("");
   const [cssSaving, setCssSaving] = useState(false);
   const [cssSaveMessage, setCssSaveMessage] = useState("");
+  const [templateSaving, setTemplateSaving] = useState(false);
+  const [templateSaveMessage, setTemplateSaveMessage] = useState("");
+  const [templateSaveError, setTemplateSaveError] = useState("");
   const [previewKey, setPreviewKey] = useState(0);
   const upgradeUrl = "admin.php?page=krefrm_forms#upgrade-to-pro";
 
@@ -144,8 +148,12 @@ export default function StyleTemplatePage() {
       .then((data) => {
         const tpl = data?.styleTemplate || "kreebi_style_1";
         setActiveTemplate(tpl);
+        setSavedTemplate(tpl);
       })
-      .catch(() => setActiveTemplate("kreebi_style_1"))
+      .catch(() => {
+        setActiveTemplate("kreebi_style_1");
+        setSavedTemplate("kreebi_style_1");
+      })
       .finally(() => setLoading(false));
 
     // Load custom CSS
@@ -164,21 +172,55 @@ export default function StyleTemplatePage() {
       window.location.href = upgradeUrl;
       return;
     }
-    // Auto-save on click
+
     setActiveTemplate(tpl.id);
-    fetch(`${restUrl}/settings`, {
-      method: "POST",
-      cache: "no-store",
-      headers: {
-        "Content-Type": "application/json",
-        "X-WP-Nonce": nonce,
-      },
-      body: JSON.stringify({ styleTemplate: tpl.id }),
-    }).then((r) => {
-      if (!r.ok) {
-        throw new Error("Failed to update style template");
+    setTemplateSaveError("");
+    setTemplateSaveMessage("");
+  };
+
+  const hasTemplateChanges = activeTemplate !== savedTemplate;
+
+  const handleSaveStyleTemplate = async () => {
+    if (!hasTemplateChanges) {
+      return;
+    }
+
+    setTemplateSaveError("");
+    setTemplateSaveMessage("");
+    setTemplateSaving(true);
+
+    try {
+      const response = await fetch(`${restUrl}/settings`, {
+        method: "POST",
+        cache: "no-store",
+        headers: {
+          "Content-Type": "application/json",
+          "X-WP-Nonce": nonce,
+        },
+        body: JSON.stringify({ styleTemplate: activeTemplate }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setTemplateSaveError(
+          data?.message || __("Failed to save style template", "kreebi-forms"),
+        );
+        return;
       }
-    });
+
+      setSavedTemplate(activeTemplate);
+      setTemplateSaveMessage(
+        __("Style template saved successfully!", "kreebi-forms"),
+      );
+      setTimeout(() => setTemplateSaveMessage(""), 3000);
+    } catch (error) {
+      setTemplateSaveError(
+        __("Network error while saving style template", "kreebi-forms"),
+      );
+    } finally {
+      setTemplateSaving(false);
+    }
   };
 
   const validateCSS = (css) => {
@@ -284,6 +326,26 @@ export default function StyleTemplatePage() {
               "kreebi-forms",
             )}
           </p>
+        </div>
+
+        <div className="krefrm-stl-page__actions">
+          {templateSaveMessage && (
+            <div className="krefrm-stl-page__saved-notice">
+              ✓ {templateSaveMessage}
+            </div>
+          )}
+          {templateSaveError && (
+            <div className="krefrm-stl-page__error">{templateSaveError}</div>
+          )}
+          <Button
+            variant="primary"
+            onClick={handleSaveStyleTemplate}
+            disabled={!hasTemplateChanges || templateSaving}
+          >
+            {templateSaving
+              ? __("Saving…", "kreebi-forms")
+              : __("Save Style", "kreebi-forms")}
+          </Button>
         </div>
       </div>
 
