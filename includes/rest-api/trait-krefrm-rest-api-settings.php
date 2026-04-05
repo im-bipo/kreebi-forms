@@ -238,10 +238,7 @@ trait Krefrm_Rest_Api_Settings
         $has_keys = ('' !== $site_key) || ('' !== $secret_key);
         $is_enabled = ! empty($captcha_settings['enabled']);
 
-        error_log('[Kreebi Forms] Captcha validation started: enabled=' . ($is_enabled ? 'true' : 'false') . ', has_keys=' . ($has_keys ? 'true' : 'false'));
-
         if (! $is_enabled && ! $has_keys) {
-            error_log('[Kreebi Forms] Captcha validation skipped: not enabled and no keys provided');
             return true;
         }
 
