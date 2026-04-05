@@ -20,6 +20,7 @@ class Krefrm_Activation
     public static function activate()
     {
         self::ensure_default_global_settings();
+        self::mark_welcome_screen_for_redirect();
 
         // Check if contact form already exists to prevent duplicates
         if (self::contact_form_exists()) {
@@ -31,6 +32,23 @@ class Krefrm_Activation
         self::create_contact_form();
 
         self::send_slack_activation_log();
+    }
+
+    /**
+     * Mark the post-activation onboarding redirect.
+     */
+    private static function mark_welcome_screen_for_redirect()
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Activation context check only.
+        if (isset($_GET['activate-multi'])) {
+            return;
+        }
+
+        if (is_multisite() && is_network_admin()) {
+            return;
+        }
+
+        set_transient('krefrm_activation_redirect', '1', 30 * MINUTE_IN_SECONDS);
     }
 
     /**
@@ -88,6 +106,13 @@ class Krefrm_Activation
         }
         if (empty($settings['emailNotification']['bodyTemplate'])) {
             $settings['emailNotification']['bodyTemplate'] = self::DEFAULT_EMAIL_TEMPLATE;
+        }
+
+        if (
+            ! isset($settings['defaultEditor'])
+            || ! in_array($settings['defaultEditor'], array('quick', 'drag_drop'), true)
+        ) {
+            $settings['defaultEditor'] = 'quick';
         }
 
         // Set default custom CSS if not already set

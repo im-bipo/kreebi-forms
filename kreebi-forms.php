@@ -37,6 +37,7 @@ require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin-forms-page.php';
 require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin-submissions-page.php';
 require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-form-handler.php';
 require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin-deactivation.php';
+require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin-welcome.php';
 
 require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-form-editor.php';
 require_once KREFRM_PLUGIN_DIR . 'admin/class-krefrm-admin.php';

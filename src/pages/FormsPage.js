@@ -145,6 +145,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [templateData, setTemplateData] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
+  const [savingEditorPreference, setSavingEditorPreference] = useState(false);
 
   const showCreatePage = route === "form/create";
   const showQuickBuilder = route === "form/quick-builder";
@@ -164,6 +165,27 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   useEffect(() => {
     fetchForms();
   }, [fetchForms]);
+
+  // Load global default editor preference from settings.
+  useEffect(() => {
+    let isMounted = true;
+
+    apiFetch({ path: "/kreebi-forms/v1/settings" })
+      .then((data) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setUseAdvanceEditor(data?.defaultEditor === "drag_drop");
+      })
+      .catch(() => {
+        // Keep local fallback value when request fails.
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Load form data when in edit mode
   useEffect(() => {
@@ -261,6 +283,40 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     fetchForms();
   };
 
+  const setDefaultEditorPreference = async (editorId) => {
+    const nextValue = editorId === "drag_drop";
+    const previousValue = useAdvanceEditor;
+
+    if (nextValue === previousValue) {
+      return;
+    }
+
+    setUseAdvanceEditor(nextValue);
+    setSavingEditorPreference(true);
+
+    try {
+      await apiFetch({
+        path: "/kreebi-forms/v1/settings",
+        method: "POST",
+        data: {
+          defaultEditor: nextValue ? "drag_drop" : "quick",
+        },
+      });
+    } catch (err) {
+      setUseAdvanceEditor(previousValue);
+      setError(
+        err.message ||
+          __("Failed to save default editor preference.", "kreebi-forms"),
+      );
+    } finally {
+      setSavingEditorPreference(false);
+    }
+  };
+
+  const handleDefaultEditorToggle = async (value) => {
+    await setDefaultEditorPreference(value ? "drag_drop" : "quick");
+  };
+
   // Handle tab changes in the editor
   const handleTabChange = (newTab) => {
     setCurrentTab(newTab);
@@ -294,6 +350,9 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           setTemplateData(null);
         }}
         formId=""
+        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
+        onSetDefaultEditor={setDefaultEditorPreference}
+        isSavingDefaultEditor={savingEditorPreference}
       />
     );
   }
@@ -331,6 +390,9 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           formId={currentFormId}
           initialTab={currentTab}
           onTabChange={handleTabChange}
+          defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
+          onSetDefaultEditor={setDefaultEditorPreference}
+          isSavingDefaultEditor={savingEditorPreference}
         />
       </div>
     );
@@ -341,6 +403,9 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     return (
       <QuickBuilder
         initialData={templateData || {}}
+        isDefaultEditor={!useAdvanceEditor}
+        onSetDefaultEditor={() => setDefaultEditorPreference("quick")}
+        isSettingDefaultEditor={savingEditorPreference}
         onSave={async (parsed) => {
           const res = await apiFetch({
             path: "/kreebi-forms/v1/forms",
@@ -408,6 +473,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         navigate={navigate}
         onDelete={handleDelete}
         onCreateNew={() => setShowPicker(true)}
+        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
       />
 
       {showPicker && (
@@ -439,7 +505,8 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
             <ToggleControl
               label={__("Use Advance Editor", "kreebi-forms")}
               checked={useAdvanceEditor}
-              onChange={(v) => setUseAdvanceEditor(!!v)}
+              onChange={handleDefaultEditorToggle}
+              disabled={savingEditorPreference}
             />
           </div>
         </Modal>

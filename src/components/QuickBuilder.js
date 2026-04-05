@@ -8,6 +8,9 @@
  *  onAdvanced   {Function} called with form JSON to open in the advance builder
  *  onCancel     {Function} called when user wants to go back
  *  saveLabel    {string}   label for the save button (defaults to "Save")
+ *  isDefaultEditor {boolean} true when quick editor is the global default
+ *  onSetDefaultEditor {Function|null} sets quick editor as default
+ *  isSettingDefaultEditor {boolean} true while default editor preference saves
  */
 
 import { useState, useCallback, useRef, useEffect } from "@wordpress/element";
@@ -118,6 +121,9 @@ export default function QuickBuilder({
   onAdvanced,
   onCancel,
   saveLabel,
+  isDefaultEditor = false,
+  onSetDefaultEditor = null,
+  isSettingDefaultEditor = false,
 }) {
   const [formName, setFormName] = useState(initialData.name || "");
   const [fields, setFields] = useState(() =>
@@ -277,8 +283,24 @@ export default function QuickBuilder({
     <div className="krefrm-qb">
       {/* Header */}
       <div className="krefrm-qb__header">
-        <h2>{__("Quick Builder", "kreebi-forms")}</h2>
-        <p>{__("Build your form in a few simple steps.", "kreebi-forms")}</p>
+        <div>
+          <h2>{__("Quick Builder", "kreebi-forms")}</h2>
+          <p>{__("Build your form in a few simple steps.", "kreebi-forms")}</p>
+        </div>
+
+        <Button
+          variant={isDefaultEditor ? "secondary" : "primary"}
+          onClick={() => onSetDefaultEditor?.()}
+          disabled={
+            isDefaultEditor || isSettingDefaultEditor || !onSetDefaultEditor
+          }
+        >
+          {isDefaultEditor
+            ? __("✓ Default Editor", "kreebi-forms")
+            : isSettingDefaultEditor
+            ? __("Setting…", "kreebi-forms")
+            : __("Set Default Editor", "kreebi-forms")}
+        </Button>
       </div>
 
       {/* Form name */}

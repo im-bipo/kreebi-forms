@@ -5,6 +5,7 @@ import StyleTemplatePage from "./pages/StyleTemplatePage";
 import IntegrationsPage from "./pages/IntegrationsPage";
 import AddonsPage from "./pages/AddonsPage";
 import UpgradePage from "./pages/UpgradePage";
+import WelcomeEditorPage from "./pages/WelcomeEditorPage";
 import PageHeader from "./components/header/PageHeader";
 import "./style.css";
 
@@ -17,6 +18,7 @@ function getHashRoute() {
   if (hash === "addons") return "addons";
   if (hash === "upgrade-to-pro") return "upgrade-to-pro";
   if (hash === "style-templates") return "style-templates";
+  if (hash === "welcome-editor") return "welcome-editor";
   if (hash.startsWith("integrations")) return hash;
   if (hash.startsWith("forms")) return hash.replace(/^forms\b/, "form");
   if (hash.startsWith("form")) return hash;
@@ -26,6 +28,7 @@ function getHashRoute() {
 
 export default function App() {
   const [route, setRoute] = useState(getHashRoute);
+  const showHeader = route !== "welcome-editor";
 
   useEffect(() => {
     const handleHashChange = () => setRoute(getHashRoute());
@@ -39,9 +42,12 @@ export default function App() {
 
   return (
     <div className="wrap krefrm-app">
-      <PageHeader route={route} navigate={navigate} />
+      {showHeader && <PageHeader route={route} navigate={navigate} />}
 
       <div className="krefrm-page-content">
+        {route === "welcome-editor" && (
+          <WelcomeEditorPage navigate={navigate} />
+        )}
         {route === "dashboard" && <div id="krefrm-dashboard-root" />}
         {route.startsWith("form") && (
           <FormsPage route={route} navigate={navigate} />

@@ -9,12 +9,28 @@ if (! defined('ABSPATH')) {
  */
 trait Krefrm_Rest_Api_Settings
 {
+    private function normalize_default_editor($value)
+    {
+        $editor = sanitize_key((string) $value);
+        $allowed = array('quick', 'drag_drop');
+
+        if (! in_array($editor, $allowed, true)) {
+            return 'quick';
+        }
+
+        return $editor;
+    }
+
     public function get_settings()
     {
         $settings = get_option('krefrm_settings', array());
         if (! is_array($settings)) {
             $settings = array();
         }
+
+        $default_editor = isset($settings['defaultEditor'])
+            ? $this->normalize_default_editor($settings['defaultEditor'])
+            : 'quick';
 
         $captcha = isset($settings['captcha']) && is_array($settings['captcha'])
             ? $settings['captcha']
@@ -30,6 +46,7 @@ trait Krefrm_Rest_Api_Settings
 
         $response = rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
+            'defaultEditor' => $default_editor,
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
             'captcha' => array(
@@ -79,6 +96,10 @@ trait Krefrm_Rest_Api_Settings
                 // Keep booleans as-is, don't sanitize
                 $settings['integrations'] = $integrations;
             }
+        }
+
+        if (isset($body['defaultEditor'])) {
+            $settings['defaultEditor'] = $this->normalize_default_editor($body['defaultEditor']);
         }
 
         if (isset($body['emailNotification'])) {
@@ -185,8 +206,13 @@ trait Krefrm_Rest_Api_Settings
             $threshold = 1;
         }
 
+        $default_editor = isset($settings['defaultEditor'])
+            ? $this->normalize_default_editor($settings['defaultEditor'])
+            : 'quick';
+
         $response = rest_ensure_response(array(
             'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
+            'defaultEditor' => $default_editor,
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
             'captcha' => array(

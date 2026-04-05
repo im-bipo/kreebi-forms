@@ -41,6 +41,9 @@ import { getIntegration } from "../../integrations/registry";
  * @param {Object}  props.globalIntegrationSettings  Map of settingsKey → settings object
  * @param {string}  props.initialTab                Initial view to show (e.g., "quick-edit", "email-notification")
  * @param {Function} props.onTabChange              Called when user switches tabs; receives (tabName)
+ * @param {string}  props.defaultEditor             "quick" or "drag_drop"
+ * @param {Function|null} props.onSetDefaultEditor  Updates global default editor preference
+ * @param {boolean} props.isSavingDefaultEditor     True while default editor preference is being saved
  */
 export default function FormBuilder({
   initialData = {},
@@ -53,6 +56,9 @@ export default function FormBuilder({
   globalIntegrationSettings = {},
   initialTab = null,
   onTabChange = () => {},
+  defaultEditor = "quick",
+  onSetDefaultEditor = null,
+  isSavingDefaultEditor = false,
 }) {
   const builder = useFormBuilder(initialData);
 
@@ -69,6 +75,7 @@ export default function FormBuilder({
   const [view, setView] = useState(getInitialView()); // "quick" | "visual" | "json" | "settings"
   const [activeDrag, setActiveDrag] = useState(null);
   const [insertIndex, setInsertIndex] = useState(null);
+  const isDragDropDefaultEditor = defaultEditor === "drag_drop";
 
   // Function for integrations to trigger form save with current state
   const triggerFormSave = useCallback(() => {
@@ -282,6 +289,38 @@ export default function FormBuilder({
 
   return (
     <div className="krefrm-builder">
+      {view === "visual" && (
+        <div className="krefrm-builder-editor-header">
+          <div>
+            <h2 className="krefrm-builder-editor-header__title">
+              {__("Drag & Drop Editor", "kreebi-forms")}
+            </h2>
+            <p className="krefrm-builder-editor-header__subtitle">
+              {__(
+                "Build your form visually with full drag-and-drop control.",
+                "kreebi-forms",
+              )}
+            </p>
+          </div>
+
+          <Button
+            variant={isDragDropDefaultEditor ? "secondary" : "primary"}
+            onClick={() => onSetDefaultEditor?.("drag_drop")}
+            disabled={
+              isDragDropDefaultEditor ||
+              isSavingDefaultEditor ||
+              !onSetDefaultEditor
+            }
+          >
+            {isDragDropDefaultEditor
+              ? __("✓ Default Editor", "kreebi-forms")
+              : isSavingDefaultEditor
+              ? __("Setting…", "kreebi-forms")
+              : __("Set Default Editor", "kreebi-forms")}
+          </Button>
+        </div>
+      )}
+
       {/* ─── Top bar ─── */}
       {view !== "quick" && (
         <div className="krefrm-builder__topbar">
@@ -357,6 +396,11 @@ export default function FormBuilder({
       {view === "quick" && (
         <QuickBuilder
           initialData={builder.getJson()}
+          isDefaultEditor={defaultEditor === "quick"}
+          onSetDefaultEditor={
+            onSetDefaultEditor ? () => onSetDefaultEditor("quick") : null
+          }
+          isSettingDefaultEditor={isSavingDefaultEditor}
           onSave={async (json) => {
             builder.setFromJson(json);
             if (onSave) {

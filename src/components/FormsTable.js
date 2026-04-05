@@ -78,7 +78,7 @@ function FormCard({
   onCopy,
   onDelete,
   onNavigateTab,
-  onQuickEdit,
+  onEdit,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -125,22 +125,11 @@ function FormCard({
                 className="krefrm-form-card__menu-item"
                 role="menuitem"
                 onClick={() => {
-                  onNavigateTab(form, null);
+                  onEdit();
                   setMenuOpen(false);
                 }}
               >
-                {__("Advance Editor", "kreebi-forms")}
-              </button>
-              <button
-                type="button"
-                className="krefrm-form-card__menu-item"
-                role="menuitem"
-                onClick={() => {
-                  onNavigateTab(form, "quick-edit");
-                  setMenuOpen(false);
-                }}
-              >
-                {__("Quick Edit", "kreebi-forms")}
+                {__("Edit", "kreebi-forms")}
               </button>
               {enabledIntegrations &&
                 Object.keys(enabledIntegrations)
@@ -231,10 +220,10 @@ function FormCard({
         <Button
           variant="secondary"
           isSmall
-          className="krefrm-form-card__btn krefrm-form-card__btn--quick-edit"
-          onClick={onQuickEdit}
+          className="krefrm-form-card__btn krefrm-form-card__btn--edit"
+          onClick={onEdit}
         >
-          {__("Quick Edit", "kreebi-forms")}
+          {__("Edit", "kreebi-forms")}
         </Button>
         <Button
           variant="tertiary"
@@ -258,12 +247,19 @@ function FormCard({
  *  navigate     {Function} navigation function for routing
  *  onDelete     {Function} called with post_id when Delete is clicked
  *  onCreateNew  {Function} called when the user wants to create a new form
+ *  defaultEditor {string}  "quick" or "drag_drop" for default edit entry
  */
 const DEFAULT_ENABLED_INTEGRATIONS = Object.fromEntries(
   DEFAULT_ENABLED.map((id) => [id, true]),
 );
 
-export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
+export default function FormsTable({
+  forms,
+  navigate,
+  onDelete,
+  onCreateNew,
+  defaultEditor = "quick",
+}) {
   const [copiedId, setCopiedId] = useState(null);
   const [enabledIntegrations, setEnabledIntegrations] = useState(
     DEFAULT_ENABLED_INTEGRATIONS,
@@ -294,6 +290,11 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
     const routeId = `form_id=${encodeURIComponent(form.form_id || "")}`;
     const tabSegment = tabName ? `/${encodeURIComponent(tabName)}` : "";
     navigate(`form/edit${tabSegment}?${routeId}`);
+  };
+
+  const handleEdit = (form) => {
+    const defaultTab = defaultEditor === "drag_drop" ? null : "quick-edit";
+    navigateToTab(form, defaultTab);
   };
 
   const handleCopy = (text, id) => {
@@ -375,7 +376,7 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
             onCopy={handleCopy}
             onDelete={onDelete}
             onNavigateTab={navigateToTab}
-            onQuickEdit={() => navigateToTab(form, "quick-edit")}
+            onEdit={() => handleEdit(form)}
           />
         ))}
       </div>

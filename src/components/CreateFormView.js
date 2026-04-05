@@ -24,6 +24,9 @@ const DEFAULT_ENABLED_INTEGRATIONS = Object.fromEntries(
  *  formId       {string}   the form's internal ID (for log fetching)
  *  initialTab   {string}   initial tab/view to show (e.g., "quick-edit", "email-notification")
  *  onTabChange  {Function} called when user switches tabs; receives (tabName)
+ *  defaultEditor {string}  "quick" or "drag_drop"
+ *  onSetDefaultEditor {Function} updates global default editor preference
+ *  isSavingDefaultEditor {Boolean} true while preference is being saved
  */
 export default function CreateFormView({
   onSubmit,
@@ -33,6 +36,9 @@ export default function CreateFormView({
   formId = "",
   initialTab = null,
   onTabChange = () => {},
+  defaultEditor = "quick",
+  onSetDefaultEditor = null,
+  isSavingDefaultEditor = false,
 }) {
   const [error, setError] = useState("");
   const [enabledIntegrations, setEnabledIntegrations] = useState(
@@ -103,6 +109,9 @@ export default function CreateFormView({
         globalIntegrationSettings={globalIntegrationSettings}
         initialTab={initialTab}
         onTabChange={onTabChange}
+        defaultEditor={defaultEditor}
+        onSetDefaultEditor={onSetDefaultEditor}
+        isSavingDefaultEditor={isSavingDefaultEditor}
       />
     </div>
   );
