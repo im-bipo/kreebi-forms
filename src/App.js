@@ -7,6 +7,7 @@ import AddonsPage from "./pages/AddonsPage";
 import UpgradePage from "./pages/UpgradePage";
 import WelcomeEditorPage from "./pages/WelcomeEditorPage";
 import PageHeader from "./components/header/PageHeader";
+import { ToastProvider } from "./components/Toast";
 import "./style.css";
 
 function getHashRoute() {
@@ -41,25 +42,27 @@ export default function App() {
   };
 
   return (
-    <div className="wrap krefrm-app">
-      {showHeader && <PageHeader route={route} navigate={navigate} />}
+    <ToastProvider>
+      <div className="wrap krefrm-app">
+        {showHeader && <PageHeader route={route} navigate={navigate} />}
 
-      <div className="krefrm-page-content">
-        {route === "welcome-editor" && (
-          <WelcomeEditorPage navigate={navigate} />
-        )}
-        {route === "dashboard" && <div id="krefrm-dashboard-root" />}
-        {route.startsWith("form") && (
-          <FormsPage route={route} navigate={navigate} />
-        )}
-        {route.startsWith("submission") && <SubmissionsPage />}
-        {route === "addons" && <AddonsPage navigate={navigate} />}
-        {route === "style-templates" && <StyleTemplatePage />}
-        {route.startsWith("integrations") && (
-          <IntegrationsPage route={route} navigate={navigate} />
-        )}
-        {route === "upgrade-to-pro" && <UpgradePage />}
+        <div className="krefrm-page-content">
+          {route === "welcome-editor" && (
+            <WelcomeEditorPage navigate={navigate} />
+          )}
+          {route === "dashboard" && <div id="krefrm-dashboard-root" />}
+          {route.startsWith("form") && (
+            <FormsPage route={route} navigate={navigate} />
+          )}
+          {route.startsWith("submission") && <SubmissionsPage />}
+          {route === "addons" && <AddonsPage navigate={navigate} />}
+          {route === "style-templates" && <StyleTemplatePage />}
+          {route.startsWith("integrations") && (
+            <IntegrationsPage route={route} navigate={navigate} />
+          )}
+          {route === "upgrade-to-pro" && <UpgradePage />}
+        </div>
       </div>
-    </div>
+    </ToastProvider>
   );
 }

@@ -10,8 +10,6 @@ export default function FormsEditPage({
   initialData,
   onSubmit,
   onCancel,
-  onViewForm,
-  canViewForm,
   formId,
   initialTab,
   onTabChange,
@@ -43,8 +41,6 @@ export default function FormsEditPage({
         initialData={initialData}
         onSubmit={onSubmit}
         onCancel={onCancel}
-        onViewForm={onViewForm}
-        canViewForm={canViewForm}
         isEditing={true}
         formId={formId}
         initialTab={initialTab}

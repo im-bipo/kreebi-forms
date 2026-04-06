@@ -5,8 +5,6 @@ export default function FormsQuickCreatePage({
   isDefaultEditor,
   onSetDefaultEditor,
   isSettingDefaultEditor,
-  onViewForm,
-  canViewForm,
   onSave,
   onAdvanced,
   onCancel,
@@ -17,8 +15,6 @@ export default function FormsQuickCreatePage({
       isDefaultEditor={isDefaultEditor}
       onSetDefaultEditor={onSetDefaultEditor}
       isSettingDefaultEditor={isSettingDefaultEditor}
-      onViewForm={onViewForm}
-      canViewForm={canViewForm}
       onSave={onSave}
       onAdvanced={onAdvanced}
       onCancel={onCancel}

@@ -4,8 +4,6 @@ export default function FormsCreatePage({
   initialData,
   onSubmit,
   onCancel,
-  onViewForm,
-  canViewForm,
   onCreateTabChange,
   defaultEditor,
   onSetDefaultEditor,
@@ -16,8 +14,6 @@ export default function FormsCreatePage({
       initialData={initialData}
       onSubmit={onSubmit}
       onCancel={onCancel}
-      onViewForm={onViewForm}
-      canViewForm={canViewForm}
       formId=""
       onTabChange={onCreateTabChange}
       defaultEditor={defaultEditor}

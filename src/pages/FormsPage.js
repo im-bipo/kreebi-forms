@@ -14,6 +14,7 @@ import {
   getTabFromRoute,
   buildEditRouteForCreatedForm,
 } from "./forms/route-helpers";
+import { useToast } from "../components/Toast";
 
 export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
@@ -30,8 +31,8 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [showPicker, setShowPicker] = useState(false);
   const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
   const [savingEditorPreference, setSavingEditorPreference] = useState(false);
-  const [lastSavedCreateForm, setLastSavedCreateForm] = useState(null);
   const createTabRef = useRef(null);
+  const toast = useToast();
 
   const showCreatePage = route === "form/create";
   const showQuickBuilder = route === "form/quick-builder";
@@ -54,6 +55,27 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
       return nextRoute;
     },
     [navigate],
+  );
+
+  const showFormSavedToast = useCallback(
+    ({ mode = "created", message = "" } = {}) => {
+      const fallbackMessage =
+        mode === "updated"
+          ? __("Your form is updated.", "kreebi-forms")
+          : __("Your form is created.", "kreebi-forms");
+
+      toast.success(message || fallbackMessage, {
+        duration: 5000,
+        actions: [
+          {
+            label: __("View Form", "kreebi-forms"),
+            onClick: () => navigate("form"),
+            variant: "primary",
+          },
+        ],
+      });
+    },
+    [navigate, toast],
   );
 
   const fetchForms = useCallback(async () => {
@@ -146,13 +168,9 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
       method: "POST",
       data: parsed,
     });
-    setSuccess(__("Form created successfully!", "kreebi-forms"));
-    setLastSavedCreateForm({
-      formId: createdForm?.form_id || "",
-      postId: createdForm?.post_id || null,
-    });
 
     navigateToCreatedForm(createdForm, createTabRef.current);
+    showFormSavedToast({ mode: "created" });
     fetchForms();
     return createdForm;
   };
@@ -189,7 +207,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
       method: "PUT",
       data: parsed,
     });
-    setSuccess(__("Form updated successfully!", "kreebi-forms"));
+    showFormSavedToast({ mode: "updated" });
     // Keep the editor open after saving; do not navigate back to the list.
     fetchForms();
   };
@@ -255,12 +273,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         onCancel={() => {
           navigate("form");
           setTemplateData(null);
-          setLastSavedCreateForm(null);
         }}
-        onViewForm={() => navigate("form")}
-        canViewForm={Boolean(
-          lastSavedCreateForm?.formId || lastSavedCreateForm?.postId,
-        )}
         onCreateTabChange={(tabName) => {
           createTabRef.current = tabName;
         }}
@@ -283,8 +296,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         initialData={editFormData}
         onSubmit={handleUpdate}
         onCancel={() => navigate("form")}
-        onViewForm={() => navigate("form")}
-        canViewForm={Boolean(currentFormId || editFormId)}
         formId={currentFormId}
         initialTab={currentTab}
         onTabChange={handleTabChange}
@@ -303,10 +314,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         isDefaultEditor={!useAdvanceEditor}
         onSetDefaultEditor={() => setDefaultEditorPreference("quick")}
         isSettingDefaultEditor={savingEditorPreference}
-        onViewForm={() => navigate("form")}
-        canViewForm={Boolean(
-          lastSavedCreateForm?.formId || lastSavedCreateForm?.postId,
-        )}
         onSave={async (parsed) => {
           const res = await apiFetch({
             path: "/kreebi-forms/v1/forms",
@@ -323,12 +330,12 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           } catch (_) {
             /* no-op */
           }
-          setSuccess(
-            __("Form created! Shortcode copied to clipboard.", "kreebi-forms"),
-          );
-          setLastSavedCreateForm({
-            formId: res?.form_id || "",
-            postId: res?.post_id || null,
+          showFormSavedToast({
+            mode: "created",
+            message: __(
+              "Your form is created. Shortcode copied to clipboard.",
+              "kreebi-forms",
+            ),
           });
           fetchForms();
           navigateToCreatedForm(res, "quick-edit");
@@ -340,7 +347,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         }}
         onCancel={() => {
           setTemplateData(null);
-          setLastSavedCreateForm(null);
           navigate("form");
         }}
       />
@@ -354,7 +360,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     // open the advance builder directly; otherwise open the quick builder.
     const data = { ...(tpl.data || {}), name: "" };
     setTemplateData(data);
-    setLastSavedCreateForm(null);
     if (useAdvanceEditor) {
       navigate("form/create");
     } else {

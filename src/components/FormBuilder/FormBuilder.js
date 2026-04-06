@@ -33,8 +33,6 @@ import { getIntegration } from "../../integrations/registry";
  * @param {Object}  props.globalIntegrationSettings  Map of settingsKey → settings object
  * @param {string}  props.initialTab                Initial view to show (e.g., "quick-edit", "email-notification")
  * @param {Function} props.onTabChange              Called when user switches tabs; receives (tabName)
- * @param {Function|null} props.onViewForm          Called when user clicks "View Form"
- * @param {boolean} props.canViewForm               Whether "View Form" button should be shown
  * @param {string}  props.defaultEditor             "quick" or "drag_drop"
  * @param {Function|null} props.onSetDefaultEditor  Updates global default editor preference
  * @param {boolean} props.isSavingDefaultEditor     True while default editor preference is being saved
@@ -50,8 +48,6 @@ export default function FormBuilder({
   globalIntegrationSettings = {},
   initialTab = null,
   onTabChange = () => {},
-  onViewForm = null,
-  canViewForm = false,
   defaultEditor = "quick",
   onSetDefaultEditor = null,
   isSavingDefaultEditor = false,
@@ -413,11 +409,6 @@ export default function FormBuilder({
                 {__("Cancel", "kreebi-forms")}
               </Button>
             )}
-            {canViewForm && onViewForm && (
-              <Button variant="secondary" onClick={onViewForm}>
-                {__("View Form", "kreebi-forms")}
-              </Button>
-            )}
             <Button variant="primary" onClick={handleSave}>
               {saveLabel || __("Save Form", "kreebi-forms")}
             </Button>
@@ -461,8 +452,6 @@ export default function FormBuilder({
             onSetDefaultEditor ? () => onSetDefaultEditor("quick") : null
           }
           isSettingDefaultEditor={isSavingDefaultEditor}
-          onViewForm={onViewForm}
-          canViewForm={canViewForm}
           onSave={async (json) => {
             builder.setFromJson(json);
             if (onSave) {
