@@ -3,7 +3,7 @@
 /**
  * Plugin Name: Kreebi Forms
  * Description: Lightweight and Powerful WordPress form builder plugin with drag-and-drop form creation, conditional logic, multi-page forms, spam protection, email notifications, webhooks, and submission management.
- * Version:     1.1.6
+ * Version:     1.1.7
  * Author:      Bipin Khatri
  * Author URI:  https://bipo.tech
  * Text Domain: kreebi-forms

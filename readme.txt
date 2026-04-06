@@ -4,7 +4,7 @@ Tags: form builder, contact form, custom forms, submission management, integrati
 Requires at least: 5.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.1.6
+Stable tag: 1.1.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Repository: https://github.com/im-bipo/kreebi-forms
@@ -134,6 +134,10 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 
 
 == Changelog ==
+
+= 1.1.7 =
+* Added toast notification system for user feedback.
+* Integrated toast notifications for error handling in forms and the JSON editor.
 
 = 1.1.6 =
 * Added consent text and refined the Welcome Editor onboarding flow for plugin installation acceptance.
