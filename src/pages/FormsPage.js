@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
-import { Notice, Spinner } from "@wordpress/components";
+import { Spinner } from "@wordpress/components";
 import FormsTable from "../components/FormsTable";
 import FormsCreatePage from "./forms/components/FormsCreatePage";
 import FormsEditPage from "./forms/components/FormsEditPage";
@@ -19,8 +19,6 @@ import { useToast } from "../components/Toast";
 export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [editFormData, setEditFormData] = useState(null);
@@ -84,10 +82,10 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
       const data = await apiFetch({ path: "/kreebi-forms/v1/forms" });
       setForms(data);
     } catch (err) {
-      setError(err.message || __("Failed to load forms.", "kreebi-forms"));
+      toast.error(err.message || __("Failed to load forms.", "kreebi-forms"));
     }
     setLoading(false);
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchForms();
@@ -151,8 +149,11 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           setLoading(false);
         })
         .catch((err) => {
-          setError(err.message || __("Failed to load form.", "kreebi-forms"));
+          toast.error(
+            err.message || __("Failed to load form.", "kreebi-forms"),
+          );
           setLoading(false);
+          window.location.hash = "form";
         });
     } else {
       setEditFormData(null);
@@ -192,11 +193,11 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         path: `/kreebi-forms/v1/forms/${deleteTarget.id}?force=1`,
         method: "DELETE",
       });
-      setSuccess(__("Form deleted.", "kreebi-forms"));
+      toast.success(__("Form deleted.", "kreebi-forms"));
       fetchForms();
       setDeleteTarget(null);
     } catch (err) {
-      setError(err.message || __("Failed to delete form.", "kreebi-forms"));
+      toast.error(err.message || __("Failed to delete form.", "kreebi-forms"));
     }
     setIsDeleting(false);
   };
@@ -233,7 +234,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
       });
     } catch (err) {
       setUseAdvanceEditor(previousValue);
-      setError(
+      toast.error(
         err.message ||
           __("Failed to save default editor preference.", "kreebi-forms"),
       );
@@ -289,10 +290,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     return (
       <FormsEditPage
         loading={loading}
-        error={error}
-        success={success}
-        onDismissError={() => setError("")}
-        onDismissSuccess={() => setSuccess("")}
         initialData={editFormData}
         onSubmit={handleUpdate}
         onCancel={() => navigate("form")}
@@ -369,17 +366,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
 
   return (
     <div>
-      {error && (
-        <Notice status="error" isDismissible onDismiss={() => setError("")}>
-          {error}
-        </Notice>
-      )}
-      {success && (
-        <Notice status="success" isDismissible onDismiss={() => setSuccess("")}>
-          {success}
-        </Notice>
-      )}
-
       <FormsTable
         forms={forms}
         navigate={navigate}

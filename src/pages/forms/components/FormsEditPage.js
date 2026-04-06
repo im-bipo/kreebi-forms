@@ -1,12 +1,8 @@
-import { Notice, Spinner } from "@wordpress/components";
+import { Spinner } from "@wordpress/components";
 import CreateFormView from "../../../components/CreateFormView";
 
 export default function FormsEditPage({
   loading,
-  error,
-  success,
-  onDismissError,
-  onDismissSuccess,
   initialData,
   onSubmit,
   onCancel,
@@ -27,16 +23,6 @@ export default function FormsEditPage({
 
   return (
     <div>
-      {error && (
-        <Notice status="error" isDismissible onDismiss={onDismissError}>
-          {error}
-        </Notice>
-      )}
-      {success && (
-        <Notice status="success" isDismissible onDismiss={onDismissSuccess}>
-          {success}
-        </Notice>
-      )}
       <CreateFormView
         initialData={initialData}
         onSubmit={onSubmit}

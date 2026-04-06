@@ -28,47 +28,12 @@ const TYPE_COLORS = {
   },
 };
 
-function ToastIcon({ type = "info" }) {
-  if (type === "success") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 12.8 10 17l8-10" />
-      </svg>
-    );
-  }
-
-  if (type === "error") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="m7.5 7.5 9 9M16.5 7.5l-9 9" />
-      </svg>
-    );
-  }
-
-  if (type === "warning") {
-    return (
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 3.6 2.8 20h18.4L12 3.6Z" />
-        <path d="M12 9.2v4.8M12 17.2h.01" />
-      </svg>
-    );
-  }
-
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M12 8.5h.01M11.2 11.5h1.6V17h-1.6" />
-      <path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z" />
-    </svg>
-  );
-}
-
 export default function Toast({
   id,
   type = "info",
   title = "",
   message = "",
   actions = [],
-  icon = null,
   color = {},
   duration = 5000,
   onClose,
@@ -127,7 +92,6 @@ export default function Toast({
     [beginClose],
   );
 
-  const customIcon = icon;
   const hasActions = Array.isArray(actions) && actions.length > 0;
   const hasProgress = typeof duration === "number" && duration > 0;
 

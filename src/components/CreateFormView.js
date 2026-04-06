@@ -1,8 +1,8 @@
 import { useState, useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
-import { Notice } from "@wordpress/components";
 import FormBuilder from "./FormBuilder";
 import { DEFAULT_ENABLED } from "../integrations/definitions";
+import { useToast } from "./Toast";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
 
@@ -40,7 +40,7 @@ export default function CreateFormView({
   onSetDefaultEditor = null,
   isSavingDefaultEditor = false,
 }) {
-  const [error, setError] = useState("");
+  const toast = useToast();
   const [enabledIntegrations, setEnabledIntegrations] = useState(
     DEFAULT_ENABLED_INTEGRATIONS,
   );
@@ -71,11 +71,10 @@ export default function CreateFormView({
   }, []);
 
   const handleSave = async (formJson) => {
-    setError("");
     try {
       await onSubmit(formJson);
     } catch (err) {
-      setError(
+      toast.error(
         err.message ||
           __(
             isEditing ? "Failed to update form." : "Failed to create form.",
@@ -88,12 +87,6 @@ export default function CreateFormView({
 
   return (
     <div>
-      {error && (
-        <Notice status="error" isDismissible onDismiss={() => setError("")}>
-          {error}
-        </Notice>
-      )}
-
       <FormBuilder
         initialData={initialData}
         onSave={handleSave}
