@@ -10,6 +10,8 @@ if (! defined('ABSPATH')) {
 class Krefrm_Activation
 {
     const DEFAULT_EMAIL_TEMPLATE = "Hello,\n\nYou have received a new form submission.\n\nSubmitted Data:\n{fields}\n\n---\nThis is an automated email. Please do not reply.";
+    const REDIRECT_TRANSIENT_KEY = 'krefrm_activation_redirect';
+    const REDIRECT_OPTION_KEY = 'krefrm_activation_redirect_flag';
 
     /**
      * Activation hook callback
@@ -34,7 +36,10 @@ class Krefrm_Activation
             return;
         }
 
-        set_transient('krefrm_activation_redirect', '1', 30 * MINUTE_IN_SECONDS);
+        set_transient(self::REDIRECT_TRANSIENT_KEY, '1', 30 * MINUTE_IN_SECONDS);
+
+        // Keep an option fallback to survive environments where transients are short-lived or flushed.
+        update_option(self::REDIRECT_OPTION_KEY, '1', false);
     }
 
     /**
