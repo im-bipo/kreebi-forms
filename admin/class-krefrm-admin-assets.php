@@ -84,6 +84,75 @@ class Krefrm_Admin_Assets
                 'before'
             );
 
+            // Force-bypass aggressive cache layers for all plugin REST requests.
+            wp_add_inline_script(
+                'krefrm-admin',
+                '(function() {
+                    if (typeof window.fetch !== "function") {
+                        return;
+                    }
+
+                    var originalFetch = window.fetch.bind(window);
+
+                    function isKreebiRestUrl(url) {
+                        if (!url) {
+                            return false;
+                        }
+
+                        return (
+                            url.indexOf("/kreebi-forms/v1") !== -1 ||
+                            url.indexOf("rest_route=/kreebi-forms/v1") !== -1 ||
+                            url.indexOf("rest_route=%2Fkreebi-forms%2Fv1") !== -1
+                        );
+                    }
+
+                    function withCacheBuster(url) {
+                        try {
+                            var u = new URL(url, window.location.origin);
+                            u.searchParams.set("_krefrm_nc", Date.now().toString());
+                            return u.toString();
+                        } catch (e) {
+                            return url;
+                        }
+                    }
+
+                    window.fetch = function(input, init) {
+                        var requestInit = init || {};
+                        var requestUrl = "";
+
+                        if (typeof input === "string" || input instanceof URL) {
+                            requestUrl = String(input);
+                        } else if (input && typeof input.url === "string") {
+                            requestUrl = input.url;
+                        }
+
+                        if (!isKreebiRestUrl(requestUrl)) {
+                            return originalFetch(input, requestInit);
+                        }
+
+                        var finalUrl = withCacheBuster(requestUrl);
+                        var headers = new Headers(requestInit.headers || (input && input.headers ? input.headers : undefined));
+
+                        headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+                        headers.set("Pragma", "no-cache");
+                        headers.set("Expires", "0");
+                        headers.set("X-LiteSpeed-Cache-Control", "no-cache");
+
+                        requestInit = Object.assign({}, requestInit, {
+                            cache: "no-store",
+                            headers: headers
+                        });
+
+                        if (typeof Request !== "undefined" && input instanceof Request) {
+                            return originalFetch(new Request(finalUrl, input), requestInit);
+                        }
+
+                        return originalFetch(finalUrl, requestInit);
+                    };
+                })();',
+                'before'
+            );
+
             wp_add_inline_script(
                 'krefrm-admin',
                 '(function() {

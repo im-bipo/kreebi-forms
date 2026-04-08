@@ -24,6 +24,9 @@ final class Krefrm_Plugin
         // Register post types
         new Krefrm_Post_Types();
 
+        // Disable caching for dynamic plugin admin and REST requests.
+        new Krefrm_Cache_Control();
+
         // Register shortcode
         new Krefrm_Shortcode();
 
