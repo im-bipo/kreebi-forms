@@ -139,6 +139,12 @@ Submissions are stored as a custom post type and can be viewed under **Kreebi Fo
 
 == Changelog ==
 
+= 1.1.8 =
+
+* Fixed activation onboarding redirect so the welcome screen reliably opens after plugin activation.
+* Updated the plugin icon to SVG for sharper display.
+* Added YouTube demo video reference for easier onboarding and feature preview.
+
 = 1.1.7 =
 * Added toast notification system for user feedback.
 * Integrated toast notifications for error handling in forms and the JSON editor.
