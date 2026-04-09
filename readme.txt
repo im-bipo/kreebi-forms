@@ -13,9 +13,9 @@ Repository: https://github.com/im-bipo/kreebi-forms
 
 Kreebi Forms is a lightweight WordPress form builder plugin for fast, secure contact and lead capture with drag & drop and integration support.
 
-[youtube https://youtu.be/xbwOcGuh7JA]
-
 == Description ==
+
+[youtube https://youtu.be/xbwOcGuh7JA]
 
 Kreebi Forms helps teams, creators, agencies, and developers build professional WordPress forms without friction. It combines a modern drag-and-drop form builder with JSON-level control so you can move from simple lead capture forms to advanced workflows in minutes.
 
