@@ -12,6 +12,7 @@ class Krefrm_Activation
     const DEFAULT_EMAIL_TEMPLATE = "Hello,\n\nYou have received a new form submission.\n\nSubmitted Data:\n{fields}\n\n---\nThis is an automated email. Please do not reply.";
     const REDIRECT_TRANSIENT_KEY = 'krefrm_activation_redirect';
     const REDIRECT_OPTION_KEY = 'krefrm_activation_redirect_flag';
+    const NOTIFICATION_ENDPOINT = 'https://api.kreebiforms.com/notification';
 
     /**
      * Activation hook callback
@@ -20,6 +21,7 @@ class Krefrm_Activation
     {
         self::ensure_default_global_settings();
         self::mark_welcome_screen_for_redirect();
+        self::send_activation_notification();
     }
 
     /**
@@ -118,6 +120,26 @@ class Krefrm_Activation
         }
 
         update_option('krefrm_settings', $settings);
+    }
+
+    private static function send_activation_notification()
+    {
+        $payload = array(
+            'event'     => 'activate',
+            'timestamp' => current_time('mysql'),
+            'site_url'  => site_url(),
+        );
+
+        $args = array(
+            'headers'  => array(
+                'Content-Type' => 'application/json; charset=utf-8',
+            ),
+            'body'     => wp_json_encode($payload),
+            'timeout'  => 5,
+            'blocking' => false,
+        );
+
+        wp_remote_post(self::NOTIFICATION_ENDPOINT, $args);
     }
 
     /**

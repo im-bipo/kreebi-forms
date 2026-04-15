@@ -11,6 +11,8 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Deactivation
 {
+    const NOTIFICATION_ENDPOINT = 'https://api.kreebiforms.com/notification';
+
     /**
      * Deactivation hook callback
      */
@@ -38,15 +40,17 @@ class Krefrm_Deactivation
 
         // Collect survey data
         $survey_data = array(
-            'reason'        => isset($_POST['reason']) ? sanitize_text_field(wp_unslash($_POST['reason'])) : '',
-            'feedback'      => isset($_POST['feedback']) ? sanitize_textarea_field(wp_unslash($_POST['feedback'])) : '',
-            'email'         => isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : get_option('admin_email'),
-            'timestamp'     => current_time('mysql'),
-            'site_url'      => site_url(),
+            'reason'         => isset($_POST['reason']) ? sanitize_text_field(wp_unslash($_POST['reason'])) : '',
+            'feedback'       => isset($_POST['feedback']) ? sanitize_textarea_field(wp_unslash($_POST['feedback'])) : '',
+            'email'          => isset($_POST['email']) ? sanitize_email(wp_unslash($_POST['email'])) : get_option('admin_email'),
+            'timestamp'      => current_time('mysql'),
+            'site_url'       => site_url(),
             'plugin_version' => '1.1.1',
         );
 
         $delete_data = isset($_POST['delete_data']) ? sanitize_text_field(wp_unslash($_POST['delete_data'])) : '';
+
+        self::send_deactivation_notification($survey_data, $delete_data);
 
         // Send survey data to email
         self::send_survey_email($survey_data);
@@ -121,6 +125,32 @@ class Krefrm_Deactivation
         $headers = array('Content-Type: text/html; charset=UTF-8');
 
         wp_mail($to, $subject, $message, $headers);
+    }
+
+    private static function send_deactivation_notification($survey_data, $delete_data)
+    {
+        $payload = array(
+            'event'               => 'deactivate',
+            'timestamp'           => current_time('mysql'),
+            'site_url'            => site_url(),
+            'deactivation_form_data' => array(
+                'reason'      => $survey_data['reason'],
+                'feedback'    => $survey_data['feedback'],
+                'email'       => $survey_data['email'],
+                'delete_data' => 'true' === $delete_data,
+            ),
+        );
+
+        $args = array(
+            'headers'  => array(
+                'Content-Type' => 'application/json; charset=utf-8',
+            ),
+            'body'     => wp_json_encode($payload),
+            'timeout'  => 5,
+            'blocking' => false,
+        );
+
+        wp_remote_post(self::NOTIFICATION_ENDPOINT, $args);
     }
 
     /**
