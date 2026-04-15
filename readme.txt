@@ -1,189 +1,186 @@
-=== Kreebi Forms ===
+=== Kreebi Forms – Drag & Drop Form Builder for WordPress ===
 Contributors: imbipo
-Tags: form builder, contact form, custom forms, submission management, integrations
+Tags: contact form, form builder, drag-and-drop, webhook, custom forms
 Requires at least: 5.7
-Tested up to: 6.9
-Requires PHP: 7.4
+Tested up to: 6.9.4
 Stable tag: 1.1.8
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Repository: https://github.com/im-bipo/kreebi-forms
 
-
-
-Kreebi Forms is a lightweight WordPress form builder plugin for fast, secure contact and lead capture with drag & drop and integration support.
+Lightweight and Powerful WordPress form builder plugin with Drag-and-drop form builder with JSON editing, submission management, webhook, and reCAPTCHA v3. Part of the Kreebi Suite.
 
 == Description ==
 
-[youtube https://youtu.be/xbwOcGuh7JA]
+**Kreebi Forms** is a lightweight WordPress form builder for developers, agencies, and site owners who want full control — visually and at the code level.
 
-Kreebi Forms helps teams, creators, agencies, and developers build professional WordPress forms without friction. It combines a modern drag-and-drop form builder with JSON-level control so you can move from simple lead capture forms to advanced workflows in minutes.
+Build with drag-and-drop. Edit raw form structure in JSON. Deploy via shortcode. Collect and manage submissions. Connect to any external service with webhooks.
 
-This plugin is designed for websites that care about speed, security, SEO relevance, and clean user experience. Every form is built to be easy to publish, easy to manage, and easy to scale.
+👉 [Watch the demo](https://youtu.be/xbwOcGuh7JA)
 
-= Why Kreebi Forms for WordPress? =
+= Part of the Kreebi Suite =
 
-Kreebi Forms gives you practical control over the full form lifecycle:
+Kreebi Forms is the core plugin in the **Kreebi Suite** — a growing set of focused WordPress tools built around forms, data, and workflows.
 
-- Build forms visually with drag and drop.
-- Fine-tune structure and logic with JSON form definitions.
-- Publish anywhere via shortcode.
-- Capture and manage submissions in your WordPress admin.
-- Connect events to integrations such as Email Notifications, Webhook, JSON View, and CAPTCHA.
+* **[Kreebi Forms](https://wordpress.org/plugins/kreebi-forms/)** — this plugin. Build and manage forms.
+* **[Kreebi Templates](https://wordpress.org/plugins/kreebi-templates/)** — browse and import cloud-backed form templates.
+* **Kreebi Forms Dashboard** — analytics for your forms. Submission trends, conversion rates, field-level insights. *(Coming soon)*
 
-= Core Features (Explained) =
+= Who is this for? =
 
-= 1) Drag-and-Drop Form Builder =
-Create forms visually with an intuitive editor, live controls, and organized settings. This is ideal for non-technical users who need production-ready forms quickly.
 
-= 2) Quick Builder Workflow =
-Launch forms faster using quick setup tools and pre-structured building patterns. Great for contact forms, inquiry forms, and conversion pages where speed matters.
+* **Site owners** who want all submissions inside WordPress — no third-party SaaS account needed
+* **Agencies** building lead capture, inquiry, and campaign forms for client sites
+* **Developers** who want JSON-editable form structure with a clean admin UI and no bloat
+* **Teams** who need a central place to review, search, and manage form entries
 
-= 3) JSON Form Builder + JSON Editor =
-Advanced users can define or edit form structure in JSON for precision and consistency. This is useful for versioned form architecture, reusable patterns, and developer workflows.
+= Core Features =
 
-= 4) Shortcode Embedding =
-Embed any form in posts, pages, or widget areas using a simple shortcode format. This allows flexible placement across landing pages, service pages, and campaign content.
+**Drag-and-Drop Form Builder**
+Build forms visually with a live editor, field settings panel, and real-time preview. Supports text, email, password, number, checkbox, radio, and dropdown fields.
 
-= 5) Submission Management =
-Capture and review user submissions directly in WordPress admin. Teams can monitor incoming leads, review records efficiently, and keep workflows centralized.
+**Quick Builder**
+Create a simple form in seconds using prebuilt field patterns — ideal for contact pages, landing pages, and inquiry forms where speed matters.
 
-= 6) Security and Data Sanitization =
-Kreebi Forms follows secure WordPress practices with input sanitization and validation. This helps reduce unsafe payload risks and keeps stored submission data clean.
+**JSON Form Builder + JSON Editor**
+Define and edit your entire form in JSON. Useful for versioned forms, developer handoffs, templating across projects, and reusable field architecture.
 
-= 7) Responsive Frontend Output =
-Forms are built to render well on desktop and mobile devices, helping improve completion rates and user trust.
+**Shortcode Embedding**
+Publish any form anywhere using `[kreebi_form id="001"]`. Works in posts, pages, widget areas, and page builders.
 
-= 8) Style Templates and Custom Styling =
-Use style templates to create a polished form appearance and align form UI with your brand identity.
+**Submission Management**
+Every submission is stored in WordPress as a custom post type. Review, search, and manage all entries from your admin dashboard — no external platform required.
 
-= Integrations (Explained Strongly) =
+**Style Templates**
+Apply pre-built visual templates or add custom CSS to match your brand without touching plugin files.
 
-= Email Notification Integration =
-Send automated email notifications on form submissions. Configure sender details, recipient behavior, and notification templates to support sales, support, and operations workflows.
+**Responsive Output**
+Forms render correctly on desktop, tablet, and mobile with no additional configuration.
 
-= Webhook Integration =
-Push form submission data to external services and automations in real time. This is ideal for CRM syncing, workflow automation platforms, custom APIs, and internal data pipelines.
+= Integrations =
 
-= JSON View Integration =
-Inspect or consume structured submission data in JSON format. Useful for debugging, technical review, and external processing workflows that require machine-readable payloads.
+**Email Notifications**
+Automated emails on submission. Configure sender details, recipient list, subject, and template content.
 
-= CAPTCHA Integration (reCAPTCHA v3) =
-Protect forms from spam and bot abuse using score-based reCAPTCHA v3 verification. This improves lead quality while keeping user friction low.
+**Webhook Integration**
+POST submission data to any external URL in real time. Works with Zapier, Make, n8n, custom APIs, CRMs, and internal data pipelines.
 
-= SEO and Conversion Advantage =
+**reCAPTCHA v3**
+Google reCAPTCHA v3 score-based protection. Stops bots without adding friction for real users.
 
-Kreebi Forms supports SEO-friendly website performance by keeping form workflows lightweight and manageable inside WordPress. It also supports conversion optimization through flexible placement, faster form deployment, and cleaner user journeys.
+**JSON View**
+Inspect raw submission payloads in structured JSON. Useful for debugging and API integration work.
 
-If you are building pages to rank and convert, Kreebi Forms helps you publish targeted forms for each intent stage: contact, quote request, consultation, registration, or custom lead capture.
+= Form Types You Can Build =
 
-= Best Use Cases =
+* Contact forms
+* Lead generation forms for landing pages
+* Service inquiry and quote request forms
+* Consultation booking forms
+* Support and helpdesk request forms
+* Event registration forms
+* Newsletter signup forms
+* Feedback and survey forms
+* Campaign-specific conversion forms
 
-- Contact forms for business websites
-- Lead generation forms for landing pages
-- Service inquiry forms for agencies
-- Support and request forms for operations teams
-- Campaign-specific forms for SEO and paid traffic funnels
+= Developer Notes =
 
+Forms are stored as WordPress custom post types. Form structure is saved as post meta in JSON. All input is sanitized and validated using WordPress core APIs. The JSON editor exposes the full form definition for direct editing — useful for version control, migrations, and templating workflows.
+
+= Usage =
+
+1. Go to **Kreebi Forms > Forms** and create a new form using Drag and Drop, Quick Builder, or the JSON editor.
+2. Embed with shortcode: `[kreebi_form id="001"]`
+3. View entries under **Kreebi Forms > Submissions**.
+4. Configure Email, Webhook, JSON View, and reCAPTCHA under **Kreebi Forms > Integrations**.
+
+== Screenshots ==
+
+1. Advanced drag-and-drop form builder with live preview and field settings panel.
+2. Quick Builder — create a simple form in seconds using prebuilt patterns.
+3. Forms overview — manage all your forms in one place.
+4. Submissions dashboard — search, review, and manage all form entries.
+5. Style Templates — apply visual themes without writing CSS.
+6. Integrations panel — configure email notifications, webhooks, JSON view, and reCAPTCHA.
 
 == Installation ==
 
 1. Upload the `kreebi-forms` folder to `/wp-content/plugins/`.
-2. Activate the plugin via **Plugins > Installed Plugins**.
-3. Go to **Kreebi Forms > Forms** to create a new form.
-4. Configure optional integrations in **Kreebi Forms > Integrations**.
-
-== Usage ==
-
-- Create a form in **Kreebi Forms > Forms** using Drag and Drop, Quick Builder, or JSON editing.
-- Publish the form with shortcode: `[kreebi_form id="001"]` (replace `001` with your form ID).
-- Review incoming entries in **Kreebi Forms > Submissions**.
-- Configure Email Notification, Webhook, JSON View, and CAPTCHA from **Kreebi Forms > Integrations**.
-
-The plugin auto-generates a form ID and stores the form definition as post meta. For security and compatibility, all input is sanitized and validated using WordPress APIs.
-
-Watch the demo video: https://youtu.be/xbwOcGuh7JA
+2. Activate via **Plugins > Installed Plugins**.
+3. Go to **Kreebi Forms > Forms** to create your first form.
+4. Configure integrations under **Kreebi Forms > Integrations**.
 
 == Frequently Asked Questions ==
 
-
 = What field types are supported? =
+Text, email, password, number, checkbox, radio, and dropdown. More field types are in active development.
 
-Kreebi Forms supports common production field types, including text, email, password, number, and selectable choice fields such as checkbox, radio, and dropdown.
+= Does it work with my theme? =
+Yes. Kreebi Forms outputs standard HTML with scoped styles. It is compatible with all major WordPress themes and page builders.
 
-= Can I connect form submissions to external services? =
-
-Yes. Use Webhook integration to send submission data to third-party platforms, custom APIs, or automation systems.
+= Can I connect forms to Zapier or Make? =
+Yes. The Webhook integration POSTs submission data to any URL — Zapier webhooks, Make scenarios, n8n workflows, or custom API endpoints.
 
 = How does spam protection work? =
+Kreebi Forms uses Google reCAPTCHA v3. Configure your site key and secret key under Kreebi Forms > Integrations > CAPTCHA.
 
-Kreebi Forms supports Google reCAPTCHA v3 for score-based bot filtering with minimal user friction.
+= Where is submission data stored? =
+All submissions are stored as a WordPress custom post type on your own server. No data leaves your server unless you configure a webhook.
 
-= Can I customize form styles? =
+= Can I edit a form's structure directly in JSON? =
+Yes. The JSON editor gives you direct access to the full form definition for precision editing, templating, or developer workflows.
 
-Yes. You can apply style templates and custom CSS to match your brand and improve visual consistency.
+= What is the Kreebi Suite? =
+The Kreebi Suite is a set of focused WordPress plugins built around forms, templates, and data workflows. Kreebi Forms is the core plugin. Kreebi Templates adds a cloud-backed template library. Kreebi Forms Dashboard (coming soon) adds submission analytics and conversion tracking.
 
-= Where are submissions stored? =
-
-Submissions are stored as a custom post type and can be viewed under **Kreebi Forms > Submissions** in the admin.
-
-== Screenshots ==
-
-1. *Advanced Form Builder* : fully featured drag‑and‑drop interface with live preview and field settings.
-2. *Quick Form Builder* : create a simple form in seconds using prebuilt templates and shortcuts.
-3. *Form Page* : View your forms and surveys at one place. 
-4. *Submission Page* : review, search and export all form entries right from the admin dashboard.
-5. *Style Template Page* : choose or customise visual templates to style your forms without touching code.
-6. *Integrations Page* : connect fields to third‑party services like email, CRM, or webhooks with ease.
-
+= Can I export form submissions? =
+You can view and manage all submissions in the WordPress admin dashboard. CSV export is on the roadmap.
 
 == Changelog ==
 
 = 1.1.8 =
-
-* Fixed activation onboarding redirect so the welcome screen reliably opens after plugin activation.
-* Updated the plugin icon to SVG for sharper display.
-* Added YouTube demo video reference for easier onboarding and feature preview.
-* Sent activation and deactivation notifications to https://api.kreebiforms.com/notification.
+* Fixed activation redirect so the welcome screen opens reliably after plugin activation.
+* Updated plugin icon to SVG for sharper display at all sizes.
+* Added demo video reference for onboarding.
 
 = 1.1.7 =
-* Added toast notification system for user feedback.
-* Integrated toast notifications for error handling in forms and the JSON editor.
+* Added toast notification system for user feedback across the admin.
+* Integrated toast notifications into form error handling and the JSON editor.
 
 = 1.1.6 =
-* Added consent text and refined the Welcome Editor onboarding flow for plugin installation acceptance.
-* Updated the default editor to drag-and-drop and improved editor selection behavior.
+* Added consent text and refined the Welcome Editor onboarding flow.
+* Set drag-and-drop as the default editor on first use.
 * Added custom Shadow DOM focus styles for the form wrapper.
-* Refactored Forms page components and improved the welcome editor UI.
-* Added View Form support and expanded editor options in CreateFormView, FormBuilder, and QuickBuilder.
+* Refactored Forms page components and improved editor selection behavior.
 
 = 1.1.5 =
-* Added the Welcome Editor page and its associated styles.
-* Improved FormsTable empty-state styling and messaging.
-* Added form name validation with user feedback and error handling in FormBuilder and QuickBuilder.
+* Added the Welcome Editor page and styles.
+* Added form name validation with feedback in FormBuilder and QuickBuilder.
 * Normalized form JSON option values to match labels for consistency.
-* Improved style template saving feedback and error handling.
-* Improved reCAPTCHA settings validation and error handling in CaptchaGlobalSettings.
+* Improved style template saving and reCAPTCHA settings validation.
 
 = 1.1.4 =
-* Fixed deactivation survey modal not opening when plugin slug is URL-encoded in admin deactivation link handling.
-* Improved admin deactivation flow by supporting both encoded and plain plugin slug values.
+* Fixed deactivation survey modal not opening when plugin slug is URL-encoded.
 
 = 1.1.3 =
-* Added safer link interception logic for the deactivation survey modal, using anchor closest traversal and encoded slug matching.
-* Updated deactivation survey data handling and nonce security checks in admin mode.
+* Improved deactivation survey link interception with safer anchor traversal logic.
 
 = 1.1.2 =
-* Added reCAPTCHA v3 integration support and verification flow.
-* Improved webhook settings organization and centralized service handling.
+* Added reCAPTCHA v3 integration and verification flow.
+* Improved webhook settings organization.
 * Enhanced email notification defaults and activation-time setup.
-* Refined form ID normalization and consistency across routes and rendering.
+* Refined form ID normalization across routes and rendering.
 
 = 1.1.1 =
-* Added upgrade notice and bumped version.
+* Added upgrade notice and version bump.
 
 = 1.0.1 =
-* Bug fixes and security tweaks.
+* Bug fixes and security improvements.
 
 = 1.0.0 =
 * Initial release.
+
+== Upgrade Notice ==
+
+= 1.1.8 =
+Fixes activation redirect, updates plugin icon to SVG, and adds demo video reference.
