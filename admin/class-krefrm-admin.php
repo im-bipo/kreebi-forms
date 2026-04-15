@@ -15,5 +15,7 @@ class Krefrm_Admin
         new Krefrm_Admin_Assets();
         new Krefrm_Form_Handler();
         new Krefrm_Form_Editor();
+        new Krefrm_Admin_Deactivation();
+        new Krefrm_Admin_Welcome();
     }
 }

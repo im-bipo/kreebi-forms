@@ -1,0 +1,633 @@
+/* ============================================================
+   Style Templates Page
+   ============================================================ */
+
+/* ─── Page layout ─── */
+
+.krefrm-stl-page {
+  padding-bottom: 40px;
+}
+
+.krefrm-stl-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 24px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-stl-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  color: #1d2327;
+  line-height: 1.2;
+}
+
+.krefrm-stl-page__subtitle {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: #646970;
+  font-weight: 400;
+}
+
+.krefrm-stl-page__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.krefrm-stl-page__saved-notice {
+  font-size: 13px;
+  font-weight: 600;
+  color: #00a32a;
+}
+
+.krefrm-stl-page__error {
+  font-size: 13px;
+  font-weight: 600;
+  color: #b32d2e;
+}
+
+/* ─── Template Cards row ─── */
+
+.krefrm-stl-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+  margin-bottom: 30px;
+}
+
+.krefrm-stl-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: #fff;
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.krefrm-stl-card:hover {
+  border-color: #2271b1;
+  box-shadow: 0 4px 12px rgba(34, 113, 177, 0.12);
+}
+
+.krefrm-stl-card.is-selected {
+  border-color: #2271b1;
+  background: #f8fafc;
+  box-shadow: 0 0 0 2px rgba(34, 113, 177, 0.1);
+}
+
+.krefrm-stl-card__pro-badge {
+  position: absolute;
+  top: 12px;
+  right: 44px;
+  z-index: 2;
+  line-height: 1;
+}
+
+.krefrm-stl-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.krefrm-stl-card__name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.krefrm-stl-card__desc {
+  font-size: 13px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.krefrm-stl-card__check {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  background: #2271b1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ─── Thumbnail inside card (abstract wireframe) ─── */
+
+.krefrm-stl-card__thumb {
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 90px;
+  background: #f9f9f9;
+}
+
+.krefrm-stl-thumb__premium-lock {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #2271b1;
+}
+
+.krefrm-stl-thumb__premium-lock svg {
+  width: 32px;
+  height: 32px;
+  fill: none;
+  stroke: #2271b1;
+  stroke-width: 2;
+}
+
+/* Thumbnail – Premium */
+
+.krefrm-stl-preview--premium.krefrm-stl-card__thumb {
+  background: #f0f0f0;
+  border: 1px dashed #ccc;
+  align-items: center;
+  justify-content: center;
+}
+
+.krefrm-stl-card.is-premium:hover {
+  border-color: #a7caef;
+}
+
+.krefrm-stl-thumb__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.krefrm-stl-thumb__label {
+  height: 6px;
+  width: 40%;
+  border-radius: 3px;
+  background: #ddd;
+}
+
+.krefrm-stl-thumb__input {
+  height: 20px;
+  width: 100%;
+  border-radius: 4px;
+}
+
+.krefrm-stl-thumb__btn {
+  margin-top: 4px;
+  height: 22px;
+  width: 80px;
+  border-radius: 4px;
+}
+
+/* Thumbnail – Style 1 (Polished) */
+
+.krefrm-stl-preview--style-1.krefrm-stl-card__thumb {
+  background: #f0f8ff;
+}
+
+.krefrm-stl-preview--style-1 .krefrm-stl-thumb__label {
+  background: #c8dff7;
+}
+
+.krefrm-stl-preview--style-1 .krefrm-stl-thumb__input {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+}
+
+.krefrm-stl-preview--style-1 .krefrm-stl-thumb__btn {
+  background: #2271b1;
+  border-radius: 6px;
+}
+
+/* Thumbnail – Style 2 (Flat) */
+
+.krefrm-stl-preview--style-2.krefrm-stl-card__thumb {
+  background: #f9f9f9;
+}
+
+.krefrm-stl-preview--style-2 .krefrm-stl-thumb__label {
+  background: #bbb;
+  border-radius: 2px;
+}
+
+.krefrm-stl-preview--style-2 .krefrm-stl-thumb__input {
+  background: #fff;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+}
+
+.krefrm-stl-preview--style-2 .krefrm-stl-thumb__field {
+  padding: 8px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background: #fafafa;
+  gap: 4px;
+}
+
+.krefrm-stl-preview--style-2 .krefrm-stl-thumb__btn {
+  background: #333;
+  border-radius: 3px;
+}
+
+/* Thumbnail – Blank */
+
+.krefrm-stl-preview--blank.krefrm-stl-card__thumb {
+  background: #f6f7f7;
+  border: 1px dashed #c3c4c7;
+}
+
+.krefrm-stl-preview--blank .krefrm-stl-thumb__label {
+  background: #dcdcde;
+}
+
+.krefrm-stl-preview--blank .krefrm-stl-thumb__input {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 0;
+}
+
+.krefrm-stl-preview--blank .krefrm-stl-thumb__btn {
+  background: #999;
+  border-radius: 0;
+}
+
+/* ─── Live Preview Section ─── */
+
+.krefrm-stl-preview-section {
+  margin-top: 32px;
+}
+
+.krefrm-stl-preview-section__title {
+  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.krefrm-stl-preview-section__subtitle {
+  margin: 0 0 16px;
+  font-size: 14px;
+  color: #666;
+}
+
+.krefrm-stl-preview-wrap {
+  background: #f5f5f5;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 100%;
+}
+
+.krefrm-stl-preview-custom-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 1024px) {
+  .krefrm-stl-preview-custom-grid {
+    grid-template-columns: 1fr minmax(340px, 1fr);
+    align-items: start;
+  }
+
+  .krefrm-stl-preview-section,
+  .krefrm-custom-css-section {
+    margin-top: 0;
+  }
+}
+
+/* ─── Live preview host (uses the same classes as frontend render) ─── */
+
+.krefrm-stl-preview {
+  margin: 0;
+}
+
+.krefrm-stl-preview-wrap .krefrm-frontend-form {
+  margin: 0;
+}
+
+.krefrm-stl-preview-wrap .krefrm-frontend-form input,
+.krefrm-stl-preview-wrap .krefrm-frontend-form button,
+.krefrm-stl-preview-wrap .krefrm-frontend-form label {
+  margin: 0;
+  font: inherit;
+  line-height: normal;
+}
+
+.krefrm-stl-preview-wrap .krefrm-frontend-form button {
+  cursor: default;
+}
+
+/* ============================================================
+   Template Styles (shared between admin preview and frontend)
+   ============================================================ */
+
+/* Complete reset: remove ALL default browser/WordPress styles */
+#krefrm-forms-container,
+#krefrm-forms-container * {
+  all: unset;
+  display: revert;
+}
+
+/* Restore display for block elements */
+#krefrm-forms-container,
+#krefrm-forms-container form,
+#krefrm-forms-container div,
+#krefrm-forms-container fieldset {
+  display: block;
+}
+
+#krefrm-forms-container input,
+#krefrm-forms-container button,
+#krefrm-forms-container label {
+  display: revert;
+  box-sizing: border-box;
+}
+
+#krefrm-forms-container button {
+  cursor: pointer;
+}
+
+#krefrm-forms-container input[type="text"],
+#krefrm-forms-container input[type="email"],
+#krefrm-forms-container input[type="password"],
+#krefrm-forms-container input[type="number"],
+#krefrm-forms-container textarea,
+#krefrm-forms-container select {
+  box-sizing: border-box;
+}
+
+/* ─── Style 1 — Polished / Rounded ─── */
+
+#krefrm-forms-container .krefrm-ui-style-1-form {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  width: 100%;
+  max-width: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-1-field {
+  margin-bottom: 14px;
+}
+
+#krefrm-forms-container .krefrm-ui-style-1-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d2327;
+  margin-bottom: 6px;
+}
+
+#krefrm-forms-container .krefrm-ui-style-1-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+  color: #1d2327;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+#krefrm-forms-container .krefrm-ui-style-1-input:focus {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  outline: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-1-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  background: #2271b1;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+  text-transform: none;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-1-btn:hover {
+  background: #135e96;
+}
+
+/* ─── Style 2 — Flat / Bordered ─── */
+
+#krefrm-forms-container .krefrm-ui-style-2-form {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  width: 100%;
+  max-width: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-2-field {
+  margin-bottom: 14px;
+  padding: 10px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 3px;
+  background: #fafafa;
+}
+
+#krefrm-forms-container .krefrm-ui-style-2-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #444;
+  margin-bottom: 6px;
+}
+
+#krefrm-forms-container .krefrm-ui-style-2-input {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #bbb;
+  border-radius: 3px;
+  font-size: 14px;
+  background: #fff;
+  box-sizing: border-box;
+  color: #1d2327;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-2-input:focus {
+  border-color: #333;
+  outline: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-2-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 24px;
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  background: #333;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.2s;
+  line-height: 1.3;
+  text-decoration: none;
+}
+
+#krefrm-forms-container .krefrm-ui-style-2-btn:hover {
+  background: #555;
+}
+
+/* ─── Custom CSS Section ─── */
+
+.krefrm-custom-css-section {
+  margin-top: 58px;
+  padding: 24px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.krefrm-custom-css-section__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1d2327;
+}
+
+.krefrm-custom-css-section__subtitle {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+.krefrm-custom-css-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.krefrm-custom-css-textarea {
+  width: 100%;
+  padding: 12px;
+  font-family: "Monaco", "Menlo", "Ubuntu Mono", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #1d2327;
+  background: #f5f5f5;
+  border: 1px solid #d3d3d3;
+  border-radius: 4px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.krefrm-custom-css-textarea:focus {
+  outline: none;
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+  background: #ffffff;
+}
+
+.krefrm-custom-css-error {
+  padding: 12px;
+  background: #fee;
+  border: 1px solid #f8b7af;
+  border-radius: 4px;
+  color: #992222;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.krefrm-custom-css-error strong {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 700;
+}
+
+.krefrm-custom-css-success {
+  padding: 12px;
+  background: #efe;
+  border: 1px solid #afd96f;
+  border-radius: 4px;
+  color: #229922;
+  font-size: 13px;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.krefrm-custom-css-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.krefrm-custom-css-help {
+  margin: 0;
+  font-size: 12px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 600px) {
+  .krefrm-stl-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .krefrm-stl-page__actions {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .krefrm-stl-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .krefrm-custom-css-section {
+    padding: 16px;
+  }
+
+  .krefrm-custom-css-textarea {
+    font-size: 12px;
+  }
+}

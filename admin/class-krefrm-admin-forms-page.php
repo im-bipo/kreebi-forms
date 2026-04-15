@@ -31,6 +31,13 @@ class Krefrm_Admin_Forms_Page
             $error = rawurldecode($raw_error);
         }
 
+        // Check if user wants to create a new form
+        $view = isset($_GET['view']) ? sanitize_text_field(wp_unslash($_GET['view'])) : '';
+        if ($view === 'create') {
+            $this->render_create_page($created, $error);
+            return;
+        }
+
         $forms = get_posts(array(
             'post_type'      => 'krefrm_form',
             'post_status'    => 'publish',
@@ -42,9 +49,9 @@ class Krefrm_Admin_Forms_Page
 ?>
         <div class="wrap">
             <h1 class="wp-heading-inline"><?php esc_html_e('Forms', 'kreebi-forms'); ?></h1>
-            <button type="button" class="page-title-action" id="krefrm-open-modal">
+            <a href="<?php echo esc_url(add_query_arg('view', 'create', admin_url('admin.php?page=krefrm_forms'))); ?>" class="page-title-action">
                 <?php esc_html_e('Create New Form', 'kreebi-forms'); ?>
-            </button>
+            </a>
             <hr class="wp-header-end">
 
             <?php if ($created === '1') : ?>
@@ -100,8 +107,87 @@ class Krefrm_Admin_Forms_Page
                 </table>
             <?php endif; ?>
         </div>
+    <?php
+    }
 
-        <?php $this->render_create_modal(); ?>
+    private function render_create_page($created = '', $error = '')
+    {
+    ?>
+        <div class="wrap">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h1><?php esc_html_e('Create New Form', 'kreebi-forms'); ?></h1>
+                <a href="<?php echo esc_url(admin_url('admin.php?page=krefrm_forms')); ?>" class="button">
+                    <?php esc_html_e('← Back to Forms', 'kreebi-forms'); ?>
+                </a>
+            </div>
+
+            <?php if ($created === '1') : ?>
+                <div class="notice notice-success is-dismissible">
+                    <p><?php esc_html_e('Form created successfully.', 'kreebi-forms'); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($error !== '') : ?>
+                <div class="notice notice-error is-dismissible">
+                    <p><?php echo esc_html($error); ?></p>
+                </div>
+            <?php endif; ?>
+
+            <div style="max-width: 800px; background: #fff; padding: 20px; border: 1px solid #ddd; border-radius: 4px;">
+                <form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+                    <input type="hidden" name="action" value="krefrm_create_form" />
+                    <?php wp_nonce_field('krefrm_create_form'); ?>
+
+                    <p>
+                        <label for="krefrm_form_json">
+                            <strong><?php esc_html_e('Paste your form JSON below:', 'kreebi-forms'); ?></strong>
+                        </label>
+                    </p>
+                    <textarea
+                        id="krefrm_form_json"
+                        name="krefrm_form_json"
+                        rows="16"
+                        class="large-text code"
+                        placeholder='<?php echo esc_attr("{\n  \"name\": \"\",\n  \"description\": \"\",\n  \"fields\": []\n}"); ?>'></textarea>
+
+                    <details class="krefrm-json-example-details" style="margin-top: 15px;">
+                        <summary class="krefrm-json-example-summary">
+                            <?php esc_html_e('View sample JSON', 'kreebi-forms'); ?>
+                        </summary>
+                        <pre class="krefrm-json-example-pre">{
+  "name": "Contact Form",
+  "description": "A simple contact form",
+  "fields": [
+    {
+      "name": "Full Name",
+      "type": "text",
+      "placeholder": "Enter your name"
+    },
+    {
+      "name": "Email Address",
+      "type": "email",
+      "placeholder": "you@example.com"
+    },
+    {
+      "name": "Password",
+      "type": "password",
+      "placeholder": "Enter a password"
+    },
+    {
+      "name": "Age",
+      "type": "number",
+      "placeholder": "25"
+    }
+  ]
+}</pre>
+                    </details>
+
+                    <div style="margin-top: 20px;">
+                        <?php submit_button(__('Create Form', 'kreebi-forms')); ?>
+                    </div>
+                </form>
+            </div>
+        </div>
     <?php
     }
 

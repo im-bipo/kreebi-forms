@@ -1,27 +1,80 @@
-import { useState, useEffect, useCallback } from "@wordpress/element";
+import { useState, useEffect, useCallback, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
+import { Spinner } from "@wordpress/components";
+import FormsTable from "../components/FormsTable";
+import FormsCreatePage from "./forms/components/FormsCreatePage";
+import FormsEditPage from "./forms/components/FormsEditPage";
+import FormsQuickCreatePage from "./forms/components/FormsQuickCreatePage";
+import TemplatePickerModal from "./forms/components/TemplatePickerModal";
+import DeleteFormModal from "./forms/components/DeleteFormModal";
 import {
-  Button,
-  Notice,
-  Modal,
-  TextareaControl,
-  Spinner,
-} from "@wordpress/components";
+  getPostIdFromRoute,
+  getPublicFormIdFromRoute,
+  getTabFromRoute,
+  buildEditRouteForCreatedForm,
+} from "./forms/route-helpers";
+import { useToast } from "../components/Toast";
 
-export default function FormsPage() {
+export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showModal, setShowModal] = useState(false);
-  const [jsonInput, setJsonInput] = useState("");
-  const [creating, setCreating] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [editFormData, setEditFormData] = useState(null);
+  const [editFormId, setEditFormId] = useState(null);
+  const [currentFormId, setCurrentFormId] = useState(null);
+  const [currentTab, setCurrentTab] = useState(null); // Track active tab in editor
+  const [templateData, setTemplateData] = useState(null);
+  const [showPicker, setShowPicker] = useState(false);
+  const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
+  const [savingEditorPreference, setSavingEditorPreference] = useState(false);
+  const createTabRef = useRef(null);
+  const toast = useToast();
 
-  // Edit state
-  const [editForm, setEditForm] = useState(null);
-  const [editJson, setEditJson] = useState("");
-  const [saving, setSaving] = useState(false);
+  const showCreatePage = route === "form/create";
+  const showQuickBuilder = route === "form/quick-builder";
+  const showEditPage = route.startsWith("form/edit");
+
+  useEffect(() => {
+    if (showCreatePage) {
+      createTabRef.current = null;
+    }
+  }, [showCreatePage]);
+
+  const navigateToCreatedForm = useCallback(
+    (createdForm, tabName = null) => {
+      const nextRoute = buildEditRouteForCreatedForm(createdForm, tabName);
+      navigate(nextRoute);
+      // Fallback for rare hash-update race conditions.
+      if (window.location.hash.replace(/^#\/?/, "") !== nextRoute) {
+        window.location.hash = nextRoute;
+      }
+      return nextRoute;
+    },
+    [navigate],
+  );
+
+  const showFormSavedToast = useCallback(
+    ({ mode = "created", message = "" } = {}) => {
+      const fallbackMessage =
+        mode === "updated"
+          ? __("Your form is updated.", "kreebi-forms")
+          : __("Your form is created.", "kreebi-forms");
+
+      toast.success(message || fallbackMessage, {
+        duration: 5000,
+        actions: [
+          {
+            label: __("View Form", "kreebi-forms"),
+            onClick: () => navigate("form"),
+            variant: "primary",
+          },
+        ],
+      });
+    },
+    [navigate, toast],
+  );
 
   const fetchForms = useCallback(async () => {
     setLoading(true);
@@ -29,109 +82,180 @@ export default function FormsPage() {
       const data = await apiFetch({ path: "/kreebi-forms/v1/forms" });
       setForms(data);
     } catch (err) {
-      setError(err.message || __("Failed to load forms.", "kreebi-forms"));
+      toast.error(err.message || __("Failed to load forms.", "kreebi-forms"));
     }
     setLoading(false);
-  }, []);
+  }, [toast]);
 
   useEffect(() => {
     fetchForms();
   }, [fetchForms]);
 
-  const handleCreate = async () => {
-    setCreating(true);
-    setError("");
-    try {
-      const parsed = JSON.parse(jsonInput);
-      await apiFetch({
-        path: "/kreebi-forms/v1/forms",
-        method: "POST",
-        data: parsed,
+  // Load global default editor preference from settings.
+  useEffect(() => {
+    let isMounted = true;
+
+    apiFetch({ path: "/kreebi-forms/v1/settings" })
+      .then((data) => {
+        if (!isMounted) {
+          return;
+        }
+
+        setUseAdvanceEditor(data?.defaultEditor === "drag_drop");
+      })
+      .catch(() => {
+        // Keep local fallback value when request fails.
       });
-      setSuccess(__("Form created successfully!", "kreebi-forms"));
-      setShowModal(false);
-      setJsonInput("");
-      fetchForms();
-    } catch (err) {
-      if (err instanceof SyntaxError) {
-        setError(__("Invalid JSON. Please check the syntax.", "kreebi-forms"));
-      } else {
-        setError(err.message || __("Failed to create form.", "kreebi-forms"));
-      }
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // Load form data when in edit mode
+  useEffect(() => {
+    const postIdFromRoute = getPostIdFromRoute(route);
+    const publicFormId = getPublicFormIdFromRoute(route);
+    const tabName = getTabFromRoute(route);
+
+    let targetPostId = postIdFromRoute;
+    if (!targetPostId && publicFormId) {
+      const matchedForm = forms.find(
+        (item) => String(item.form_id || "") === String(publicFormId),
+      );
+      targetPostId = matchedForm ? matchedForm.post_id : null;
     }
-    setCreating(false);
+
+    if (showEditPage && targetPostId) {
+      setEditFormId(targetPostId);
+      if (publicFormId) {
+        setCurrentFormId(publicFormId);
+      }
+      setCurrentTab(tabName); // Set the tab from URL (or null for default visual editor)
+      setLoading(true);
+      apiFetch({ path: `/kreebi-forms/v1/forms/${targetPostId}` })
+        .then((data) => {
+          // Use FormBuilder format with steps for all edit modes
+          // The FormBuilder/CreateFormView will handle different views based on the tab
+          const formBuilderData = {
+            name: data.title || "",
+            description: data.description || "",
+            styleTemplate: data.styleTemplate || "kreebi_style_1",
+            steps: data.steps || [],
+            formIntegrations: data.formIntegrations || {},
+          };
+          setEditFormData(formBuilderData);
+          setCurrentFormId(data.form_id || "");
+          setLoading(false);
+        })
+        .catch((err) => {
+          toast.error(
+            err.message || __("Failed to load form.", "kreebi-forms"),
+          );
+          setLoading(false);
+          window.location.hash = "form";
+        });
+    } else {
+      setEditFormData(null);
+      setEditFormId(null);
+      setCurrentFormId(null);
+      setCurrentTab(null);
+    }
+  }, [route, showEditPage, forms]);
+
+  const handleCreate = async (parsed) => {
+    const createdForm = await apiFetch({
+      path: "/kreebi-forms/v1/forms",
+      method: "POST",
+      data: parsed,
+    });
+
+    navigateToCreatedForm(createdForm, createTabRef.current);
+    showFormSavedToast({ mode: "created" });
+    fetchForms();
+    return createdForm;
   };
 
-  const handleDelete = async (postId) => {
-    if (
-      !window.confirm(
-        __("Are you sure you want to delete this form?", "kreebi-forms"),
-      )
-    ) {
-      return;
-    }
+  const handleDelete = (postId) => {
+    const form = forms.find((f) => f.post_id === postId);
+    setDeleteTarget({
+      id: postId,
+      title: form ? form.title : "",
+    });
+  };
+
+  const handleForceDelete = async () => {
+    if (!deleteTarget) return;
+
+    setIsDeleting(true);
     try {
       await apiFetch({
-        path: `/kreebi-forms/v1/forms/${postId}`,
+        path: `/kreebi-forms/v1/forms/${deleteTarget.id}?force=1`,
         method: "DELETE",
       });
-      setSuccess(__("Form deleted.", "kreebi-forms"));
+      toast.success(__("Form deleted.", "kreebi-forms"));
       fetchForms();
+      setDeleteTarget(null);
     } catch (err) {
-      setError(err.message || __("Failed to delete form.", "kreebi-forms"));
+      toast.error(err.message || __("Failed to delete form.", "kreebi-forms"));
     }
+    setIsDeleting(false);
   };
 
-  const openEdit = (form) => {
-    setEditForm(form);
-    const data = {
-      name: form.title,
-      description: form.description,
-      fields: form.fields,
-    };
-    setEditJson(JSON.stringify(data, null, 2));
+  const handleUpdate = async (parsed) => {
+    await apiFetch({
+      path: `/kreebi-forms/v1/forms/${editFormId}`,
+      method: "PUT",
+      data: parsed,
+    });
+    showFormSavedToast({ mode: "updated" });
+    // Keep the editor open after saving; do not navigate back to the list.
+    fetchForms();
   };
 
-  const handleUpdate = async () => {
-    setSaving(true);
-    setError("");
+  const setDefaultEditorPreference = async (editorId) => {
+    const nextValue = editorId === "drag_drop";
+    const previousValue = useAdvanceEditor;
+
+    if (nextValue === previousValue) {
+      return;
+    }
+
+    setUseAdvanceEditor(nextValue);
+    setSavingEditorPreference(true);
+
     try {
-      const parsed = JSON.parse(editJson);
       await apiFetch({
-        path: `/kreebi-forms/v1/forms/${editForm.post_id}`,
-        method: "PUT",
-        data: parsed,
+        path: "/kreebi-forms/v1/settings",
+        method: "POST",
+        data: {
+          defaultEditor: nextValue ? "drag_drop" : "quick",
+        },
       });
-      setSuccess(__("Form updated successfully!", "kreebi-forms"));
-      setEditForm(null);
-      setEditJson("");
-      fetchForms();
     } catch (err) {
-      if (err instanceof SyntaxError) {
-        setError(__("Invalid JSON. Please check the syntax.", "kreebi-forms"));
-      } else {
-        setError(err.message || __("Failed to update form.", "kreebi-forms"));
-      }
+      setUseAdvanceEditor(previousValue);
+      toast.error(
+        err.message ||
+          __("Failed to save default editor preference.", "kreebi-forms"),
+      );
+    } finally {
+      setSavingEditorPreference(false);
     }
-    setSaving(false);
   };
 
-  const sampleJson = JSON.stringify(
-    {
-      name: "Contact Form",
-      description: "A simple contact form",
-      fields: [
-        { name: "Full Name", type: "text", placeholder: "Enter your name" },
-        {
-          name: "Email Address",
-          type: "email",
-          placeholder: "you@example.com",
-        },
-      ],
-    },
-    null,
-    2,
-  );
+  // Handle tab changes in the editor
+  const handleTabChange = (newTab) => {
+    setCurrentTab(newTab);
+    const routeId = currentFormId
+      ? `form_id=${encodeURIComponent(currentFormId)}`
+      : `id=${editFormId}`;
+
+    if (newTab) {
+      navigate(`form/edit/${encodeURIComponent(newTab)}?${routeId}`);
+    } else {
+      navigate(`form/edit?${routeId}`);
+    }
+  };
 
   if (loading) {
     return (
@@ -141,142 +265,127 @@ export default function FormsPage() {
     );
   }
 
+  /* ─── Advance form builder (create) ─── */
+  if (showCreatePage) {
+    return (
+      <FormsCreatePage
+        initialData={templateData || {}}
+        onSubmit={handleCreate}
+        onCancel={() => {
+          navigate("form");
+          setTemplateData(null);
+        }}
+        onCreateTabChange={(tabName) => {
+          createTabRef.current = tabName;
+        }}
+        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
+        onSetDefaultEditor={setDefaultEditorPreference}
+        isSavingDefaultEditor={savingEditorPreference}
+      />
+    );
+  }
+
+  /* ─── Advance form builder (edit) ─── */
+  if (showEditPage) {
+    return (
+      <FormsEditPage
+        loading={loading}
+        initialData={editFormData}
+        onSubmit={handleUpdate}
+        onCancel={() => navigate("form")}
+        formId={currentFormId}
+        initialTab={currentTab}
+        onTabChange={handleTabChange}
+        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
+        onSetDefaultEditor={setDefaultEditorPreference}
+        isSavingDefaultEditor={savingEditorPreference}
+      />
+    );
+  }
+
+  /* ─── Quick builder (create) ─── */
+  if (showQuickBuilder) {
+    return (
+      <FormsQuickCreatePage
+        initialData={templateData || {}}
+        isDefaultEditor={!useAdvanceEditor}
+        onSetDefaultEditor={() => setDefaultEditorPreference("quick")}
+        isSettingDefaultEditor={savingEditorPreference}
+        onSave={async (parsed) => {
+          const res = await apiFetch({
+            path: "/kreebi-forms/v1/forms",
+            method: "POST",
+            data: parsed,
+          });
+          // Auto-copy shortcode
+          const sc =
+            res && res.shortcode
+              ? res.shortcode
+              : `[kreebi_form id="${res && res.post_id ? res.post_id : ""}"]`;
+          try {
+            await navigator.clipboard.writeText(sc);
+          } catch (_) {
+            /* no-op */
+          }
+          showFormSavedToast({
+            mode: "created",
+            message: __(
+              "Your form is created. Shortcode copied to clipboard.",
+              "kreebi-forms",
+            ),
+          });
+          fetchForms();
+          navigateToCreatedForm(res, "quick-edit");
+          return res;
+        }}
+        onAdvanced={(jsonData) => {
+          setTemplateData(jsonData);
+          navigate("form/create");
+        }}
+        onCancel={() => {
+          setTemplateData(null);
+          navigate("form");
+        }}
+      />
+    );
+  }
+
+  /* ─── Template picker handler ─── */
+  const handlePickTemplate = (tpl) => {
+    setShowPicker(false);
+    // Respect the user's preference: if Use Advance Editor is enabled,
+    // open the advance builder directly; otherwise open the quick builder.
+    const data = { ...(tpl.data || {}), name: "" };
+    setTemplateData(data);
+    if (useAdvanceEditor) {
+      navigate("form/create");
+    } else {
+      navigate("form/quick-builder");
+    }
+  };
+
   return (
     <div>
-      {error && (
-        <Notice status="error" isDismissible onDismiss={() => setError("")}>
-          {error}
-        </Notice>
-      )}
-      {success && (
-        <Notice status="success" isDismissible onDismiss={() => setSuccess("")}>
-          {success}
-        </Notice>
-      )}
+      <FormsTable
+        forms={forms}
+        navigate={navigate}
+        onDelete={handleDelete}
+        onCreateNew={() => setShowPicker(true)}
+        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
+      />
 
-      <div className="krefrm-toolbar">
-        <Button variant="primary" onClick={() => setShowModal(true)}>
-          {__("Create New Form", "kreebi-forms")}
-        </Button>
-      </div>
+      <TemplatePickerModal
+        isOpen={showPicker}
+        onClose={() => setShowPicker(false)}
+        onPickTemplate={handlePickTemplate}
+      />
 
-      {forms.length === 0 ? (
-        <p>{__("No forms yet. Create your first form!", "kreebi-forms")}</p>
-      ) : (
-        <table className="widefat fixed striped krefrm-forms-table">
-          <thead>
-            <tr>
-              <th>{__("#", "kreebi-forms")}</th>
-              <th>{__("Name", "kreebi-forms")}</th>
-              <th>{__("Shortcode", "kreebi-forms")}</th>
-              <th>{__("Fields", "kreebi-forms")}</th>
-              <th>{__("Date", "kreebi-forms")}</th>
-              <th>{__("Actions", "kreebi-forms")}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {forms.map((form, index) => (
-              <tr key={form.post_id}>
-                <td>{index + 1}</td>
-                <td>
-                  <strong>{form.title}</strong>
-                </td>
-                <td>
-                  <code>{form.shortcode}</code>
-                </td>
-                <td>{form.field_count}</td>
-                <td>{form.date}</td>
-                <td>
-                  <Button
-                    variant="secondary"
-                    isSmall
-                    onClick={() => openEdit(form)}
-                    style={{ marginRight: 8 }}
-                  >
-                    {__("Edit", "kreebi-forms")}
-                  </Button>
-                  <Button
-                    variant="tertiary"
-                    isSmall
-                    isDestructive
-                    onClick={() => handleDelete(form.post_id)}
-                  >
-                    {__("Delete", "kreebi-forms")}
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-
-      {/* Create Modal */}
-      {showModal && (
-        <Modal
-          title={__("Create New Form", "kreebi-forms")}
-          onRequestClose={() => setShowModal(false)}
-          className="krefrm-create-modal"
-        >
-          <TextareaControl
-            label={__("Paste your form JSON below:", "kreebi-forms")}
-            value={jsonInput}
-            onChange={setJsonInput}
-            rows={16}
-            className="krefrm-json-textarea"
-          />
-          <details className="krefrm-sample-json">
-            <summary>{__("View sample JSON", "kreebi-forms")}</summary>
-            <pre>{sampleJson}</pre>
-          </details>
-          <div className="krefrm-modal-actions">
-            <Button
-              variant="primary"
-              onClick={handleCreate}
-              isBusy={creating}
-              disabled={creating}
-            >
-              {creating
-                ? __("Creating…", "kreebi-forms")
-                : __("Create Form", "kreebi-forms")}
-            </Button>
-            <Button variant="tertiary" onClick={() => setShowModal(false)}>
-              {__("Cancel", "kreebi-forms")}
-            </Button>
-          </div>
-        </Modal>
-      )}
-
-      {/* Edit Modal */}
-      {editForm && (
-        <Modal
-          title={__("Edit Form", "kreebi-forms") + ": " + editForm.title}
-          onRequestClose={() => setEditForm(null)}
-          className="krefrm-create-modal"
-        >
-          <TextareaControl
-            label={__("Edit form JSON:", "kreebi-forms")}
-            value={editJson}
-            onChange={setEditJson}
-            rows={16}
-            className="krefrm-json-textarea"
-          />
-          <div className="krefrm-modal-actions">
-            <Button
-              variant="primary"
-              onClick={handleUpdate}
-              isBusy={saving}
-              disabled={saving}
-            >
-              {saving
-                ? __("Saving…", "kreebi-forms")
-                : __("Save Changes", "kreebi-forms")}
-            </Button>
-            <Button variant="tertiary" onClick={() => setEditForm(null)}>
-              {__("Cancel", "kreebi-forms")}
-            </Button>
-          </div>
-        </Modal>
-      )}
+      <DeleteFormModal
+        deleteTarget={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onForceDelete={handleForceDelete}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }

@@ -1,0 +1,747 @@
+/* ============================================================
+   Integrations Page
+   ============================================================ */
+
+/* ─── Page layout ─── */
+
+.krefrm-integrations-page {
+  padding-bottom: 40px;
+}
+
+.krefrm-integrations-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  background: #fff;
+  border: 0;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-integrations-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  color: #1d2327;
+  line-height: 1.2;
+}
+
+.krefrm-integrations-page__subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #646970;
+}
+
+/* ─── Cards grid ─── */
+
+.krefrm-integrations-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.krefrm-integration-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: #fff;
+  border: 2px solid #e0e0e2;
+  border-radius: 14px;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s;
+}
+
+.krefrm-integration-card.is-enabled {
+  border-color: #2271b1;
+  box-shadow:
+    0 0 0 1px rgba(34, 113, 177, 0.12),
+    0 4px 14px rgba(34, 113, 177, 0.06);
+}
+
+.krefrm-integration-card.is-premium {
+  background: linear-gradient(135deg, #fff 0%, #f8fafc 100%);
+  border-color: #d4af37;
+}
+
+.krefrm-integration-card.is-premium .krefrm-integration-card__icon {
+  background: #fef5e7;
+  color: #d4af37;
+}
+
+/* ─── Card header ─── */
+
+.krefrm-integration-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.krefrm-integration-card__icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f6fc;
+  border-radius: 8px;
+  color: #2271b1;
+}
+
+.krefrm-integration-card__icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.krefrm-integration-card__name {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 650;
+  color: #1d2327;
+}
+
+.krefrm-integration-card__toggle {
+  flex-shrink: 0;
+}
+
+.krefrm-integration-card__toggle .components-toggle-control {
+  margin: 0;
+}
+
+.krefrm-integration-card__toggle .components-base-control__help {
+  display: none;
+}
+
+.krefrm-integration-card__pro-button {
+  all: unset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.krefrm-integration-card__pro-button:hover {
+  transform: scale(1.05);
+}
+
+/* ─── Card body ─── */
+
+.krefrm-integration-card__desc {
+  margin: 0;
+  font-size: 13px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+/* ─── Card footer ─── */
+
+.krefrm-integration-card__footer {
+  margin-top: auto;
+  padding-top: 8px;
+}
+
+.krefrm-integration-card__settings-btn.components-button {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ============================================================
+   Integration Settings Sub-Page
+   ============================================================ */
+
+.krefrm-integration-settings {
+  padding-bottom: 40px;
+}
+
+.krefrm-integration-settings__header {
+  background: #fff;
+  border: 0;
+  border-radius: 16px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-integration-settings__back.components-button {
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #2271b1;
+  padding: 0;
+  min-height: auto;
+}
+
+.krefrm-integration-settings__back.components-button:hover {
+  color: #135e96;
+}
+
+.krefrm-integration-settings__title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.krefrm-integration-settings__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  color: #1d2327;
+}
+
+.krefrm-integration-settings__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.krefrm-integration-settings__saved {
+  font-size: 13px;
+  font-weight: 600;
+  color: #00a32a;
+}
+
+.krefrm-integration-settings__error {
+  margin: 10px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b32d2e;
+}
+
+.krefrm-integration-settings__subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #646970;
+}
+
+/* ─── Settings body ─── */
+
+.krefrm-integration-settings__body {
+  background: #fff;
+  border: 0;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 640px;
+}
+
+.krefrm-integration-settings__field .components-base-control {
+  margin: 0;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 600px) {
+  .krefrm-integrations-page__header {
+    flex-direction: column;
+  }
+
+  .krefrm-integrations-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .krefrm-integration-settings__title-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* ============================================================
+   Integration Info Block (JSON View global settings page)
+   ============================================================ */
+
+.krefrm-integration-info {
+  max-width: 640px;
+}
+
+.krefrm-integration-info__block {
+  padding-bottom: 4px;
+}
+
+.krefrm-integration-info__heading {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 650;
+  color: #1d2327;
+}
+
+.krefrm-integration-info__list {
+  margin: 0 0 8px;
+  padding-left: 20px;
+  color: #646970;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.krefrm-integration-info__note {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #8c8f94;
+  font-style: italic;
+}
+
+/* ============================================================
+   Integration Form-Level Panel (inside the form editor)
+   ============================================================ */
+
+.krefrm-intg-panel {
+  padding: 24px;
+  background: #f6f7f7;
+  min-height: 240px;
+}
+
+/* ─── Tab component ─── */
+
+.krefrm-intg-form-tab {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-intg-form-tab__title {
+  margin: 0 0 6px;
+  font-size: 16px;
+  font-weight: 650;
+  color: #1d2327;
+}
+
+.krefrm-intg-form-tab__desc {
+  margin: 0 0 16px;
+  font-size: 13px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+.krefrm-intg-form-tab__header .components-toggle-control {
+  margin-top: 0;
+}
+
+.krefrm-intg-form-tab__header {
+  margin-bottom: 18px;
+}
+
+/* ─── Global preview (when using global settings) ─── */
+
+.krefrm-intg-form-tab__preview {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e2;
+}
+
+.krefrm-intg-form-tab__preview-note {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: #646970;
+  font-style: italic;
+}
+
+.krefrm-intg-form-tab__preview-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.krefrm-intg-form-tab__preview-row {
+  display: flex;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.krefrm-intg-form-tab__preview-label {
+  font-weight: 600;
+  color: #1d2327;
+  min-width: 72px;
+}
+
+.krefrm-intg-form-tab__preview-value {
+  color: #646970;
+  word-break: break-all;
+}
+
+/* ============================================================
+   Webhook Integration
+   ============================================================ */
+
+.krefrm-webhook-settings {
+  max-width: 900px;
+}
+
+.krefrm-webhook-vars {
+  padding: 14px;
+  background: #f6f7f7;
+  border: 1px solid #e0e0e2;
+  border-radius: 10px;
+}
+
+.krefrm-webhook-vars__title {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 650;
+  color: #1d2327;
+}
+
+.krefrm-webhook-vars__desc {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: #646970;
+}
+
+.krefrm-webhook-vars__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.krefrm-webhook-vars__chip {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+}
+
+.krefrm-webhook-sample {
+  border: 1px solid #e0e0e2;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.krefrm-webhook-sample__title {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.krefrm-webhook-sample pre {
+  margin: 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 10px;
+  background: #f8f9fb;
+  border-radius: 8px;
+}
+
+.krefrm-webhook-logs {
+  margin-top: 20px;
+  background: #fff;
+  border: 0;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-webhook-logs__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.krefrm-webhook-logs__header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.krefrm-webhook-logs__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.krefrm-webhook-test-results {
+  margin-top: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e2;
+}
+
+.krefrm-webhook-test-results p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.krefrm-webhook-test-results ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.krefrm-webhook-logs__empty {
+  color: #646970;
+  font-size: 13px;
+}
+
+.krefrm-webhook-logs__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.krefrm-webhook-log-item {
+  border: 1px solid #e0e0e2;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.krefrm-webhook-log-item summary {
+  display: grid;
+  grid-template-columns: auto auto 1fr auto auto;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.krefrm-webhook-log-item__status {
+  display: inline-block;
+  font-weight: 700;
+  min-width: 38px;
+}
+
+.krefrm-webhook-log-item__status.is-pass {
+  color: #00a32a;
+}
+
+.krefrm-webhook-log-item__status.is-fail {
+  color: #d63638;
+}
+
+.krefrm-webhook-log-item__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.krefrm-webhook-log-item__grid p {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.krefrm-webhook-log-item__grid pre {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: #f8f9fb;
+  border-radius: 6px;
+  padding: 8px;
+  max-height: 160px;
+  overflow: auto;
+}
+
+.krefrm-intg-form-tab__disabled-note {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  background: #f3f1f1;
+  border: 1px solid #e0e0e2;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #646970;
+}
+
+.krefrm-webhook-test-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.krefrm-webhook-test-required {
+  margin: 0;
+  font-size: 12px;
+  color: #d63638;
+  font-weight: 600;
+}
+
+.krefrm-webhook-info {
+  padding: 14px;
+  background: #f6f7f7;
+  border: 1px solid #e0e0e2;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.krefrm-webhook-info h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.krefrm-webhook-info h4 {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.krefrm-webhook-info p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #646970;
+  line-height: 1.5;
+}
+
+.krefrm-webhook-info ol {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: #646970;
+}
+
+.krefrm-webhook-info li {
+  margin-bottom: 4px;
+}
+
+/* ─── Override fields ─── */
+
+.krefrm-intg-form-tab__fields {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e0e0e2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.krefrm-intg-form-tab__fields .components-base-control {
+  margin: 0;
+}
+
+/* ─── Webhook Two-Column Layout ─── */
+
+.krefrm-webhook-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 16px;
+}
+
+.krefrm-webhook-layout__left {
+  flex: 1;
+}
+
+.krefrm-webhook-layout__right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Webhook Logs in Form Tab ─── */
+
+.krefrm-webhook-logs-section {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.krefrm-webhook-logs-section h4 {
+  margin: 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 650;
+  color: #1d2327;
+  background: #f8f9fb;
+  border-bottom: 1px solid #ddd;
+}
+
+.krefrm-webhook-logs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 500px;
+}
+
+.krefrm-webhook-logs-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #646970;
+  font-size: 13px;
+  min-height: 200px;
+}
+
+.krefrm-webhook-logs-empty p {
+  margin: 0;
+}
+
+.krefrm-webhook-log-entry {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.krefrm-webhook-log-status {
+  flex-shrink: 0;
+}
+
+.krefrm-webhook-log-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-weight: bold;
+  color: #fff;
+}
+
+.krefrm-webhook-log-badge--success {
+  background-color: #00a32a;
+}
+
+.krefrm-webhook-log-badge--error {
+  background-color: #d63638;
+}
+
+.krefrm-webhook-log-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.krefrm-webhook-log-url {
+  font-weight: 600;
+  color: #1d2327;
+  word-break: break-all;
+}
+
+.krefrm-webhook-log-timestamp {
+  font-size: 12px;
+  color: #646970;
+  margin-top: 2px;
+}
+
+.krefrm-webhook-log-code {
+  font-size: 12px;
+  color: #646970;
+  margin-top: 4px;
+}
+
+.krefrm-webhook-log-error {
+  font-size: 12px;
+  color: #d63638;
+  margin-top: 4px;
+}

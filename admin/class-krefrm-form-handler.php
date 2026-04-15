@@ -43,9 +43,7 @@ class Krefrm_Form_Handler
         }
 
         // Generate sequential numeric ID (001, 002, 003, etc.)
-        $count     = wp_count_posts('krefrm_form');
-        $published = isset($count->publish) ? $count->publish : 0;
-        $form_id   = str_pad($published + 1, 3, '0', STR_PAD_LEFT);
+        $form_id = $this->get_next_form_id();
 
         $post_id = wp_insert_post(array(
             'post_type'    => 'krefrm_form',
@@ -79,5 +77,36 @@ class Krefrm_Form_Handler
             'krefrm_notice_nonce' => wp_create_nonce('krefrm_admin_notice'),
         ), admin_url('admin.php')));
         exit;
+    }
+
+    private function get_next_form_id()
+    {
+        $posts = get_posts(array(
+            'post_type'      => 'krefrm_form',
+            'post_status'    => 'any',
+            'posts_per_page' => -1,
+            'fields'         => 'ids',
+        ));
+
+        $max = 0;
+        foreach ($posts as $post_id) {
+            $form_data = get_post_meta($post_id, '_krefrm_form_data', true);
+            $candidate = '';
+
+            if (is_array($form_data) && ! empty($form_data['id'])) {
+                $candidate = $form_data['id'];
+            } else {
+                $post = get_post($post_id);
+                if ($post) {
+                    $candidate = $post->post_name;
+                }
+            }
+
+            if (is_string($candidate) && preg_match('/^\d+$/', $candidate)) {
+                $max = max($max, intval($candidate));
+            }
+        }
+
+        return str_pad($max + 1, 3, '0', STR_PAD_LEFT);
     }
 }

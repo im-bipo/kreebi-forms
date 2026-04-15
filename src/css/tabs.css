@@ -1,0 +1,35 @@
+/* ============================================================
+   Tab Navigation
+   ============================================================ */
+
+.krefrm-tabs {
+  display: flex;
+  gap: 0;
+  margin: 16px 0 24px;
+  border-bottom: 1px solid #c3c4c7;
+}
+
+.krefrm-tab {
+  background: none;
+  border: 1px solid transparent;
+  border-bottom: none;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #50575e;
+  margin-bottom: -1px;
+  border-radius: 4px 4px 0 0;
+}
+
+.krefrm-tab:hover {
+  color: #2271b1;
+}
+
+.krefrm-tab.active {
+  background: #fff;
+  border-color: #c3c4c7;
+  border-bottom-color: #fff;
+  color: #1d2327;
+  font-weight: 600;
+}

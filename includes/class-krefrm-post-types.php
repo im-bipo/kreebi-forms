@@ -53,5 +53,18 @@ class Krefrm_Post_Types
             'supports'        => array('title'),
             'capability_type' => 'post',
         ));
+
+        // Webhook Logs CPT
+        register_post_type('krefrm_webhook_log', array(
+            'labels'          => array(
+                'name'               => __('Webhook Logs', 'kreebi-forms'),
+                'singular_name'      => __('Webhook Log', 'kreebi-forms'),
+            ),
+            'public'          => false,
+            'show_ui'         => false,
+            'show_in_menu'    => false,
+            'supports'        => array(),
+            'capability_type' => 'post',
+        ));
     }
 }
