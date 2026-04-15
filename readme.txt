@@ -1,4 +1,4 @@
-=== Kreebi Forms – Drag & Drop Form Builder for WordPress ===
+=== Kreebi Forms - Drag & Drop Form Builder. Contact Forms, Survey Form, Registration Form and More ===
 Contributors: imbipo
 Tags: contact form, form builder, drag-and-drop, webhook, custom forms
 Requires at least: 5.7

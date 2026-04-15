@@ -67,6 +67,7 @@ function TrashIcon() {
 /* ─── Available field types the user can add ─── */
 const ADD_FIELD_TYPES = [
   { type: "text", label: "Text", icon: "Aa" },
+  { type: "textarea", label: "Long Text", icon: "Tt" },
   { type: "email", label: "Email", icon: "@" },
   { type: "number", label: "Number", icon: "#" },
   { type: "password", label: "Password", icon: "••" },
@@ -221,7 +222,7 @@ export default function QuickBuilder({
     const type = field.type || "text";
     const baseField = { ...field, type };
 
-    if (["text", "email", "password", "number"].includes(type)) {
+    if (["text", "email", "password", "number", "textarea"].includes(type)) {
       const { options, ...rest } = baseField;
       return { ...rest, placeholder: rest.placeholder || "" };
     }

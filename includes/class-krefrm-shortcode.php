@@ -13,7 +13,7 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Shortcode
 {
-  private $allowed_types = array('text', 'email', 'password', 'number', 'checkbox', 'radio', 'dropdown');
+  private $allowed_types = array('text', 'email', 'password', 'number', 'textarea', 'checkbox', 'radio', 'dropdown');
 
   /**
    * Map styleTemplate values to the CSS classes injected at render time.
@@ -1085,6 +1085,13 @@ CSS;
         $html .= '<option value="' . esc_attr($opt_value) . '">' . esc_html($opt_label) . '</option>';
       }
       $html .= '</select>';
+    } elseif ($type === 'textarea') {
+      $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . $label_text . '</label>';
+      $html .= '<textarea id="' . esc_attr($input_id) . '" name="krefrm_fields[' . esc_attr($key) . ']" placeholder="' . esc_attr($placeholder) . '"' . $input_class;
+      if ($required) {
+        $html .= ' required';
+      }
+      $html .= ' rows="4"></textarea>';
     } else {
       // Text, email, password, number fields
       $html .= '<label for="' . esc_attr($input_id) . '"' . $label_class . '>' . $label_text . '</label>';

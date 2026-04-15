@@ -65,12 +65,21 @@ export default function SortableFieldCard({
           {field.name || __("(untitled)", "kreebi-forms")}
           {field.required && <span className="krefrm-required-star"> *</span>}
         </label>
-        <input
-          type={field.type || "text"}
-          placeholder={field.placeholder || ""}
-          disabled
-          className="krefrm-field-card__input"
-        />
+        {field.type === "textarea" ? (
+          <textarea
+            placeholder={field.placeholder || ""}
+            disabled
+            className="krefrm-field-card__input"
+            rows={3}
+          />
+        ) : (
+          <input
+            type={field.type || "text"}
+            placeholder={field.placeholder || ""}
+            disabled
+            className="krefrm-field-card__input"
+          />
+        )}
       </div>
 
       <div className="krefrm-field-card__actions">

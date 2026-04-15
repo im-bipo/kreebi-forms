@@ -18,6 +18,18 @@ const FIELD_TYPES = [
     },
   },
   {
+    type: "textarea",
+    label: __("Long Text", "kreebi-forms"),
+    icon: "Tt",
+    defaults: {
+      name: "Long Text Field",
+      type: "textarea",
+      placeholder: "",
+      required: false,
+      wrapper: { class: "", id: "" },
+    },
+  },
+  {
     type: "email",
     label: __("Email", "kreebi-forms"),
     icon: "@",
@@ -53,6 +65,7 @@ const FIELD_TYPES = [
       wrapper: { class: "", id: "" },
     },
   },
+  
   {
     type: "checkbox",
     label: __("Checkbox", "kreebi-forms"),
