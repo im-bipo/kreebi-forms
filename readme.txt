@@ -138,6 +138,10 @@ You can view and manage all submissions in the WordPress admin dashboard. CSV ex
 
 == Changelog ==
 
+= 1.1.9 =
+* Added long text field support for enhanced form content entry.
+* Improved the welcome screen onboarding experience for new activations.
+
 = 1.1.8 =
 * Fixed activation redirect so the welcome screen opens reliably after plugin activation.
 * Updated plugin icon to SVG for sharper display at all sizes.
