@@ -1,6 +1,6 @@
 {
   "name": "kreebi-forms",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Kreebi Forms WordPress plugin",
   "main": "index.js",
   "scripts": {
