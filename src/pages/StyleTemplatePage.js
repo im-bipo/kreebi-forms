@@ -12,6 +12,8 @@ import {
   STYLE_TEMPLATES,
   STYLE_CLASS_MAP,
   SHADOW_STYLES,
+  DEFAULT_STYLE_TEMPLATE_ID,
+  normalizeStyleTemplateId,
 } from "../components/StyleTemplate";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
@@ -28,9 +30,12 @@ const TEMPLATES = STYLE_TEMPLATES.map((template) => ({
 
 function LivePreview({ templateId, customCss }) {
   const containerRef = useRef(null);
-  const tpl = TEMPLATES.find((t) => t.id === templateId) || TEMPLATES[0];
+  const normalizedTemplateId = normalizeStyleTemplateId(templateId);
+  const tpl =
+    TEMPLATES.find((t) => t.id === normalizedTemplateId) || TEMPLATES[0];
   const styleClass =
-    STYLE_CLASS_MAP[templateId] || STYLE_CLASS_MAP.kreebi_style_1;
+    STYLE_CLASS_MAP[normalizedTemplateId] ||
+    STYLE_CLASS_MAP[DEFAULT_STYLE_TEMPLATE_ID];
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -76,35 +81,35 @@ function LivePreview({ templateId, customCss }) {
     // Create form HTML
     const formDiv = document.createElement("div");
     formDiv.innerHTML = `
-      <form class="krefrm-stl-preview krefrm-frontend-form ${tpl.previewClass} ${styleClass.form}">
+      <form class="krefrm-stl-preview krefrm-frontend-form krefrm-ui-form ${tpl.previewClass} ${styleClass.form}">
         <div class="krefrm-fields-flex">
-          <div class="krefrm-field ${styleClass.field}">
-            <label class="${styleClass.label}">
+          <div class="krefrm-field krefrm-ui-field ${styleClass.field}">
+            <label class="krefrm-ui-label ${styleClass.label}">
               Full Name <span class="krefrm-required-star">*</span>
             </label>
-            <input type="text" class="${styleClass.input}" placeholder="John Smith" readonly>
+            <input type="text" class="krefrm-ui-input ${styleClass.input}" placeholder="John Smith" readonly>
           </div>
           
-          <div class="krefrm-field ${styleClass.field}">
-            <label class="${styleClass.label}">
+          <div class="krefrm-field krefrm-ui-field ${styleClass.field}">
+            <label class="krefrm-ui-label ${styleClass.label}">
               Email Address <span class="krefrm-required-star">*</span>
             </label>
-            <input type="email" class="${styleClass.input}" placeholder="john@example.com" readonly>
+            <input type="email" class="krefrm-ui-input ${styleClass.input}" placeholder="john@example.com" readonly>
           </div>
           
-          <div class="krefrm-field ${styleClass.field}">
-            <label class="${styleClass.label}">
+          <div class="krefrm-field krefrm-ui-field ${styleClass.field}">
+            <label class="krefrm-ui-label ${styleClass.label}">
               Phone Number
             </label>
-            <input type="text" class="${styleClass.input}" placeholder="+1 555 123 456" readonly>
+            <input type="text" class="krefrm-ui-input ${styleClass.input}" placeholder="+1 555 123 456" readonly>
           </div>
         </div>
         
-        <button type="submit" class="${styleClass.btn}">Submit</button>
+        <button type="submit" class="krefrm-ui-btn ${styleClass.btn}">Submit</button>
       </form>
     `;
     shadow.appendChild(formDiv);
-  }, [templateId, styleClass, tpl, customCss]);
+  }, [normalizedTemplateId, styleClass, tpl, customCss]);
 
   return (
     <div
@@ -125,8 +130,10 @@ function LivePreview({ templateId, customCss }) {
 /* ── Main page component ─────────────────────────────────── */
 
 export default function StyleTemplatePage() {
-  const [activeTemplate, setActiveTemplate] = useState("kreebi_style_1");
-  const [savedTemplate, setSavedTemplate] = useState("kreebi_style_1");
+  const [activeTemplate, setActiveTemplate] = useState(
+    DEFAULT_STYLE_TEMPLATE_ID,
+  );
+  const [savedTemplate, setSavedTemplate] = useState(DEFAULT_STYLE_TEMPLATE_ID);
   const [loading, setLoading] = useState(true);
   const [customCSS, setCustomCSS] = useState("");
   const [cssError, setCssError] = useState("");
@@ -146,13 +153,13 @@ export default function StyleTemplatePage() {
     })
       .then((r) => r.json())
       .then((data) => {
-        const tpl = data?.styleTemplate || "kreebi_style_1";
+        const tpl = normalizeStyleTemplateId(data?.styleTemplate);
         setActiveTemplate(tpl);
         setSavedTemplate(tpl);
       })
       .catch(() => {
-        setActiveTemplate("kreebi_style_1");
-        setSavedTemplate("kreebi_style_1");
+        setActiveTemplate(DEFAULT_STYLE_TEMPLATE_ID);
+        setSavedTemplate(DEFAULT_STYLE_TEMPLATE_ID);
       })
       .finally(() => setLoading(false));
 

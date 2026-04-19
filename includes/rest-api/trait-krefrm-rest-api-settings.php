@@ -9,6 +9,28 @@ if (! defined('ABSPATH')) {
  */
 trait Krefrm_Rest_Api_Settings
 {
+    private function get_allowed_style_templates()
+    {
+        return array('style-polished', 'style-flat', 'style-blank');
+    }
+
+    private function normalize_style_template($value)
+    {
+        $template = sanitize_text_field((string) $value);
+        $template = trim($template, " \t\n\r\0\x0B\"'");
+        $legacy_map = array(
+            'kreebi_style_1' => 'style-polished',
+            'kreebi_style_2' => 'style-flat',
+            'blank_dev' => 'style-blank',
+        );
+
+        if (isset($legacy_map[$template])) {
+            return $legacy_map[$template];
+        }
+
+        return $template;
+    }
+
     private function normalize_default_editor($value)
     {
         $editor = sanitize_key((string) $value);
@@ -45,7 +67,7 @@ trait Krefrm_Rest_Api_Settings
         }
 
         $response = rest_ensure_response(array(
-            'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
+            'styleTemplate' => $this->normalize_style_template(get_option('krefrm_style_template', 'style-polished')),
             'defaultEditor' => $default_editor,
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),
@@ -73,8 +95,8 @@ trait Krefrm_Rest_Api_Settings
 
         // Handle style template
         if (isset($body['styleTemplate'])) {
-            $allowed = array('kreebi_style_1', 'kreebi_style_2', 'blank_dev');
-            $template = sanitize_text_field($body['styleTemplate']);
+            $allowed = $this->get_allowed_style_templates();
+            $template = $this->normalize_style_template($body['styleTemplate']);
 
             if (! in_array($template, $allowed, true)) {
                 return new WP_Error('invalid_template', __('Invalid style template.', 'kreebi-forms'), array('status' => 400));
@@ -211,7 +233,7 @@ trait Krefrm_Rest_Api_Settings
             : 'drag_drop';
 
         $response = rest_ensure_response(array(
-            'styleTemplate' => get_option('krefrm_style_template', 'kreebi_style_1'),
+            'styleTemplate' => $this->normalize_style_template(get_option('krefrm_style_template', 'style-polished')),
             'defaultEditor' => $default_editor,
             'integrations' => isset($settings['integrations']) ? $settings['integrations'] : array(),
             'emailNotification' => isset($settings['emailNotification']) ? $settings['emailNotification'] : array(),

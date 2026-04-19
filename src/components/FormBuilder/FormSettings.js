@@ -10,16 +10,16 @@ import { SelectControl } from "@wordpress/components";
 
 const STYLE_TEMPLATE_OPTIONS = [
   {
-    label: __("Kreebi Style 1 — polished default UI", "kreebi-forms"),
-    value: "kreebi_style_1",
+    label: __("Polished — modern rounded default UI", "kreebi-forms"),
+    value: "style-polished",
   },
   {
-    label: __("Kreebi Style 2 — alternative UI", "kreebi-forms"),
-    value: "kreebi_style_2",
+    label: __("Flat — compact bordered alternative", "kreebi-forms"),
+    value: "style-flat",
   },
   {
     label: __("Blank / Developer — no injected styles", "kreebi-forms"),
-    value: "blank_dev",
+    value: "style-blank",
   },
 ];
 
@@ -33,11 +33,11 @@ export default function FormSettings({ styleTemplate, onChangeStyleTemplate }) {
       <div className="krefrm-form-settings__section">
         <SelectControl
           label={__("Style Template", "kreebi-forms")}
-          value={styleTemplate || "kreebi_style_1"}
+          value={styleTemplate || "style-polished"}
           options={STYLE_TEMPLATE_OPTIONS}
           onChange={onChangeStyleTemplate}
           help={__(
-            "Controls which internal CSS classes are injected when the form is rendered on the frontend. Developer-provided wrapper classes are always preserved.",
+            "Controls the applied template styling. Shared base classes are always present, and developer-provided wrapper classes are preserved.",
             "kreebi-forms",
           )}
         />
@@ -47,7 +47,7 @@ export default function FormSettings({ styleTemplate, onChangeStyleTemplate }) {
             {__("Template preview", "kreebi-forms")}
           </h4>
 
-          {styleTemplate === "kreebi_style_1" && (
+          {styleTemplate === "style-polished" && (
             <p className="description">
               {__(
                 "Injects krefrm-ui-style-1-* classes for a polished, rounded form look with shadow and spacing.",
@@ -55,7 +55,7 @@ export default function FormSettings({ styleTemplate, onChangeStyleTemplate }) {
               )}
             </p>
           )}
-          {styleTemplate === "kreebi_style_2" && (
+          {styleTemplate === "style-flat" && (
             <p className="description">
               {__(
                 "Injects krefrm-ui-style-2-* classes for a flat, bordered form with compact spacing.",
@@ -63,10 +63,10 @@ export default function FormSettings({ styleTemplate, onChangeStyleTemplate }) {
               )}
             </p>
           )}
-          {styleTemplate === "blank_dev" && (
+          {styleTemplate === "style-blank" && (
             <p className="description">
               {__(
-                "No internal classes are injected. The developer is responsible for all styling.",
+                "No template-specific styles are injected. Shared base classes remain; the developer controls final styling.",
                 "kreebi-forms",
               )}
             </p>

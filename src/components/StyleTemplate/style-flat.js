@@ -1,4 +1,4 @@
-const style2 = {
+const styleFlat = {
   id: "style-flat",
   legacyIds: ["kreebi_style_2"],
   label: "Flat",
@@ -48,6 +48,14 @@ const style2 = {
     -webkit-appearance: none ;
   }
 
+  .krefrm-ui-style-2-input::placeholder,
+  .krefrm-ui-style-2-input::-webkit-input-placeholder,
+  .krefrm-ui-style-2-input:-ms-input-placeholder,
+  .krefrm-ui-style-2-input::-ms-input-placeholder {
+    color: #6b7280 ;
+    opacity: 1 ;
+  }
+
   .krefrm-ui-style-2-input:focus {
     border-color: #333 ;
     outline: none ;
@@ -89,4 +97,4 @@ const style2 = {
   `,
 };
 
-export default style2;
+export default styleFlat;

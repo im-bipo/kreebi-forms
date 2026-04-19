@@ -66,7 +66,7 @@ export function buildFormJson(
 export function parseFormJson(json) {
   const name = json.name || "";
   const description = json.description || "";
-  const styleTemplate = json.styleTemplate || "kreebi_style_1";
+  const styleTemplate = json.styleTemplate || "style-polished";
   const formIntegrations = json.formIntegrations || {};
   let steps = [];
 

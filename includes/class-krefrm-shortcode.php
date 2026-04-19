@@ -15,26 +15,34 @@ class Krefrm_Shortcode
 {
   private $allowed_types = array('text', 'email', 'password', 'number', 'textarea', 'checkbox', 'radio', 'dropdown');
 
+  private $default_style_template = 'style-polished';
+
+  private $legacy_style_template_map = array(
+    'kreebi_style_1' => 'style-polished',
+    'kreebi_style_2' => 'style-flat',
+    'blank_dev'      => 'style-blank',
+  );
+
   /**
    * Map styleTemplate values to the CSS classes injected at render time.
    * These are merged with any developer-provided wrapper classes.
    */
   private $style_class_map = array(
-    'kreebi_style_1' => array(
+    'style-polished' => array(
       'form'    => 'krefrm-ui-style-1-form',
       'field'   => 'krefrm-ui-style-1-field',
       'label'   => 'krefrm-ui-style-1-label',
       'input'   => 'krefrm-ui-style-1-input',
       'btn'     => 'krefrm-ui-style-1-btn',
     ),
-    'kreebi_style_2' => array(
+    'style-flat' => array(
       'form'    => 'krefrm-ui-style-2-form',
       'field'   => 'krefrm-ui-style-2-field',
       'label'   => 'krefrm-ui-style-2-label',
       'input'   => 'krefrm-ui-style-2-input',
       'btn'     => 'krefrm-ui-style-2-btn',
     ),
-    'blank_dev' => array(
+    'style-blank' => array(
       'form'    => '',
       'field'   => '',
       'label'   => '',
@@ -51,6 +59,17 @@ class Krefrm_Shortcode
   public function register()
   {
     add_shortcode('kreebi_form', array($this, 'render'));
+  }
+
+  private function normalize_style_template_id($style_template)
+  {
+    $template = sanitize_text_field((string) $style_template);
+    $template = trim($template, " \t\n\r\0\x0B\"'");
+    if (isset($this->legacy_style_template_map[$template])) {
+      return $this->legacy_style_template_map[$template];
+    }
+
+    return $template;
   }
 
   /**
@@ -81,9 +100,27 @@ class Krefrm_Shortcode
 
     $this->enqueue_frontend_assets($captcha_settings);
 
-    // Resolve style template — global option overrides any per-form value
-    $style_template = get_option('krefrm_style_template', 'kreebi_style_1');
-    $style_classes  = isset($this->style_class_map[$style_template]) ? $this->style_class_map[$style_template] : $this->style_class_map['blank_dev'];
+    // Resolve style template — form-level value takes priority, then global fallback.
+    $global_style_template = $this->normalize_style_template_id(
+      get_option('krefrm_style_template', $this->default_style_template)
+    );
+    $form_style_template = is_array($form_data) && ! empty($form_data['styleTemplate'])
+      ? $this->normalize_style_template_id($form_data['styleTemplate'])
+      : '';
+
+    $style_template = $form_style_template ? $form_style_template : $global_style_template;
+    if (
+      $style_template === $this->default_style_template &&
+      $global_style_template !== $this->default_style_template
+    ) {
+      // Let global style apply to legacy forms that still carry the old default.
+      $style_template = $global_style_template;
+    }
+    if (! isset($this->style_class_map[$style_template])) {
+      $style_template = $this->default_style_template;
+    }
+
+    $style_classes = $this->style_class_map[$style_template];
 
     // Normalise to steps format (handles both legacy fields and new steps)
     $steps = $this->normalise_steps($form_data);
@@ -96,7 +133,7 @@ class Krefrm_Shortcode
     $total_steps  = count($steps);
 
     $action     = esc_url(admin_url('admin-post.php'));
-    $form_class = 'krefrm-frontend-form' . ($is_multistep ? ' krefrm-multistep-form' : '');
+    $form_class = 'krefrm-frontend-form krefrm-ui-form' . ($is_multistep ? ' krefrm-multistep-form' : '');
     if (! empty($style_classes['form'])) {
       $form_class .= ' ' . $style_classes['form'];
     }
@@ -158,7 +195,11 @@ class Krefrm_Shortcode
           $html .= '<button type="button" class="krefrm-next-btn">' . esc_html__('Next', 'kreebi-forms') . '</button>';
         }
         if ($is_last) {
-          $btn_class = ! empty($style_classes['btn']) ? ' class="' . esc_attr($style_classes['btn']) . '"' : '';
+          $btn_classes = 'krefrm-ui-btn';
+          if (! empty($style_classes['btn'])) {
+            $btn_classes .= ' ' . $style_classes['btn'];
+          }
+          $btn_class = ' class="' . esc_attr($btn_classes) . '"';
           $html .= '<button type="submit"' . $btn_class . '>' . esc_html__('Submit', 'kreebi-forms') . '</button>';
         }
         $html .= '</div>';
@@ -170,7 +211,11 @@ class Krefrm_Shortcode
     if (! $is_multistep) {
       // re-render fields in grid (single step has only one set of fields)
       // Note: fields were already rendered above inside the step loop.
-      $btn_class = ! empty($style_classes['btn']) ? ' class="' . esc_attr($style_classes['btn']) . '"' : '';
+      $btn_classes = 'krefrm-ui-btn';
+      if (! empty($style_classes['btn'])) {
+        $btn_classes .= ' ' . $style_classes['btn'];
+      }
+      $btn_class = ' class="' . esc_attr($btn_classes) . '"';
       $html .= '<p><button type="submit"' . $btn_class . '>' . esc_html__('Submit', 'kreebi-forms') . '</button></p>';
     }
 
@@ -277,7 +322,7 @@ class Krefrm_Shortcode
 
   var submitButton = form.querySelector("button[type=\"submit\"], input[type=\"submit\"]");
   var styleTemplate = form.getAttribute("data-krefrm-style-template") || "";
-  var isBlankTemplate = styleTemplate === "blank_dev";
+  var isBlankTemplate = styleTemplate === "style-blank";
 
   var feedback = form.querySelector(".krefrm-submit-feedback");
   if (!feedback) {
@@ -471,6 +516,26 @@ class Krefrm_Shortcode
         form { display: block; }
         input, button, label, textarea, select { all: revert; box-sizing: border-box; }
         button { cursor: pointer; }
+
+        .krefrm-ui-input {
+          font-family: inherit ;
+          font-size: 14px ;
+          line-height: 1.4 ;
+          color: #1d2327 ;
+        }
+
+        .krefrm-ui-input::placeholder,
+        .krefrm-ui-input::-webkit-input-placeholder,
+        .krefrm-ui-input:-ms-input-placeholder,
+        .krefrm-ui-input::-ms-input-placeholder {
+          color: #6b7280 ;
+          opacity: 1 ;
+        }
+
+        textarea.krefrm-ui-input {
+          resize: vertical ;
+          min-height: 96px ;
+        }
         
         /* ─── Style 1 — Polished / Rounded ─── */
         .krefrm-ui-style-1-form {
@@ -501,6 +566,14 @@ class Krefrm_Shortcode
           appearance: none ;
           -webkit-appearance: none ;
           transition: border-color 0.2s, box-shadow 0.2s ;
+        }
+
+        .krefrm-ui-style-1-input::placeholder,
+        .krefrm-ui-style-1-input::-webkit-input-placeholder,
+        .krefrm-ui-style-1-input:-ms-input-placeholder,
+        .krefrm-ui-style-1-input::-ms-input-placeholder {
+          color: #6b7280 ;
+          opacity: 1 ;
         }
 
         textarea.krefrm-ui-style-1-input,
@@ -641,7 +714,15 @@ class Krefrm_Shortcode
           appearance: none ;
           -webkit-appearance: none ;
         }
-        
+
+        .krefrm-ui-style-2-input::placeholder,
+        .krefrm-ui-style-2-input::-webkit-input-placeholder,
+        .krefrm-ui-style-2-input:-ms-input-placeholder,
+        .krefrm-ui-style-2-input::-ms-input-placeholder {
+          color: #6b7280 ;
+          opacity: 1 ;
+        }
+
         .krefrm-ui-style-2-input:focus {
           border-color: #333 ;
           outline: none ;
@@ -1035,16 +1116,24 @@ CSS;
     $input_id = 'krefrm_' . sanitize_key($form_id) . '_s' . $step_index . '_f' . $field_index;
 
     // Build wrapper classes: just field + any style template
-    $wrapper_classes = 'krefrm-field';
+    $wrapper_classes = 'krefrm-field krefrm-ui-field';
     if (! empty($style_classes['field'])) {
       $wrapper_classes .= ' ' . $style_classes['field'];
     }
 
     // Label classes
-    $label_class = ! empty($style_classes['label']) ? ' class="' . esc_attr($style_classes['label']) . '"' : '';
+    $label_classes = 'krefrm-ui-label';
+    if (! empty($style_classes['label'])) {
+      $label_classes .= ' ' . $style_classes['label'];
+    }
+    $label_class = ' class="' . esc_attr($label_classes) . '"';
 
     // Input classes
-    $input_class = ! empty($style_classes['input']) ? ' class="' . esc_attr($style_classes['input']) . '"' : '';
+    $input_classes = 'krefrm-ui-input';
+    if (! empty($style_classes['input'])) {
+      $input_classes .= ' ' . $style_classes['input'];
+    }
+    $input_class = ' class="' . esc_attr($input_classes) . '"';
 
     $html = '<div class="' . $wrapper_classes . '">';
 

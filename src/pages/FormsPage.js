@@ -127,7 +127,7 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
           const formBuilderData = {
             name: data.title || "",
             description: data.description || "",
-            styleTemplate: data.styleTemplate || "kreebi_style_1",
+            styleTemplate: data.styleTemplate || "style-polished",
             steps: data.steps || [],
             formIntegrations: data.formIntegrations || {},
           };

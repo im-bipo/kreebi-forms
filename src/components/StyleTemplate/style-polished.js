@@ -1,4 +1,4 @@
-const style1 = {
+const stylePolished = {
   id: "style-polished",
   legacyIds: ["kreebi_style_1"],
   label: "Polished",
@@ -43,6 +43,14 @@ const style1 = {
     transition: border-color 0.2s, box-shadow 0.2s ;
   }
 
+  .krefrm-ui-style-1-input::placeholder,
+  .krefrm-ui-style-1-input::-webkit-input-placeholder,
+  .krefrm-ui-style-1-input:-ms-input-placeholder,
+  .krefrm-ui-style-1-input::-ms-input-placeholder {
+    color: #6b7280 ;
+    opacity: 1 ;
+  }
+
   .krefrm-ui-style-1-input:focus {
     border-color: #2271b1 ;
     box-shadow: 0 0 0 1px #2271b1 ;
@@ -84,4 +92,4 @@ const style1 = {
   `,
 };
 
-export default style1;
+export default stylePolished;

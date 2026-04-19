@@ -1,4 +1,4 @@
-const blankDev = {
+const styleBlank = {
   id: "style-blank",
   legacyIds: ["blank_dev"],
   label: "Blank / Developer",
@@ -15,4 +15,4 @@ const blankDev = {
   shadowCss: ``,
 };
 
-export default blankDev;
+export default styleBlank;

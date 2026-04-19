@@ -9,6 +9,23 @@ if (! defined('ABSPATH')) {
  */
 trait Krefrm_Rest_Api_Helpers
 {
+    private function normalize_style_template_id($value)
+    {
+        $template = sanitize_text_field((string) $value);
+        $template = trim($template, " \t\n\r\0\x0B\"'");
+        $legacy_map = array(
+            'kreebi_style_1' => 'style-polished',
+            'kreebi_style_2' => 'style-flat',
+            'blank_dev' => 'style-blank',
+        );
+
+        if (isset($legacy_map[$template])) {
+            return $legacy_map[$template];
+        }
+
+        return $template;
+    }
+
     private function prepare_form($post)
     {
         $form_data = get_post_meta($post->ID, '_krefrm_form_data', true);
@@ -53,7 +70,9 @@ trait Krefrm_Rest_Api_Helpers
             'title'            => $post->post_title,
             'description'      => $post->post_content,
             'shortcode'        => sprintf('[kreebi_form id="%s"]', esc_attr($form_id)),
-            'styleTemplate'    => isset($form_data['styleTemplate']) ? $form_data['styleTemplate'] : 'kreebi_style_1',
+            'styleTemplate'    => isset($form_data['styleTemplate'])
+                ? $this->normalize_style_template_id($form_data['styleTemplate'])
+                : 'style-polished',
             'steps'            => $steps,
             'fields'           => $all_fields,
             'field_count'      => count($all_fields),

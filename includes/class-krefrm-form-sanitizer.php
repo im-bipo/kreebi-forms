@@ -14,14 +14,23 @@ class Krefrm_Form_Sanitizer
 {
     private $allowed_types = array('text', 'email', 'password', 'number', 'textarea', 'checkbox', 'radio', 'dropdown');
 
-    private $allowed_style_templates = array('kreebi_style_1', 'kreebi_style_2', 'blank_dev');
+    private $allowed_style_templates = array('style-polished', 'style-flat', 'style-blank');
+
+    private $legacy_style_template_map = array(
+        'kreebi_style_1' => 'style-polished',
+        'kreebi_style_2' => 'style-flat',
+        'blank_dev'      => 'style-blank',
+    );
 
     public function sanitize($data)
     {
         // Sanitize styleTemplate (form-level setting)
-        $style_template = 'kreebi_style_1'; // default
-        if (! empty($data['styleTemplate']) && in_array($data['styleTemplate'], $this->allowed_style_templates, true)) {
-            $style_template = $data['styleTemplate'];
+        $style_template = 'style-polished'; // default
+        if (! empty($data['styleTemplate'])) {
+            $normalized_style_template = $this->normalize_style_template_id($data['styleTemplate']);
+            if (in_array($normalized_style_template, $this->allowed_style_templates, true)) {
+                $style_template = $normalized_style_template;
+            }
         }
 
         $sanitized = array(
@@ -80,6 +89,17 @@ class Krefrm_Form_Sanitizer
         }
 
         return $sanitized;
+    }
+
+    private function normalize_style_template_id($style_template)
+    {
+        $template = sanitize_text_field((string) $style_template);
+        $template = trim($template, " \t\n\r\0\x0B\"'");
+        if (isset($this->legacy_style_template_map[$template])) {
+            return $this->legacy_style_template_map[$template];
+        }
+
+        return $template;
     }
 
     /**
