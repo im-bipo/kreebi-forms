@@ -1,16 +1,23 @@
 import { __ } from "@wordpress/i18n";
-import { Button } from "@wordpress/components";
+import { Button, Modal } from "@wordpress/components";
 
-export default function WelcomeEditorPage({ navigate = () => {} }) {
+export default function WelcomeEditorPage({
+  onClose = () => {},
+  onContinue = () => {},
+}) {
   return (
-    <div className="krefrm-welcome-editor">
-      <div className="krefrm-welcome-editor__container">
+    <Modal
+      className="krefrm-welcome-modal"
+      title={__("Welcome", "kreebi-forms")}
+      onRequestClose={onClose}
+    >
+      <div className="krefrm-welcome-editor">
         <div className="krefrm-welcome-editor__header">
           <h1 className="krefrm-welcome-editor__main-title">
             {__("Welcome to Kreebi Forms", "kreebi-forms")}
           </h1>
           <p className="krefrm-welcome-editor__main-subtitle">
-            {__("You are ready to build your first form.", "kreebi-forms")}
+            {__("Would you like to continue to Kreebi Forms?", "kreebi-forms")}
           </p>
         </div>
 
@@ -19,17 +26,25 @@ export default function WelcomeEditorPage({ navigate = () => {} }) {
             <div className="krefrm-welcome-editor__footer-content">
               <p className="krefrm-welcome-editor__footer-text">
                 {__(
-                  "Start with the drag-and-drop editor and create forms in minutes.",
+                  "Click continue to open your forms dashboard.",
                   "kreebi-forms",
                 )}
               </p>
               <Button
                 variant="primary"
                 size="large"
-                onClick={() => navigate("form")}
+                onClick={onContinue}
                 className="krefrm-welcome-editor__submit-btn"
               >
                 {__("Continue", "kreebi-forms")}
+              </Button>
+              <Button
+                variant="secondary"
+                size="large"
+                onClick={onClose}
+                className="krefrm-welcome-editor__submit-btn"
+              >
+                {__("Not now", "kreebi-forms")}
               </Button>
               <p className="krefrm-welcome-editor__consent-text">
                 {__(
@@ -57,6 +72,6 @@ export default function WelcomeEditorPage({ navigate = () => {} }) {
           </div>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

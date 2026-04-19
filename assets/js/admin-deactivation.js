@@ -33,6 +33,19 @@ jQuery(document).ready(function ($) {
     $("#krefrm-deactivation-modal").removeClass("show");
   });
 
+  // Handle skip button (deactivate without submitting feedback)
+  $(document).on("click", '[data-action="skip"]', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    $("#krefrm-deactivation-modal").removeClass("show");
+
+    if (deactivateLink) {
+      deactivateLink.setAttribute("data-krefrm-approved", "true");
+      window.location.href = deactivateLink.href;
+    }
+  });
+
   // Handle form submission
   $("#krefrm-deactivation-form").on("submit", function (e) {
     e.preventDefault();

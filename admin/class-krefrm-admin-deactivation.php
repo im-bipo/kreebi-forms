@@ -112,6 +112,9 @@ class Krefrm_Admin_Deactivation
                         <button type="button" class="button" data-action="continue">
                             <?php esc_html_e('Cancel', 'kreebi-forms'); ?>
                         </button>
+                        <button type="button" class="button" data-action="skip">
+                            <?php esc_html_e('Skip and Deactivate', 'kreebi-forms'); ?>
+                        </button>
                         <button type="submit" class="button button-primary">
                             <?php esc_html_e('Submit and Deactivate', 'kreebi-forms'); ?>
                         </button>
@@ -143,7 +146,7 @@ class Krefrm_Admin_Deactivation
             'krefrm-admin-deactivation',
             KREFRM_PLUGIN_URL . 'assets/js/admin-deactivation.js',
             array('jquery'),
-            '1.1.1',
+            '1.1.2',
             true
         );
 

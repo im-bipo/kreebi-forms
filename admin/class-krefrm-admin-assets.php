@@ -21,6 +21,13 @@ class Krefrm_Admin_Assets
             return;
         }
 
+        $current_admin_page = '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page context.
+        if (isset($_GET['page'])) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only page context.
+            $current_admin_page = sanitize_key(wp_unslash($_GET['page']));
+        }
+
         $asset_file = KREFRM_PLUGIN_DIR . 'build/index.asset.php';
 
         // If build exists, enqueue the React bundle
@@ -44,8 +51,7 @@ class Krefrm_Admin_Assets
 
             // Determine which page we're on
             $page = 'forms';
-            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only reading page slug, no data mutation.
-            if (isset($_GET['page']) && 'krefrm_submissions' === $_GET['page']) {
+            if ('krefrm_submissions' === $current_admin_page) {
                 $page = 'submissions';
             }
 
