@@ -55,13 +55,15 @@ async function ensurePluginInactive(page) {
     await deactivate.first().click();
     await expect(page.locator("#krefrm-deactivation-modal")).toBeVisible();
 
-    await page.getByRole("button", { name: "Skip and Deactivate" }).click();
+    await page.getByRole("button", { name: "Deactivate" }).click();
     await expect(row.getByRole("link", { name: "Activate" })).toBeVisible();
   }
 }
 
 test.describe.serial("Kreebi Forms deactivation/onboarding popup", () => {
-  test("deactivation modal allows skip and deactivates plugin", async ({ page }) => {
+  test("deactivation modal allows deactivate with optional feedback", async ({
+    page,
+  }) => {
     await loginToWpAdmin(page);
     await ensurePluginActive(page);
     await goToPluginsPage(page);
@@ -80,7 +82,9 @@ test.describe.serial("Kreebi Forms deactivation/onboarding popup", () => {
     await expect(row.getByRole("link", { name: "Activate" })).toBeVisible();
   });
 
-  test("reactivating plugin shows onboarding popup immediately on current page", async ({ page }) => {
+  test("reactivating plugin shows onboarding popup immediately on current page", async ({
+    page,
+  }) => {
     await loginToWpAdmin(page);
     await ensurePluginInactive(page);
     await goToPluginsPage(page);
@@ -93,12 +97,16 @@ test.describe.serial("Kreebi Forms deactivation/onboarding popup", () => {
     await expect(row.getByRole("link", { name: /Deactivate/i })).toBeVisible();
 
     await expect(page.locator("#krefrm-global-welcome-modal")).toBeVisible();
+    await expect(page.getByText("Welcome to Kreebi Forms")).toBeVisible();
     await expect(
-      page.getByText("Would you like to continue to Kreebi Forms?"),
+      page.getByRole("button", { name: "Start Kreebi Forms" }),
     ).toBeVisible();
+    await expect(page.getByText("Skip for now")).toBeVisible();
 
     await page
-      .locator('#krefrm-global-welcome-modal [data-krefrm-welcome-action="dismiss"]')
+      .locator(
+        '#krefrm-global-welcome-modal [data-krefrm-welcome-action="dismiss"]',
+      )
       .click();
     await expect(page.locator("#krefrm-global-welcome-modal")).toHaveCount(0);
   });

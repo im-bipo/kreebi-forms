@@ -33,19 +33,6 @@ jQuery(document).ready(function ($) {
     $("#krefrm-deactivation-modal").removeClass("show");
   });
 
-  // Handle skip button (deactivate without submitting feedback)
-  $(document).on("click", '[data-action="skip"]', function (e) {
-    e.preventDefault();
-    e.stopPropagation();
-
-    $("#krefrm-deactivation-modal").removeClass("show");
-
-    if (deactivateLink) {
-      deactivateLink.setAttribute("data-krefrm-approved", "true");
-      window.location.href = deactivateLink.href;
-    }
-  });
-
   // Handle form submission
   $("#krefrm-deactivation-form").on("submit", function (e) {
     e.preventDefault();
@@ -54,12 +41,6 @@ jQuery(document).ready(function ($) {
     const form = this;
     const $submitBtn = $(form).find('button[type="submit"]');
     const originalText = $submitBtn.text();
-
-    // Validate required field
-    if (!$("#krefrm-reason").val()) {
-      alert("Please select a reason for deactivation.");
-      return;
-    }
 
     // Show loading state
     $submitBtn.prop("disabled", true).text("Processing...");

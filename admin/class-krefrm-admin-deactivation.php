@@ -74,8 +74,8 @@ class Krefrm_Admin_Deactivation
                         <p><?php esc_html_e('We would love to know why you are deactivating Kreebi Forms. Your feedback helps us improve the plugin!', 'kreebi-forms'); ?></p>
 
                         <div class="krefrm-form-group">
-                            <label for="krefrm-reason"><?php esc_html_e('Why are you deactivating?', 'kreebi-forms'); ?> <span class="required">*</span></label>
-                            <select id="krefrm-reason" name="reason" required>
+                            <label for="krefrm-reason"><?php esc_html_e('Why are you deactivating?', 'kreebi-forms'); ?></label>
+                            <select id="krefrm-reason" name="reason">
                                 <option value=""><?php esc_html_e('-- Select a reason --', 'kreebi-forms'); ?></option>
                                 <option value="found-alternative"><?php esc_html_e('I found a better plugin alternative', 'kreebi-forms'); ?></option>
                                 <option value="not-needed"><?php esc_html_e('I no longer need this plugin', 'kreebi-forms'); ?></option>
@@ -112,11 +112,8 @@ class Krefrm_Admin_Deactivation
                         <button type="button" class="button" data-action="continue">
                             <?php esc_html_e('Cancel', 'kreebi-forms'); ?>
                         </button>
-                        <button type="button" class="button" data-action="skip">
-                            <?php esc_html_e('Skip and Deactivate', 'kreebi-forms'); ?>
-                        </button>
                         <button type="submit" class="button button-primary">
-                            <?php esc_html_e('Submit and Deactivate', 'kreebi-forms'); ?>
+                            <?php esc_html_e('Deactivate', 'kreebi-forms'); ?>
                         </button>
                     </div>
                 </form>

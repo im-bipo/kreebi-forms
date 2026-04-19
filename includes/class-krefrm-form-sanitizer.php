@@ -12,7 +12,7 @@ if (! defined('ABSPATH')) {
  */
 class Krefrm_Form_Sanitizer
 {
-    private $allowed_types = array('text', 'email', 'password', 'number', 'checkbox', 'radio', 'dropdown');
+    private $allowed_types = array('text', 'email', 'password', 'number', 'textarea', 'checkbox', 'radio', 'dropdown');
 
     private $allowed_style_templates = array('kreebi_style_1', 'kreebi_style_2', 'blank_dev');
 
@@ -87,16 +87,23 @@ class Krefrm_Form_Sanitizer
      */
     private function sanitize_field($field)
     {
+        $field_name = isset($field['name']) ? sanitize_text_field($field['name']) : '';
         $type = isset($field['type']) ? sanitize_key($field['type']) : 'text';
         if ('select' === $type) {
             $type = 'dropdown';
+        }
+        if (in_array($type, array('text-area', 'long-text', 'long_text'), true)) {
+            $type = 'textarea';
+        }
+        if ('text' === $type && (false !== strpos(sanitize_key($field_name), 'long_text') || false !== strpos(strtolower($field_name), 'long text'))) {
+            $type = 'textarea';
         }
         if (! in_array($type, $this->allowed_types, true)) {
             $type = 'text';
         }
 
         $sanitized_field = array(
-            'name'        => isset($field['name']) ? sanitize_text_field($field['name']) : '',
+            'name'        => $field_name,
             'type'        => $type,
             'required'    => ! empty($field['required']),
         );

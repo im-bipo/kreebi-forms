@@ -502,7 +502,13 @@ class Krefrm_Shortcode
           -webkit-appearance: none ;
           transition: border-color 0.2s, box-shadow 0.2s ;
         }
-        
+
+        textarea.krefrm-ui-style-1-input,
+        textarea.krefrm-ui-style-2-input {
+          resize: vertical ;
+          min-height: 96px ;
+        }
+
         .krefrm-ui-style-1-input:focus {
           border-color: #2271b1 ;
           box-shadow: 0 0 0 1px #2271b1 ;
@@ -1008,7 +1014,16 @@ CSS;
   {
     $name        = isset($f['name']) ? $f['name'] : 'field_' . $field_index;
     $key         = sanitize_key(preg_replace('/\s+/', '_', strtolower($name)));
-    $type        = isset($f['type']) ? $f['type'] : 'text';
+    $type        = isset($f['type']) ? sanitize_key($f['type']) : 'text';
+    if ('select' === $type) {
+      $type = 'dropdown';
+    }
+    if (in_array($type, array('text-area', 'long-text', 'long_text'), true)) {
+      $type = 'textarea';
+    }
+    if ('text' === $type && (false !== strpos($key, 'long_text') || false !== strpos(strtolower($name), 'long text'))) {
+      $type = 'textarea';
+    }
     if (! in_array($type, $this->allowed_types, true)) {
       $type = 'text';
     }
