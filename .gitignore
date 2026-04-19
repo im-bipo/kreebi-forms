@@ -130,6 +130,11 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Playwright artifacts
+playwright-report/
+test-results/
+blob-report/
+
 # pnpm
 .pnpm-store
 

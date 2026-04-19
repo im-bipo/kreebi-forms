@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Plugin Name: Kreebi Forms - Drag & Drop Form Builder. Contact Forms, Survey Form, Registration Form and More
+ * Plugin Name: Kreebi Forms
  * Description: Lightweight and Powerful WordPress form builder plugin with drag-and-drop form creation, conditional logic, multi-page forms, spam protection, email notifications, webhooks, and submission management.
  * Version:     1.1.8
  * Author:      Bipin Khatri

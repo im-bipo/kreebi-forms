@@ -1,4 +1,4 @@
-=== Kreebi Forms - Drag & Drop Form Builder. Contact Forms, Survey Form, Registration Form and More ===
+=== Kreebi Forms ===
 Contributors: imbipo
 Tags: contact form, form builder, drag-and-drop, webhook, custom forms
 Requires at least: 5.7
@@ -8,7 +8,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Lightweight and Powerful WordPress form builder plugin with Drag-and-drop form builder with JSON editing, submission management, webhook, and reCAPTCHA v3. Part of the Kreebi Suite.
+Lightweight and Powerful WordPress form builder plugin with Drag-and-drop form builder with JSON editing, submission management, webhook, and reCAPTCHA v3. Kreebi forms is a  Drag & Drop Form Builder for Contact Forms, Survey Form, Registration Form and More 
 
 == Description ==
 

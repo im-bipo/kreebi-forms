@@ -142,25 +142,63 @@ npx gulp clean
 
 Removes the `/build` directory without rebuilding.
 
+### E2E Testing (Playwright)
+
+You can run WordPress admin dashboard end-to-end tests for Kreebi Forms with Playwright.
+
+#### 1. Install dependencies
+
+```bash
+npm install
+```
+
+#### 2. Configure test environment
+
+Copy `.env.example` to `.env` and set credentials for your local WordPress admin:
+
+```env
+WP_BASE_URL=http://localhost
+WP_ADMIN_USER=admin
+WP_ADMIN_PASSWORD=password
+WP_LOGIN_PATH=/wp-login.php
+```
+
+#### 3. Run tests
+
+```bash
+ npm test
+```
+
+Helpful variants:
+
+````bash
+npm run test:headed
+npm run test:ui
+npm run test:debug
+
+- WordPress admin login flow
+- Loading `wp-admin/admin.php?page=krefrm_forms`
+- Hash-route navigation check for `#submission`
+
 ### Modifying the Plugin
 
 #### Adding Custom Field Types
 
 1. **Update the Form JSON Schema** in `/includes/class-krefrm-core.php`
 
-   - Add field type validation
+  - Add field type validation
 
 2. **Update Frontend Component** in `/src/App.js`
 
-   - Add field rendering logic
-   - Include input validation
+  - Add field rendering logic
+  - Include input validation
 
 3. **Update Admin Editor** in `/src/pages/FormsPage.js`
 
-   - Add field option to the builder UI
+  - Add field option to the builder UI
 
 4. **Update Form Sanitizer** in `/includes/class-krefrm-form-sanitizer.php`
-   - Add sanitization rules for the new field type
+  - Add sanitization rules for the new field type
 
 #### Creating Custom Form from JSON
 
@@ -168,69 +206,69 @@ Example form JSON structure with all field types:
 
 ```json
 {
-  "title": "Contact Form",
-  "description": "Get in touch with us",
-  "fields": [
-    {
-      "name": "Full Name",
-      "type": "text",
-      "placeholder": "Enter your name",
-      "required": true
-    },
-    {
-      "name": "Email Address",
-      "type": "email",
-      "placeholder": "your@email.com",
-      "required": true
-    },
-    {
-      "name": "Phone Number",
-      "type": "number",
-      "placeholder": "+1 555-0000",
-      "required": false
-    },
-    {
-      "name": "Product Interest",
-      "type": "dropdown",
-      "required": true,
-      "options": [
-        { "label": "Product A", "value": "Product A" },
-        { "label": "Product B", "value": "Product B" },
-        { "label": "Product C", "value": "Product C" }
-      ]
-    },
-    {
-      "name": "How did you hear about us?",
-      "type": "radio",
-      "required": true,
-      "options": [
-        { "label": "Google Search", "value": "Google Search" },
-        { "label": "Social Media", "value": "Social Media" },
-        { "label": "Referral", "value": "Referral" },
-        { "label": "Other", "value": "Other" }
-      ]
-    },
-    {
-      "name": "Interests",
-      "type": "checkbox",
-      "required": false,
-      "options": [
-        { "label": "Marketing", "value": "marketing" },
-        { "label": "Sales", "value": "sales" },
-        { "label": "Support", "value": "support" },
-        { "label": "Development", "value": "development" }
-      ]
-    },
-    {
-      "name": "Password",
-      "type": "password",
-      "placeholder": "Enter password",
-      "required": true
-    }
-  ],
-  "submitButtonText": "Send Message"
+ "title": "Contact Form",
+ "description": "Get in touch with us",
+ "fields": [
+   {
+     "name": "Full Name",
+     "type": "text",
+     "placeholder": "Enter your name",
+     "required": true
+   },
+   {
+     "name": "Email Address",
+     "type": "email",
+     "placeholder": "your@email.com",
+     "required": true
+   },
+   {
+     "name": "Phone Number",
+     "type": "number",
+     "placeholder": "+1 555-0000",
+     "required": false
+   },
+   {
+     "name": "Product Interest",
+     "type": "dropdown",
+     "required": true,
+     "options": [
+       { "label": "Product A", "value": "Product A" },
+       { "label": "Product B", "value": "Product B" },
+       { "label": "Product C", "value": "Product C" }
+     ]
+   },
+   {
+     "name": "How did you hear about us?",
+     "type": "radio",
+     "required": true,
+     "options": [
+       { "label": "Google Search", "value": "Google Search" },
+       { "label": "Social Media", "value": "Social Media" },
+       { "label": "Referral", "value": "Referral" },
+       { "label": "Other", "value": "Other" }
+     ]
+   },
+   {
+     "name": "Interests",
+     "type": "checkbox",
+     "required": false,
+     "options": [
+       { "label": "Marketing", "value": "marketing" },
+       { "label": "Sales", "value": "sales" },
+       { "label": "Support", "value": "support" },
+       { "label": "Development", "value": "development" }
+     ]
+   },
+   {
+     "name": "Password",
+     "type": "password",
+     "placeholder": "Enter password",
+     "required": true
+   }
+ ],
+ "submitButtonText": "Send Message"
 }
-```
+````
 
 ### Field Type Reference
 

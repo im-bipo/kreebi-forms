@@ -41,12 +41,30 @@ export default function App() {
     window.location.hash = newHash;
   };
 
+  const pageId = route.startsWith("form")
+    ? "kreebi-form-form"
+    : route.startsWith("submission")
+    ? "kreebi-form-submission"
+    : route === "addons"
+    ? "kreebi-form-addons"
+    : route === "style-templates"
+    ? "kreebi-form-style-templates"
+    : route.startsWith("integrations")
+    ? "kreebi-form-integrations"
+    : route === "upgrade-to-pro"
+    ? "kreebi-form-upgrade-to-pro"
+    : route === "dashboard"
+    ? "kreebi-form-dashboard"
+    : route === "welcome-editor"
+    ? "kreebi-form-welcome-editor"
+    : "kreebi-form-form";
+
   return (
     <ToastProvider>
       <div className="wrap krefrm-app">
         {showHeader && <PageHeader route={route} navigate={navigate} />}
 
-        <div className="krefrm-page-content">
+        <div id={pageId} className="krefrm-page-content">
           {route === "welcome-editor" && (
             <WelcomeEditorPage navigate={navigate} />
           )}
