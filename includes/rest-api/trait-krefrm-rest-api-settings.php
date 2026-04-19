@@ -12,7 +12,7 @@ trait Krefrm_Rest_Api_Settings
     private function normalize_default_editor($value)
     {
         $editor = sanitize_key((string) $value);
-        $allowed = array('quick', 'drag_drop');
+        $allowed = array('drag_drop');
 
         if (! in_array($editor, $allowed, true)) {
             return 'drag_drop';

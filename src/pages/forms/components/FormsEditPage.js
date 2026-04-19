@@ -9,9 +9,6 @@ export default function FormsEditPage({
   formId,
   initialTab,
   onTabChange,
-  defaultEditor,
-  onSetDefaultEditor,
-  isSavingDefaultEditor,
 }) {
   if (loading || !initialData) {
     return (
@@ -31,9 +28,6 @@ export default function FormsEditPage({
         formId={formId}
         initialTab={initialTab}
         onTabChange={onTabChange}
-        defaultEditor={defaultEditor}
-        onSetDefaultEditor={onSetDefaultEditor}
-        isSavingDefaultEditor={isSavingDefaultEditor}
       />
     </div>
   );

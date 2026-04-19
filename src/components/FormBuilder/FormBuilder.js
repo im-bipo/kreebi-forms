@@ -25,17 +25,13 @@ import FormPreview from "./FormPreview";
 import SettingsPanel from "./SettingsPanel";
 import JsonEditor from "./JsonEditor";
 import FIELD_TYPES from "./fieldTypes";
-import QuickBuilder from "../QuickBuilder"; // used as additional view
 import { getIntegration } from "../../integrations/registry";
 
 /**
  * @param {Object}  props.enabledIntegrations       Map of integrationId → boolean
  * @param {Object}  props.globalIntegrationSettings  Map of settingsKey → settings object
- * @param {string}  props.initialTab                Initial view to show (e.g., "quick-edit", "email-notification")
+ * @param {string}  props.initialTab                Initial view to show (e.g., "email-notification")
  * @param {Function} props.onTabChange              Called when user switches tabs; receives (tabName)
- * @param {string}  props.defaultEditor             "quick" or "drag_drop"
- * @param {Function|null} props.onSetDefaultEditor  Updates global default editor preference
- * @param {boolean} props.isSavingDefaultEditor     True while default editor preference is being saved
  */
 export default function FormBuilder({
   initialData = {},
@@ -48,29 +44,25 @@ export default function FormBuilder({
   globalIntegrationSettings = {},
   initialTab = null,
   onTabChange = () => {},
-  defaultEditor = "quick",
-  onSetDefaultEditor = null,
-  isSavingDefaultEditor = false,
 }) {
   const builder = useFormBuilder(initialData);
 
   // Convert initialTab to internal view format
-  // "quick-edit" -> "quick", "json-view" -> "json", "email-notification" -> "intg:email-notification", etc.
+  // "quick-edit" (legacy) -> "visual", "json-view" -> "json", "email-notification" -> "intg:email-notification", etc.
   const getInitialView = () => {
     if (!initialTab) return "visual"; // default
-    if (initialTab === "quick-edit") return "quick";
+    if (initialTab === "quick-edit") return "visual";
     if (initialTab === "json-view") return "json";
     if (initialTab.startsWith("intg:")) return initialTab;
     return `intg:${initialTab}`; // treat other tabs as integrations
   };
 
-  const [view, setView] = useState(getInitialView()); // "quick" | "visual" | "json" | "settings"
+  const [view, setView] = useState(getInitialView()); // "visual" | "json" | "settings"
   const [nameError, setNameError] = useState("");
   const [shakeNameInput, setShakeNameInput] = useState(false);
   const [settingsAttention, setSettingsAttention] = useState(false);
   const settingsAttentionTimeoutRef = useRef(null);
   const settingsAttentionLastTriggerRef = useRef(0);
-  const isDragDropDefaultEditor = defaultEditor === "drag_drop";
 
   // Function for integrations to trigger form save with current state
   const triggerFormSave = useCallback(() => {
@@ -86,9 +78,7 @@ export default function FormBuilder({
 
       // Convert internal view format back to tab name for parent
       let tabName = null;
-      if (newView === "quick") {
-        tabName = "quick-edit";
-      } else if (newView === "visual") {
+      if (newView === "visual") {
         tabName = null; // default, no tab param
       } else if (newView === "json") {
         // JSON View is treated as an integration tab for URL consistency
@@ -346,75 +336,48 @@ export default function FormBuilder({
               )}
             </p>
           </div>
-
-          <Button
-            variant={isDragDropDefaultEditor ? "secondary" : "primary"}
-            onClick={() => onSetDefaultEditor?.("drag_drop")}
-            disabled={
-              isDragDropDefaultEditor ||
-              isSavingDefaultEditor ||
-              !onSetDefaultEditor
-            }
-          >
-            {isDragDropDefaultEditor
-              ? __("✓ Default Editor", "kreebi-forms")
-              : isSavingDefaultEditor
-              ? __("Setting…", "kreebi-forms")
-              : __("Set Default Editor", "kreebi-forms")}
-          </Button>
         </div>
       )}
 
       {/* ─── Top bar ─── */}
-      {view !== "quick" && (
-        <div className="krefrm-builder__topbar">
-          <div className="krefrm-builder__toggle">
+      <div className="krefrm-builder__topbar">
+        <div className="krefrm-builder__toggle">
+          <button
+            type="button"
+            className={`krefrm-builder__toggle-btn ${
+              view === "visual" ? "is-active" : ""
+            }`}
+            onClick={() => handleViewChange("visual")}
+          >
+            {__("Visual Editor", "kreebi-forms")}
+          </button>
+
+          {/* Integration tabs (JSON View, Email Notification, etc.) */}
+          {integrationTabs.map((tab) => (
             <button
+              key={tab.id}
               type="button"
               className={`krefrm-builder__toggle-btn ${
-                view === "quick" ? "is-active" : ""
+                view === tab.viewKey ? "is-active" : ""
               }`}
-              onClick={() => handleViewChange("quick")}
+              onClick={() => handleViewChange(tab.viewKey)}
             >
-              {__("Quick Editor", "kreebi-forms")}
+              {tab.label}
             </button>
-            <button
-              type="button"
-              className={`krefrm-builder__toggle-btn ${
-                view === "visual" ? "is-active" : ""
-              }`}
-              onClick={() => handleViewChange("visual")}
-            >
-              {__("Visual Editor", "kreebi-forms")}
-            </button>
-
-            {/* Integration tabs (JSON View, Email Notification, etc.) */}
-            {integrationTabs.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                className={`krefrm-builder__toggle-btn ${
-                  view === tab.viewKey ? "is-active" : ""
-                }`}
-                onClick={() => handleViewChange(tab.viewKey)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="krefrm-builder__topbar-actions">
-            {onCancel && (
-              <Button variant="tertiary" onClick={onCancel}>
-                {__("Cancel", "kreebi-forms")}
-              </Button>
-            )}
-            <Button variant="primary" onClick={handleSave}>
-              {saveLabel || __("Save Form", "kreebi-forms")}
-            </Button>
-          </div>
+          ))}
         </div>
-      )}
+
+        <div className="krefrm-builder__topbar-actions">
+          {onCancel && (
+            <Button variant="tertiary" onClick={onCancel}>
+              {__("Cancel", "kreebi-forms")}
+            </Button>
+          )}
+          <Button variant="primary" onClick={handleSave}>
+            {saveLabel || __("Save Form", "kreebi-forms")}
+          </Button>
+        </div>
+      </div>
 
       {/* ─── Form name / desc (visual only) ─── */}
       {view === "visual" && (
@@ -444,27 +407,6 @@ export default function FormBuilder({
       )}
 
       {/* ─── View body ─── */}
-      {view === "quick" && (
-        <QuickBuilder
-          initialData={builder.getJson()}
-          isDefaultEditor={defaultEditor === "quick"}
-          onSetDefaultEditor={
-            onSetDefaultEditor ? () => onSetDefaultEditor("quick") : null
-          }
-          isSettingDefaultEditor={isSavingDefaultEditor}
-          onSave={async (json) => {
-            builder.setFromJson(json);
-            if (onSave) {
-              await onSave(json);
-            }
-          }}
-          onAdvanced={(json) => {
-            builder.setFromJson(json);
-            handleViewChange("visual");
-          }}
-        />
-      )}
-
       {view === "json" && (
         <JsonEditor getJson={builder.getJson} onApply={builder.setFromJson} />
       )}

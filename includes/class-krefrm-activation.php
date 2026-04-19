@@ -103,9 +103,9 @@ class Krefrm_Activation
 
         if (
             ! isset($settings['defaultEditor'])
-            || ! in_array($settings['defaultEditor'], array('quick', 'drag_drop'), true)
+            || ! in_array($settings['defaultEditor'], array('drag_drop'), true)
         ) {
-            $settings['defaultEditor'] = 'quick';
+            $settings['defaultEditor'] = 'drag_drop';
         }
 
         // Set default custom CSS if not already set

@@ -5,7 +5,6 @@ import { Spinner } from "@wordpress/components";
 import FormsTable from "../components/FormsTable";
 import FormsCreatePage from "./forms/components/FormsCreatePage";
 import FormsEditPage from "./forms/components/FormsEditPage";
-import FormsQuickCreatePage from "./forms/components/FormsQuickCreatePage";
 import TemplatePickerModal from "./forms/components/TemplatePickerModal";
 import DeleteFormModal from "./forms/components/DeleteFormModal";
 import {
@@ -27,14 +26,23 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [currentTab, setCurrentTab] = useState(null); // Track active tab in editor
   const [templateData, setTemplateData] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
-  const [useAdvanceEditor, setUseAdvanceEditor] = useState(false);
-  const [savingEditorPreference, setSavingEditorPreference] = useState(false);
   const createTabRef = useRef(null);
   const toast = useToast();
 
   const showCreatePage = route === "form/create";
-  const showQuickBuilder = route === "form/quick-builder";
+  const showLegacyQuickBuilderRoute = route === "form/quick-builder";
   const showEditPage = route.startsWith("form/edit");
+
+  useEffect(() => {
+    if (!showLegacyQuickBuilderRoute) {
+      return;
+    }
+
+    navigate("form/create");
+    if (window.location.hash.replace(/^#\/?/, "") !== "form/create") {
+      window.location.hash = "form/create";
+    }
+  }, [navigate, showLegacyQuickBuilderRoute]);
 
   useEffect(() => {
     if (showCreatePage) {
@@ -90,27 +98,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   useEffect(() => {
     fetchForms();
   }, [fetchForms]);
-
-  // Load global default editor preference from settings.
-  useEffect(() => {
-    let isMounted = true;
-
-    apiFetch({ path: "/kreebi-forms/v1/settings" })
-      .then((data) => {
-        if (!isMounted) {
-          return;
-        }
-
-        setUseAdvanceEditor(data?.defaultEditor === "drag_drop");
-      })
-      .catch(() => {
-        // Keep local fallback value when request fails.
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   // Load form data when in edit mode
   useEffect(() => {
@@ -213,36 +200,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
     fetchForms();
   };
 
-  const setDefaultEditorPreference = async (editorId) => {
-    const nextValue = editorId === "drag_drop";
-    const previousValue = useAdvanceEditor;
-
-    if (nextValue === previousValue) {
-      return;
-    }
-
-    setUseAdvanceEditor(nextValue);
-    setSavingEditorPreference(true);
-
-    try {
-      await apiFetch({
-        path: "/kreebi-forms/v1/settings",
-        method: "POST",
-        data: {
-          defaultEditor: nextValue ? "drag_drop" : "quick",
-        },
-      });
-    } catch (err) {
-      setUseAdvanceEditor(previousValue);
-      toast.error(
-        err.message ||
-          __("Failed to save default editor preference.", "kreebi-forms"),
-      );
-    } finally {
-      setSavingEditorPreference(false);
-    }
-  };
-
   // Handle tab changes in the editor
   const handleTabChange = (newTab) => {
     setCurrentTab(newTab);
@@ -278,9 +235,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         onCreateTabChange={(tabName) => {
           createTabRef.current = tabName;
         }}
-        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
-        onSetDefaultEditor={setDefaultEditorPreference}
-        isSavingDefaultEditor={savingEditorPreference}
       />
     );
   }
@@ -296,56 +250,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         formId={currentFormId}
         initialTab={currentTab}
         onTabChange={handleTabChange}
-        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
-        onSetDefaultEditor={setDefaultEditorPreference}
-        isSavingDefaultEditor={savingEditorPreference}
-      />
-    );
-  }
-
-  /* ─── Quick builder (create) ─── */
-  if (showQuickBuilder) {
-    return (
-      <FormsQuickCreatePage
-        initialData={templateData || {}}
-        isDefaultEditor={!useAdvanceEditor}
-        onSetDefaultEditor={() => setDefaultEditorPreference("quick")}
-        isSettingDefaultEditor={savingEditorPreference}
-        onSave={async (parsed) => {
-          const res = await apiFetch({
-            path: "/kreebi-forms/v1/forms",
-            method: "POST",
-            data: parsed,
-          });
-          // Auto-copy shortcode
-          const sc =
-            res && res.shortcode
-              ? res.shortcode
-              : `[kreebi_form id="${res && res.post_id ? res.post_id : ""}"]`;
-          try {
-            await navigator.clipboard.writeText(sc);
-          } catch (_) {
-            /* no-op */
-          }
-          showFormSavedToast({
-            mode: "created",
-            message: __(
-              "Your form is created. Shortcode copied to clipboard.",
-              "kreebi-forms",
-            ),
-          });
-          fetchForms();
-          navigateToCreatedForm(res, "quick-edit");
-          return res;
-        }}
-        onAdvanced={(jsonData) => {
-          setTemplateData(jsonData);
-          navigate("form/create");
-        }}
-        onCancel={() => {
-          setTemplateData(null);
-          navigate("form");
-        }}
       />
     );
   }
@@ -353,15 +257,9 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   /* ─── Template picker handler ─── */
   const handlePickTemplate = (tpl) => {
     setShowPicker(false);
-    // Respect the user's preference: if Use Advance Editor is enabled,
-    // open the advance builder directly; otherwise open the quick builder.
     const data = { ...(tpl.data || {}), name: "" };
     setTemplateData(data);
-    if (useAdvanceEditor) {
-      navigate("form/create");
-    } else {
-      navigate("form/quick-builder");
-    }
+    navigate("form/create");
   };
 
   return (
@@ -371,7 +269,6 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
         navigate={navigate}
         onDelete={handleDelete}
         onCreateNew={() => setShowPicker(true)}
-        defaultEditor={useAdvanceEditor ? "drag_drop" : "quick"}
       />
 
       <TemplatePickerModal

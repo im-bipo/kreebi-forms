@@ -125,18 +125,7 @@ function FormCard({
                 className="krefrm-form-card__menu-item"
                 role="menuitem"
                 onClick={() => {
-                  onEdit("quick");
-                  setMenuOpen(false);
-                }}
-              >
-                {__("Quick edit", "kreebi-forms")}
-              </button>
-              <button
-                type="button"
-                className="krefrm-form-card__menu-item"
-                role="menuitem"
-                onClick={() => {
-                  onEdit("advanced");
+                  onEdit();
                   setMenuOpen(false);
                 }}
               >
@@ -258,19 +247,12 @@ function FormCard({
  *  navigate     {Function} navigation function for routing
  *  onDelete     {Function} called with post_id when Delete is clicked
  *  onCreateNew  {Function} called when the user wants to create a new form
- *  defaultEditor {string}  "quick" or "drag_drop" for default edit entry
  */
 const DEFAULT_ENABLED_INTEGRATIONS = Object.fromEntries(
   DEFAULT_ENABLED.map((id) => [id, true]),
 );
 
-export default function FormsTable({
-  forms,
-  navigate,
-  onDelete,
-  onCreateNew,
-  defaultEditor = "quick",
-}) {
+export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
   const [copiedId, setCopiedId] = useState(null);
   const [enabledIntegrations, setEnabledIntegrations] = useState(
     DEFAULT_ENABLED_INTEGRATIONS,
@@ -303,16 +285,8 @@ export default function FormsTable({
     navigate(`form/edit${tabSegment}?${routeId}`);
   };
 
-  const handleEdit = (form, editorType = null) => {
-    let chosenTab = null;
-    if (editorType === "quick") {
-      chosenTab = "quick-edit";
-    } else if (editorType === "advanced") {
-      chosenTab = null;
-    } else {
-      chosenTab = defaultEditor === "drag_drop" ? null : "quick-edit";
-    }
-    navigateToTab(form, chosenTab);
+  const handleEdit = (form) => {
+    navigateToTab(form, null);
   };
 
   const handleCopy = (text, id) => {
@@ -406,7 +380,7 @@ export default function FormsTable({
             onCopy={handleCopy}
             onDelete={onDelete}
             onNavigateTab={navigateToTab}
-            onEdit={(editorType) => handleEdit(form, editorType)}
+            onEdit={() => handleEdit(form)}
           />
         ))}
       </div>

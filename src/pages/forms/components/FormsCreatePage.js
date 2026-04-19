@@ -5,9 +5,6 @@ export default function FormsCreatePage({
   onSubmit,
   onCancel,
   onCreateTabChange,
-  defaultEditor,
-  onSetDefaultEditor,
-  isSavingDefaultEditor,
 }) {
   return (
     <CreateFormView
@@ -16,9 +13,6 @@ export default function FormsCreatePage({
       onCancel={onCancel}
       formId=""
       onTabChange={onCreateTabChange}
-      defaultEditor={defaultEditor}
-      onSetDefaultEditor={onSetDefaultEditor}
-      isSavingDefaultEditor={isSavingDefaultEditor}
     />
   );
 }
