@@ -2,6 +2,42 @@
    Submissions Page
    ============================================================ */
 
+.krefrm-submissions-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  background: #fff;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-submissions-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  color: #1d2327;
+  line-height: 1.2;
+}
+
+.krefrm-submissions-page__subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #646970;
+}
+
+.krefrm-submissions-page__content {
+  padding: 22px;
+}
+
+@media (max-width: 600px) {
+  .krefrm-submissions-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
 /* Submission form cards (list view) */
 .krefrm-submission-form-card {
   border: 0;
@@ -96,6 +132,7 @@
   border: 1px solid #dcdcde;
   border-radius: 4px;
   overflow-x: auto;
+  padding: 20px;
 }
 
 /* View toggle buttons */

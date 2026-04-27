@@ -75,12 +75,14 @@ export default function IntegrationsPage({ route, navigate }) {
       const SubPage = getIntegrationSubPage(subId);
       if (SubPage) {
         return (
-          <SubPage
-            navigate={navigate}
-            route={route}
-            subPath={subRoute.subPath}
-            query={subRoute.query}
-          />
+          <div className="krefrm-integrations-page">
+            <SubPage
+              navigate={navigate}
+              route={route}
+              subPath={subRoute.subPath}
+              query={subRoute.query}
+            />
+          </div>
         );
       }
     }
@@ -104,82 +106,86 @@ export default function IntegrationsPage({ route, navigate }) {
         </div>
       </div>
 
-      {/* Cards grid */}
-      {loading ? (
-        <div className="krefrm-loading">
-          <span>{__("Loading…", "kreebi-forms")}</span>
-        </div>
-      ) : (
-        <div className="krefrm-integrations-cards">
-          {INTEGRATIONS.map((integration) => {
-            const isEnabled = Boolean(enabled[integration.id]);
-            const isPremium = Boolean(integration.isPremium);
+      <div className="krefrm-integrations-page__content">
+        {/* Cards grid */}
+        {loading ? (
+          <div className="krefrm-loading">
+            <span>{__("Loading…", "kreebi-forms")}</span>
+          </div>
+        ) : (
+          <div className="krefrm-integrations-cards">
+            {INTEGRATIONS.map((integration) => {
+              const isEnabled = Boolean(enabled[integration.id]);
+              const isPremium = Boolean(integration.isPremium);
 
-            return (
-              <div
-                key={integration.id}
-                className={`krefrm-integration-card ${
-                  isEnabled ? "is-enabled" : ""
-                } ${isPremium ? "is-premium" : ""}`}
-                {...(isPremium && {
-                  onClick: () => {
-                    window.location.href =
-                      "admin.php?page=krefrm_forms#upgrade-to-pro";
-                  },
-                  style: { cursor: "pointer" },
-                })}
-              >
-                {/* Card header: icon + name + toggle/pro-tag */}
-                <div className="krefrm-integration-card__header">
-                  <div className="krefrm-integration-card__icon">
-                    {integration.icon}
+              return (
+                <div
+                  key={integration.id}
+                  className={`krefrm-integration-card ${
+                    isEnabled ? "is-enabled" : ""
+                  } ${isPremium ? "is-premium" : ""}`}
+                  {...(isPremium && {
+                    onClick: () => {
+                      window.location.href =
+                        "admin.php?page=krefrm_forms#upgrade-to-pro";
+                    },
+                    style: { cursor: "pointer" },
+                  })}
+                >
+                  {/* Card header: icon + name + toggle/pro-tag */}
+                  <div className="krefrm-integration-card__header">
+                    <div className="krefrm-integration-card__icon">
+                      {integration.icon}
+                    </div>
+                    <div className="krefrm-integration-card__name">
+                      {integration.name}
+                    </div>
+                    <div className="krefrm-integration-card__toggle">
+                      {isPremium ? (
+                        <button
+                          className="krefrm-integration-card__pro-button"
+                          onClick={() => {
+                            window.location.href =
+                              "admin.php?page=krefrm_forms#upgrade-to-pro";
+                          }}
+                        >
+                          <ProTag variant="primary" />
+                        </button>
+                      ) : (
+                        <ToggleControl
+                          checked={isEnabled}
+                          onChange={(val) => handleToggle(integration.id, val)}
+                          __nextHasNoMarginBottom
+                        />
+                      )}
+                    </div>
                   </div>
-                  <div className="krefrm-integration-card__name">
-                    {integration.name}
-                  </div>
-                  <div className="krefrm-integration-card__toggle">
-                    {isPremium ? (
-                      <button
-                        className="krefrm-integration-card__pro-button"
-                        onClick={() => {
-                          window.location.href =
-                            "admin.php?page=krefrm_forms#upgrade-to-pro";
-                        }}
+
+                  {/* Description */}
+                  <p className="krefrm-integration-card__desc">
+                    {integration.description}
+                  </p>
+
+                  {/* Settings link — only when enabled (non-premium) */}
+                  {!isPremium && isEnabled && (
+                    <div className="krefrm-integration-card__footer">
+                      <Button
+                        variant="secondary"
+                        className="krefrm-integration-card__settings-btn"
+                        onClick={() =>
+                          navigate(`integrations/${integration.id}`)
+                        }
                       >
-                        <ProTag variant="primary" />
-                      </button>
-                    ) : (
-                      <ToggleControl
-                        checked={isEnabled}
-                        onChange={(val) => handleToggle(integration.id, val)}
-                        __nextHasNoMarginBottom
-                      />
-                    )}
-                  </div>
+                        {__("Settings", "kreebi-forms")}
+                      </Button>
+                    </div>
+                  )}
                 </div>
-
-                {/* Description */}
-                <p className="krefrm-integration-card__desc">
-                  {integration.description}
-                </p>
-
-                {/* Settings link — only when enabled (non-premium) */}
-                {!isPremium && isEnabled && (
-                  <div className="krefrm-integration-card__footer">
-                    <Button
-                      variant="secondary"
-                      className="krefrm-integration-card__settings-btn"
-                      onClick={() => navigate(`integrations/${integration.id}`)}
-                    >
-                      {__("Settings", "kreebi-forms")}
-                    </Button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
+              );
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

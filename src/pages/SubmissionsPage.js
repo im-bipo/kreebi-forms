@@ -165,254 +165,278 @@ export default function SubmissionsPage() {
 
   if (loading) {
     return (
-      <div className="krefrm-loading">
-        <Spinner />
+      <div className="krefrm-submissions-page">
+        <div className="krefrm-submissions-page__content">
+          <div className="krefrm-loading">
+            <Spinner />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div>
-      {error && (
-        <Notice status="error" isDismissible onDismiss={() => setError("")}>
-          {error}
-        </Notice>
-      )}
-      {success && (
-        <Notice status="success" isDismissible onDismiss={() => setSuccess("")}>
-          {success}
-        </Notice>
-      )}
-
-      {/* Main submissions view - show forms list */}
-      {!selectedForm ? (
+    <div className="krefrm-submissions-page">
+      <div className="krefrm-submissions-page__header">
         <div>
-          <h2>{__("Your submissions", "kreebi-forms")}</h2>
-          {formList.length === 0 ? (
-            <p>{__("No submissions yet.", "kreebi-forms")}</p>
-          ) : (
-            <div className="krefrm-forms-grid">
-              {formList.map((form) => (
-                <div key={form.id} className="krefrm-submission-form-card">
-                  <h3 className="krefrm-submission-form-card__title">
-                    {form.name}
-                  </h3>
-                  {form.created && (
-                    <p className="krefrm-submission-form-card__created">
-                      {__("Created:", "kreebi-forms")} {form.created}
-                    </p>
-                  )}
-                  <p className="krefrm-submission-form-card__count">
-                    {form.count}{" "}
-                    {form.count === 1
-                      ? __("Submission", "kreebi-forms")
-                      : __("Submissions", "kreebi-forms")}
-                  </p>
-                  <Button
-                    variant="primary"
-                    onClick={() => setSelectedForm(form.id)}
-                  >
-                    {__("View Submissions", "kreebi-forms")}
-                  </Button>
-                </div>
-              ))}
-            </div>
-          )}
+          <h2 className="krefrm-submissions-page__title">
+            {__("Your submissions", "kreebi-forms")}
+          </h2>
+          <p className="krefrm-submissions-page__subtitle">
+            {__(
+              "Review and manage all form submissions in one place.",
+              "kreebi-forms",
+            )}
+          </p>
         </div>
-      ) : (
-        /* Form detail view - show submissions for selected form */
-        <div>
-          <Button
-            variant="tertiary"
-            onClick={() => setSelectedForm(null)}
-            style={{ marginBottom: "16px" }}
-          >
-            ← {__("Back to Forms", "kreebi-forms")}
-          </Button>
+      </div>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: "16px",
-            }}
+      <div className="krefrm-submissions-page__content">
+        {error && (
+          <Notice status="error" isDismissible onDismiss={() => setError("")}>
+            {error}
+          </Notice>
+        )}
+        {success && (
+          <Notice
+            status="success"
+            isDismissible
+            onDismiss={() => setSuccess("")}
           >
-            {/* View toggle buttons */}
-            {groupedByFormId[selectedForm]?.submissions.length > 0 && (
-              <div
-                className="krefrm-view-toggle"
-                style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
-              >
-                <Button
-                  variant={viewMode === "table" ? "primary" : "secondary"}
-                  onClick={() => setViewMode("table")}
-                >
-                  {__("Table View", "kreebi-forms")}
-                </Button>
-                <Button
-                  variant={viewMode === "card" ? "primary" : "secondary"}
-                  onClick={() => setViewMode("card")}
-                >
-                  {__("Card View", "kreebi-forms")}
-                </Button>
-                <a
-                  href="admin.php?page=krefrm_forms#upgrade-to-pro"
-                  className="components-button components-button--secondary"
-                >
-                  {__("Bulk Actions", "kreebi-forms")} <ProTag />
-                </a>
-                <a
-                  href="admin.php?page=krefrm_forms#upgrade-to-pro"
-                  className="components-button components-button--secondary"
-                >
-                  {__("Export Data", "kreebi-forms")} <ProTag />
-                </a>
-                <a
-                  href="admin.php?page=krefrm_forms#upgrade-to-pro"
-                  className="components-button components-button--secondary"
-                >
-                  {__("Connect to Google Sheet", "kreebi-forms")} <ProTag />
-                </a>
+            {success}
+          </Notice>
+        )}
+
+        {/* Main submissions view - show forms list */}
+        {!selectedForm ? (
+          <div>
+            {formList.length === 0 ? (
+              <p>{__("No submissions yet.", "kreebi-forms")}</p>
+            ) : (
+              <div className="krefrm-forms-grid">
+                {formList.map((form) => (
+                  <div key={form.id} className="krefrm-submission-form-card">
+                    <h3 className="krefrm-submission-form-card__title">
+                      {form.name}
+                    </h3>
+                    {form.created && (
+                      <p className="krefrm-submission-form-card__created">
+                        {__("Created:", "kreebi-forms")} {form.created}
+                      </p>
+                    )}
+                    <p className="krefrm-submission-form-card__count">
+                      {form.count}{" "}
+                      {form.count === 1
+                        ? __("Submission", "kreebi-forms")
+                        : __("Submissions", "kreebi-forms")}
+                    </p>
+                    <Button
+                      variant="primary"
+                      onClick={() => setSelectedForm(form.id)}
+                    >
+                      {__("View Submissions", "kreebi-forms")}
+                    </Button>
+                  </div>
+                ))}
               </div>
             )}
           </div>
+        ) : (
+          /* Form detail view - show submissions for selected form */
+          <div>
+            <Button
+              variant="tertiary"
+              onClick={() => setSelectedForm(null)}
+              style={{ marginBottom: "16px" }}
+            >
+              ← {__("Back to Forms", "kreebi-forms")}
+            </Button>
 
-          {!groupedByFormId[selectedForm] ||
-          groupedByFormId[selectedForm].submissions.length === 0 ? (
-            <p>{__("No submissions found.", "kreebi-forms")}</p>
-          ) : viewMode === "card" ? (
-            /* Card view */
-            groupedByFormId[selectedForm].submissions.map((sub) => (
-              <div key={sub.id} className="krefrm-submission-card">
-                <div className="krefrm-submission-header">
-                  <h3>{sub.title}</h3>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "16px",
+              }}
+            >
+              {/* View toggle buttons */}
+              {groupedByFormId[selectedForm]?.submissions.length > 0 && (
+                <div
+                  className="krefrm-view-toggle"
+                  style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}
+                >
                   <Button
-                    variant="tertiary"
-                    isSmall
-                    isDestructive
-                    onClick={() => openConfirm(sub.id)}
+                    variant={viewMode === "table" ? "primary" : "secondary"}
+                    onClick={() => setViewMode("table")}
                   >
-                    {__("Delete", "kreebi-forms")}
+                    {__("Table View", "kreebi-forms")}
                   </Button>
+                  <Button
+                    variant={viewMode === "card" ? "primary" : "secondary"}
+                    onClick={() => setViewMode("card")}
+                  >
+                    {__("Card View", "kreebi-forms")}
+                  </Button>
+                  <a
+                    href="admin.php?page=krefrm_forms#upgrade-to-pro"
+                    className="components-button components-button--secondary"
+                  >
+                    {__("Bulk Actions", "kreebi-forms")} <ProTag />
+                  </a>
+                  <a
+                    href="admin.php?page=krefrm_forms#upgrade-to-pro"
+                    className="components-button components-button--secondary"
+                  >
+                    {__("Export Data", "kreebi-forms")} <ProTag />
+                  </a>
+                  <a
+                    href="admin.php?page=krefrm_forms#upgrade-to-pro"
+                    className="components-button components-button--secondary"
+                  >
+                    {__("Connect to Google Sheet", "kreebi-forms")} <ProTag />
+                  </a>
                 </div>
-                <p>
-                  <strong>{__("Submitted:", "kreebi-forms")}</strong> {sub.date}
-                </p>
+              )}
+            </div>
 
-                {Object.keys(sub.data).length > 0 ? (
-                  <table className="widefat fixed striped krefrm-submission-data-table">
-                    <thead>
-                      <tr>
-                        <th>{__("Field", "kreebi-forms")}</th>
-                        <th>{__("Value", "kreebi-forms")}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(sub.data).map(([key, value]) => (
-                        <tr key={key}>
-                          <td>
+            {!groupedByFormId[selectedForm] ||
+            groupedByFormId[selectedForm].submissions.length === 0 ? (
+              <p>{__("No submissions found.", "kreebi-forms")}</p>
+            ) : viewMode === "card" ? (
+              /* Card view */
+              groupedByFormId[selectedForm].submissions.map((sub) => (
+                <div key={sub.id} className="krefrm-submission-card">
+                  <div className="krefrm-submission-header">
+                    <h3>{sub.title}</h3>
+                    <Button
+                      variant="tertiary"
+                      isSmall
+                      isDestructive
+                      onClick={() => openConfirm(sub.id)}
+                    >
+                      {__("Delete", "kreebi-forms")}
+                    </Button>
+                  </div>
+                  <p>
+                    <strong>{__("Submitted:", "kreebi-forms")}</strong>{" "}
+                    {sub.date}
+                  </p>
+
+                  {Object.keys(sub.data).length > 0 ? (
+                    <table className="widefat fixed striped krefrm-submission-data-table">
+                      <thead>
+                        <tr>
+                          <th>{__("Field", "kreebi-forms")}</th>
+                          <th>{__("Value", "kreebi-forms")}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(sub.data).map(([key, value]) => (
+                          <tr key={key}>
+                            <td>
+                              {key
+                                .replace(/_/g, " ")
+                                .replace(/\b\w/g, (c) => c.toUpperCase())}
+                            </td>
+                            <td>{value}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <p>{__("No data submitted.", "kreebi-forms")}</p>
+                  )}
+                </div>
+              ))
+            ) : (
+              /* Table view */
+              <div className="krefrm-submissions-table-wrapper">
+                <table className="widefat striped krefrm-submissions-list-table">
+                  <thead>
+                    <tr>
+                      <th>{__("Submitted", "kreebi-forms")}</th>
+                      {/* Dynamically add field headers from first submission */}
+                      {groupedByFormId[selectedForm]?.submissions[0]?.data &&
+                        Object.keys(
+                          groupedByFormId[selectedForm].submissions[0].data,
+                        ).map((key) => (
+                          <th key={key}>
                             {key
                               .replace(/_/g, " ")
                               .replace(/\b\w/g, (c) => c.toUpperCase())}
-                          </td>
-                          <td>{value}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                ) : (
-                  <p>{__("No data submitted.", "kreebi-forms")}</p>
-                )}
-              </div>
-            ))
-          ) : (
-            /* Table view */
-            <div className="krefrm-submissions-table-wrapper">
-              <table className="widefat striped krefrm-submissions-list-table">
-                <thead>
-                  <tr>
-                    <th>{__("Submitted", "kreebi-forms")}</th>
-                    {/* Dynamically add field headers from first submission */}
-                    {groupedByFormId[selectedForm]?.submissions[0]?.data &&
-                      Object.keys(
-                        groupedByFormId[selectedForm].submissions[0].data,
-                      ).map((key) => (
-                        <th key={key}>
-                          {key
-                            .replace(/_/g, " ")
-                            .replace(/\b\w/g, (c) => c.toUpperCase())}
-                        </th>
-                      ))}
-                    <th>{__("Action", "kreebi-forms")}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {groupedByFormId[selectedForm]?.submissions.map((sub) => (
-                    <tr key={sub.id}>
-                      <td>{sub.date}</td>
-                      {Object.keys(
-                        groupedByFormId[selectedForm]?.submissions[0]?.data ||
-                          {},
-                      ).map((key) => (
-                        <td key={key}>{sub.data[key] || "—"}</td>
-                      ))}
-                      <td>
-                        <Button
-                          variant="tertiary"
-                          isSmall
-                          isDestructive
-                          onClick={() => openConfirm(sub.id)}
-                        >
-                          {__("Delete", "kreebi-forms")}
-                        </Button>
-                      </td>
+                          </th>
+                        ))}
+                      <th>{__("Action", "kreebi-forms")}</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* confirmation modal (avoids browser dialog suppression) */}
-      {confirmDialog.open && (
-        <Modal
-          title={
-            confirmDialog.bulk
-              ? __("Delete selected submissions?", "kreebi-forms")
-              : __("Delete this submission?", "kreebi-forms")
-          }
-          onRequestClose={closeConfirm}
-          shouldCloseOnClickOutside={false}
-        >
-          <p>{__("This action cannot be undone.", "kreebi-forms")}</p>
-          <div style={{ marginTop: 20, textAlign: "right" }}>
-            <Button
-              variant="secondary"
-              onClick={closeConfirm}
-              style={{ marginRight: 8 }}
-            >
-              {__("Cancel", "kreebi-forms")}
-            </Button>
-            <Button
-              variant="primary"
-              isDestructive
-              onClick={async () => {
-                closeConfirm();
-                if (confirmDialog.bulk) {
-                  await performBulkDelete();
-                } else if (confirmDialog.id) {
-                  await handleDelete(confirmDialog.id);
-                }
-              }}
-            >
-              {__("Yes, delete", "kreebi-forms")}
-            </Button>
+                  </thead>
+                  <tbody>
+                    {groupedByFormId[selectedForm]?.submissions.map((sub) => (
+                      <tr key={sub.id}>
+                        <td>{sub.date}</td>
+                        {Object.keys(
+                          groupedByFormId[selectedForm]?.submissions[0]?.data ||
+                            {},
+                        ).map((key) => (
+                          <td key={key}>{sub.data[key] || "—"}</td>
+                        ))}
+                        <td>
+                          <Button
+                            variant="tertiary"
+                            isSmall
+                            isDestructive
+                            onClick={() => openConfirm(sub.id)}
+                          >
+                            {__("Delete", "kreebi-forms")}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
-        </Modal>
-      )}
+        )}
+
+        {/* confirmation modal (avoids browser dialog suppression) */}
+        {confirmDialog.open && (
+          <Modal
+            title={
+              confirmDialog.bulk
+                ? __("Delete selected submissions?", "kreebi-forms")
+                : __("Delete this submission?", "kreebi-forms")
+            }
+            onRequestClose={closeConfirm}
+            shouldCloseOnClickOutside={false}
+          >
+            <p>{__("This action cannot be undone.", "kreebi-forms")}</p>
+            <div style={{ marginTop: 20, textAlign: "right" }}>
+              <Button
+                variant="secondary"
+                onClick={closeConfirm}
+                style={{ marginRight: 8 }}
+              >
+                {__("Cancel", "kreebi-forms")}
+              </Button>
+              <Button
+                variant="primary"
+                isDestructive
+                onClick={async () => {
+                  closeConfirm();
+                  if (confirmDialog.bulk) {
+                    await performBulkDelete();
+                  } else if (confirmDialog.id) {
+                    await handleDelete(confirmDialog.id);
+                  }
+                }}
+              >
+                {__("Yes, delete", "kreebi-forms")}
+              </Button>
+            </div>
+          </Modal>
+        )}
+      </div>
     </div>
   );
 }

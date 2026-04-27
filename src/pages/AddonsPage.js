@@ -238,50 +238,52 @@ export default function AddonsPage() {
         </p>
       </header>
 
-      {error && <p className="krefrm-error">{error}</p>}
+      <div className="krefrm-addons-page__content">
+        {error && <p className="krefrm-error">{error}</p>}
 
-      {loading && (
-        <div className="krefrm-addons-skeleton-grid" aria-hidden="true">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="krefrm-addon-skeleton-card">
-              <div className="krefrm-addon-skeleton-card__top">
-                <div className="krefrm-addon-skeleton-card__icon" />
-                <div className="krefrm-addon-skeleton-card__content">
-                  <div className="krefrm-addon-skeleton-card__line is-title" />
-                  <div className="krefrm-addon-skeleton-card__line" />
-                  <div className="krefrm-addon-skeleton-card__line" />
-                  <div className="krefrm-addon-skeleton-card__line is-small" />
+        {loading && (
+          <div className="krefrm-addons-skeleton-grid" aria-hidden="true">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <div key={index} className="krefrm-addon-skeleton-card">
+                <div className="krefrm-addon-skeleton-card__top">
+                  <div className="krefrm-addon-skeleton-card__icon" />
+                  <div className="krefrm-addon-skeleton-card__content">
+                    <div className="krefrm-addon-skeleton-card__line is-title" />
+                    <div className="krefrm-addon-skeleton-card__line" />
+                    <div className="krefrm-addon-skeleton-card__line" />
+                    <div className="krefrm-addon-skeleton-card__line is-small" />
+                  </div>
                 </div>
+                <div className="krefrm-addon-skeleton-card__meta" />
               </div>
-              <div className="krefrm-addon-skeleton-card__meta" />
-            </div>
-          ))}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
-      {!loading && (
-        <div className="krefrm-addons-sections">
-          {renderSection(
-            __("Installed Addons", "kreebi-forms"),
-            __(
-              "These addons are active and ready to configure.",
-              "kreebi-forms",
-            ),
-            installedAddons,
-            "is-installed",
-          )}
+        {!loading && (
+          <div className="krefrm-addons-sections">
+            {renderSection(
+              __("Installed Addons", "kreebi-forms"),
+              __(
+                "These addons are active and ready to configure.",
+                "kreebi-forms",
+              ),
+              installedAddons,
+              "is-installed",
+            )}
 
-          {renderSection(
-            __("Available Addons", "kreebi-forms"),
-            __(
-              "Install these addons to unlock additional capabilities.",
-              "kreebi-forms",
-            ),
-            notInstalledAddons,
-            "is-available",
-          )}
-        </div>
-      )}
+            {renderSection(
+              __("Available Addons", "kreebi-forms"),
+              __(
+                "Install these addons to unlock additional capabilities.",
+                "kreebi-forms",
+              ),
+              notInstalledAddons,
+              "is-available",
+            )}
+          </div>
+        )}
+      </div>
     </section>
   );
 }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
-import { Spinner } from "@wordpress/components";
+import { Button, Spinner } from "@wordpress/components";
 import FormsTable from "../components/FormsTable";
 import FormsCreatePage from "./forms/components/FormsCreatePage";
 import FormsEditPage from "./forms/components/FormsEditPage";
@@ -216,8 +216,12 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
 
   if (loading) {
     return (
-      <div className="krefrm-loading">
-        <Spinner />
+      <div className="krefrm-forms-page">
+        <div className="krefrm-forms-page__content">
+          <div className="krefrm-loading">
+            <Spinner />
+          </div>
+        </div>
       </div>
     );
   }
@@ -225,32 +229,40 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   /* ─── Advance form builder (create) ─── */
   if (showCreatePage) {
     return (
-      <FormsCreatePage
-        initialData={templateData || {}}
-        onSubmit={handleCreate}
-        onCancel={() => {
-          navigate("form");
-          setTemplateData(null);
-        }}
-        onCreateTabChange={(tabName) => {
-          createTabRef.current = tabName;
-        }}
-      />
+      <div className="krefrm-forms-page">
+        <div className="krefrm-forms-page__content">
+          <FormsCreatePage
+            initialData={templateData || {}}
+            onSubmit={handleCreate}
+            onCancel={() => {
+              navigate("form");
+              setTemplateData(null);
+            }}
+            onCreateTabChange={(tabName) => {
+              createTabRef.current = tabName;
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
   /* ─── Advance form builder (edit) ─── */
   if (showEditPage) {
     return (
-      <FormsEditPage
-        loading={loading}
-        initialData={editFormData}
-        onSubmit={handleUpdate}
-        onCancel={() => navigate("form")}
-        formId={currentFormId}
-        initialTab={currentTab}
-        onTabChange={handleTabChange}
-      />
+      <div className="krefrm-forms-page">
+        <div className="krefrm-forms-page__content">
+          <FormsEditPage
+            loading={loading}
+            initialData={editFormData}
+            onSubmit={handleUpdate}
+            onCancel={() => navigate("form")}
+            formId={currentFormId}
+            initialTab={currentTab}
+            onTabChange={handleTabChange}
+          />
+        </div>
+      </div>
     );
   }
 
@@ -263,26 +275,42 @@ export default function FormsPage({ route = "form", navigate = () => {} }) {
   };
 
   return (
-    <div>
-      <FormsTable
-        forms={forms}
-        navigate={navigate}
-        onDelete={handleDelete}
-        onCreateNew={() => setShowPicker(true)}
-      />
+    <div className="krefrm-forms-page">
+      <div className="krefrm-forms-page__header">
+        <div>
+          <h2 className="krefrm-forms-page__title">
+            {__("Your forms", "kreebi-forms")}
+          </h2>
+          <p className="krefrm-forms-page__subtitle">
+            {__("Manage, edit, and reuse your forms quickly.", "kreebi-forms")}
+          </p>
+        </div>
 
-      <TemplatePickerModal
-        isOpen={showPicker}
-        onClose={() => setShowPicker(false)}
-        onPickTemplate={handlePickTemplate}
-      />
+        <Button
+          variant="primary"
+          onClick={() => setShowPicker(true)}
+          className="krefrm-create-btn"
+        >
+          {__("Create new form", "kreebi-forms")}
+        </Button>
+      </div>
 
-      <DeleteFormModal
-        deleteTarget={deleteTarget}
-        onClose={() => setDeleteTarget(null)}
-        onForceDelete={handleForceDelete}
-        isDeleting={isDeleting}
-      />
+      <div className="krefrm-forms-page__content">
+        <FormsTable forms={forms} navigate={navigate} onDelete={handleDelete} />
+
+        <TemplatePickerModal
+          isOpen={showPicker}
+          onClose={() => setShowPicker(false)}
+          onPickTemplate={handlePickTemplate}
+        />
+
+        <DeleteFormModal
+          deleteTarget={deleteTarget}
+          onClose={() => setDeleteTarget(null)}
+          onForceDelete={handleForceDelete}
+          isDeleting={isDeleting}
+        />
+      </div>
     </div>
   );
 }

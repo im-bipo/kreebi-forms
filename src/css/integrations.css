@@ -13,12 +13,14 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 24px;
   background: #fff;
   border: 0;
-  border-radius: 16px;
   padding: 22px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-integrations-page__content {
+  padding: 22px;
 }
 
 .krefrm-integrations-page__title {
@@ -163,10 +165,14 @@
 .krefrm-integration-settings__header {
   background: #fff;
   border: 0;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 22px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-integration-settings__content {
+  padding: 22px;
 }
 
 .krefrm-integration-settings__back.components-button {
@@ -226,7 +232,7 @@
 .krefrm-integration-settings__body {
   background: #fff;
   border: 0;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 22px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
   display: flex;

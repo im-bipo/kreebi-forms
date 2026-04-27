@@ -34,6 +34,7 @@ export default function JsonViewGlobalSettings({ navigate }) {
         </p>
       </div>
 
+      <div className="krefrm-integration-settings__content">
       <div className="krefrm-integration-settings__body krefrm-integration-info">
         <div className="krefrm-integration-info__block">
           <h3 className="krefrm-integration-info__heading">
@@ -79,6 +80,7 @@ export default function JsonViewGlobalSettings({ navigate }) {
             "kreebi-forms",
           )}
         </p>
+      </div>
       </div>
     </div>
   );

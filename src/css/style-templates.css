@@ -13,11 +13,13 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 18px;
-  margin-bottom: 24px;
   background: #fff;
-  border-radius: 16px;
   padding: 22px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-stl-page__content {
+  padding: 22px;
 }
 
 .krefrm-stl-page__title {
@@ -282,17 +284,31 @@
   margin-top: 32px;
 }
 
-.krefrm-stl-preview-section__title {
-  margin: 0 0 4px;
+.krefrm-stl-preview-section__title,
+.krefrm-custom-css-section__title,
+.krefrm-stl-page__title {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: block;
   font-size: 18px;
   font-weight: 700;
   color: #1d2327;
 }
 
-.krefrm-stl-preview-section__subtitle {
-  margin: 0 0 16px;
+.krefrm-stl-preview-section__subtitle,
+.krefrm-custom-css-section__subtitle,
+.krefrm-stl-page__subtitle {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  display: block;
   font-size: 14px;
   color: #666;
+}
+
+.krefrm-stl-preview-section__subtitle {
+  margin-bottom: 16px;
 }
 
 .krefrm-stl-preview-wrap {

@@ -356,152 +356,158 @@ export default function StyleTemplatePage() {
         </div>
       </div>
 
-      {/* Template Cards */}
-      <div className="krefrm-stl-cards">
-        {TEMPLATES.map((tpl) => {
-          const isSelected = activeTemplate === tpl.id;
-          const isPremiumCard = Boolean(tpl.isPremium);
-          return (
-            <button
-              key={tpl.id}
-              type="button"
-              className={`krefrm-stl-card ${isSelected ? "is-selected" : ""} ${
-                isPremiumCard ? "is-premium" : ""
-              }`}
-              onClick={() => handleCardClick(tpl)}
-            >
-              {isPremiumCard && (
-                <span className="krefrm-stl-card__pro-badge">
-                  <ProTag variant="secondary">Pro</ProTag>
-                </span>
-              )}
-
-              {/* Mini thumbnail */}
-              <div className={`krefrm-stl-card__thumb ${tpl.previewClass}`}>
-                {isPremiumCard ? (
-                  <div
-                    className="krefrm-stl-thumb__premium-lock"
-                    role="img"
-                    aria-label="Premium"
-                  >
-                    <svg viewBox="0 0 64 64" aria-hidden="true">
-                      <rect
-                        x="16"
-                        y="28"
-                        width="32"
-                        height="24"
-                        rx="3"
-                        ry="3"
-                      />
-                      <path d="M22 28v-6a10 10 0 0 1 20 0v6" />
-                      <circle cx="32" cy="34" r="4" />
-                    </svg>
-                  </div>
-                ) : (
-                  <>
-                    <div className="krefrm-stl-thumb__field">
-                      <div className="krefrm-stl-thumb__label" />
-                      <div className="krefrm-stl-thumb__input" />
-                    </div>
-                    <div className="krefrm-stl-thumb__field">
-                      <div className="krefrm-stl-thumb__label" />
-                      <div className="krefrm-stl-thumb__input" />
-                    </div>
-                    <div className="krefrm-stl-thumb__btn" />
-                  </>
+      <div className="krefrm-stl-page__content">
+        {/* Template Cards */}
+        <div className="krefrm-stl-cards">
+          {TEMPLATES.map((tpl) => {
+            const isSelected = activeTemplate === tpl.id;
+            const isPremiumCard = Boolean(tpl.isPremium);
+            return (
+              <button
+                key={tpl.id}
+                type="button"
+                className={`krefrm-stl-card ${
+                  isSelected ? "is-selected" : ""
+                } ${isPremiumCard ? "is-premium" : ""}`}
+                onClick={() => handleCardClick(tpl)}
+              >
+                {isPremiumCard && (
+                  <span className="krefrm-stl-card__pro-badge">
+                    <ProTag variant="secondary">Pro</ProTag>
+                  </span>
                 )}
-              </div>
 
-              <div className="krefrm-stl-card__body">
-                <span className="krefrm-stl-card__name">{tpl.label}</span>
-                <span className="krefrm-stl-card__desc">{tpl.description}</span>
-              </div>
+                {/* Mini thumbnail */}
+                <div className={`krefrm-stl-card__thumb ${tpl.previewClass}`}>
+                  {isPremiumCard ? (
+                    <div
+                      className="krefrm-stl-thumb__premium-lock"
+                      role="img"
+                      aria-label="Premium"
+                    >
+                      <svg viewBox="0 0 64 64" aria-hidden="true">
+                        <rect
+                          x="16"
+                          y="28"
+                          width="32"
+                          height="24"
+                          rx="3"
+                          ry="3"
+                        />
+                        <path d="M22 28v-6a10 10 0 0 1 20 0v6" />
+                        <circle cx="32" cy="34" r="4" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="krefrm-stl-thumb__field">
+                        <div className="krefrm-stl-thumb__label" />
+                        <div className="krefrm-stl-thumb__input" />
+                      </div>
+                      <div className="krefrm-stl-thumb__field">
+                        <div className="krefrm-stl-thumb__label" />
+                        <div className="krefrm-stl-thumb__input" />
+                      </div>
+                      <div className="krefrm-stl-thumb__btn" />
+                    </>
+                  )}
+                </div>
 
-              {isSelected && !isPremiumCard && (
-                <span className="krefrm-stl-card__check" aria-hidden="true">
-                  ✓
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </div>
+                <div className="krefrm-stl-card__body">
+                  <span className="krefrm-stl-card__name">{tpl.label}</span>
+                  <span className="krefrm-stl-card__desc">
+                    {tpl.description}
+                  </span>
+                </div>
 
-      <div className="krefrm-stl-preview-custom-grid">
-        {/* Live Preview */}
-        <div className="krefrm-stl-preview-section">
-          <h3 className="krefrm-stl-preview-section__title">
-            {__("Live Preview", "kreebi-forms")}
-          </h3>
-          <p className="krefrm-stl-preview-section__subtitle">
-            {__(
-              "See how your forms will look with the selected template.",
-              "kreebi-forms",
-            )}
-          </p>
-
-          <div className="krefrm-stl-preview-wrap">
-            <LivePreview
-              key={previewKey}
-              templateId={activeTemplate}
-              customCss={customCSS}
-            />
-          </div>
+                {isSelected && !isPremiumCard && (
+                  <span className="krefrm-stl-card__check" aria-hidden="true">
+                    ✓
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
-        {/* Custom CSS Section */}
-        <div className="krefrm-custom-css-section">
-          <h3 className="krefrm-custom-css-section__title">
-            {__("Custom CSS", "kreebi-forms")}
-          </h3>
-          <p className="krefrm-custom-css-section__subtitle">
-            {__(
-              "Add additional CSS to customize your forms. Your CSS will be isolated within the Shadow DOM.",
-              "kreebi-forms",
-            )}
-          </p>
-
-          <div className="krefrm-custom-css-editor">
-            <textarea
-              className="krefrm-custom-css-textarea"
-              value={customCSS}
-              onChange={(e) => {
-                setCustomCSS(e.target.value);
-                setCssError("");
-              }}
-              placeholder={__(
-                "/* Example:\n.krefrm-frontend-form {\n  max-width: 600px;\n  margin: 0 auto;\n}\n*/",
+        <div className="krefrm-stl-preview-custom-grid">
+          {/* Live Preview */}
+          <div className="krefrm-stl-preview-section">
+            <h3 className="krefrm-stl-preview-section__title">
+              {__("Live Preview", "kreebi-forms")}
+            </h3>
+            <p className="krefrm-stl-preview-section__subtitle">
+              {__(
+                "See how your forms will look with the selected template.",
                 "kreebi-forms",
               )}
-              rows="12"
-            />
+            </p>
 
-            {cssError && (
-              <div className="krefrm-custom-css-error">
-                <strong>{__("CSS Error:", "kreebi-forms")}</strong> {cssError}
-              </div>
-            )}
+            <div className="krefrm-stl-preview-wrap">
+              <LivePreview
+                key={previewKey}
+                templateId={activeTemplate}
+                customCss={customCSS}
+              />
+            </div>
+          </div>
 
-            {cssSaveMessage && (
-              <div className="krefrm-custom-css-success">{cssSaveMessage}</div>
-            )}
+          {/* Custom CSS Section */}
+          <div className="krefrm-custom-css-section">
+            <h3 className="krefrm-custom-css-section__title">
+              {__("Custom CSS", "kreebi-forms")}
+            </h3>
+            <p className="krefrm-custom-css-section__subtitle">
+              {__(
+                "Add additional CSS to customize your forms. Your CSS will be isolated within the Shadow DOM.",
+                "kreebi-forms",
+              )}
+            </p>
 
-            <div className="krefrm-custom-css-actions">
-              <Button
-                variant="primary"
-                onClick={handleSaveCustomCSS}
-                disabled={cssSaving}
-              >
-                {cssSaving
-                  ? __("Saving…", "kreebi-forms")
-                  : __("Save Custom CSS", "kreebi-forms")}
-              </Button>
-              <p className="krefrm-custom-css-help">
-                {__(
-                  "Tip: CSS will be validated before saving. Only valid CSS and comments are allowed.",
+            <div className="krefrm-custom-css-editor">
+              <textarea
+                className="krefrm-custom-css-textarea"
+                value={customCSS}
+                onChange={(e) => {
+                  setCustomCSS(e.target.value);
+                  setCssError("");
+                }}
+                placeholder={__(
+                  "/* Example:\n.krefrm-frontend-form {\n  max-width: 600px;\n  margin: 0 auto;\n}\n*/",
                   "kreebi-forms",
                 )}
-              </p>
+                rows="12"
+              />
+
+              {cssError && (
+                <div className="krefrm-custom-css-error">
+                  <strong>{__("CSS Error:", "kreebi-forms")}</strong> {cssError}
+                </div>
+              )}
+
+              {cssSaveMessage && (
+                <div className="krefrm-custom-css-success">
+                  {cssSaveMessage}
+                </div>
+              )}
+
+              <div className="krefrm-custom-css-actions">
+                <Button
+                  variant="primary"
+                  onClick={handleSaveCustomCSS}
+                  disabled={cssSaving}
+                >
+                  {cssSaving
+                    ? __("Saving…", "kreebi-forms")
+                    : __("Save Custom CSS", "kreebi-forms")}
+                </Button>
+                <p className="krefrm-custom-css-help">
+                  {__(
+                    "Tip: CSS will be validated before saving. Only valid CSS and comments are allowed.",
+                    "kreebi-forms",
+                  )}
+                </p>
+              </div>
             </div>
           </div>
         </div>

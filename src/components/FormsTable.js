@@ -252,7 +252,7 @@ const DEFAULT_ENABLED_INTEGRATIONS = Object.fromEntries(
   DEFAULT_ENABLED.map((id) => [id, true]),
 );
 
-export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
+export default function FormsTable({ forms, navigate, onDelete }) {
   const [copiedId, setCopiedId] = useState(null);
   const [enabledIntegrations, setEnabledIntegrations] = useState(
     DEFAULT_ENABLED_INTEGRATIONS,
@@ -321,21 +321,6 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
   if (forms.length === 0) {
     return (
       <div className="krefrm-forms-section krefrm-forms-section--empty">
-        <div className="krefrm-section-head krefrm-section-head--empty">
-          <div className="krefrm-section-head__title">
-            <h2>{__("Your forms", "kreebi-forms")}</h2>
-            <p>{__("No forms yet. Create your first form.", "kreebi-forms")}</p>
-          </div>
-
-          <Button
-            variant="primary"
-            onClick={onCreateNew}
-            className="krefrm-create-btn"
-          >
-            {__("Create new form", "kreebi-forms")}
-          </Button>
-        </div>
-
         <div className="krefrm-empty-state">
           <h3 className="krefrm-empty-state__title">
             {__("No Forms Available", "kreebi-forms")}
@@ -353,23 +338,6 @@ export default function FormsTable({ forms, navigate, onDelete, onCreateNew }) {
 
   return (
     <div className="krefrm-forms-section">
-      <div className="krefrm-section-head">
-        <div className="krefrm-section-head__title">
-          <h2>{__("Your forms", "kreebi-forms")}</h2>
-          <p>
-            {__("Manage, edit, and reuse your forms quickly.", "kreebi-forms")}
-          </p>
-        </div>
-
-        <Button
-          variant="primary"
-          onClick={onCreateNew}
-          className="krefrm-create-btn"
-        >
-          {__("Create new form", "kreebi-forms")}
-        </Button>
-      </div>
-
       <div className="krefrm-forms-grid">
         {forms.map((form) => (
           <FormCard

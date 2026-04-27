@@ -3,8 +3,25 @@
    ============================================================ */
 
 .krefrm-app {
-  margin: 0 auto;
-  padding-right: 16px;
+  margin: 0;
+  padding: 0;
+}
+
+.krefrm-page-shell {
+  background: #f4f7fb;
+}
+
+.krefrm-page-content {
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* Remove WP admin content gutter on this screen only. */
+body.toplevel_page_krefrm_forms #wpcontent,
+body.toplevel_page_krefrm_forms #wpbody-content {
+  padding-left: 0;
 }
 
 /* Loading */

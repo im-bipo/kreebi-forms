@@ -44,6 +44,7 @@ export default function EmailTemplateStyleEditor({
         </div>
       </div>
 
+      <div className="krefrm-integration-settings__content">
       <div
         style={{
           display: "grid",
@@ -327,6 +328,7 @@ export default function EmailTemplateStyleEditor({
             </div>
           </BaseControl>
         </div>
+      </div>
       </div>
     </div>
   );

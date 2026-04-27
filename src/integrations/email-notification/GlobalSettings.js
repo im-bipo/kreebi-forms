@@ -160,6 +160,7 @@ export default function EmailNotificationGlobalSettings({
         </p>
       </div>
 
+      <div className="krefrm-integration-settings__content">
       <div className="krefrm-integration-settings__body">
         <div className="krefrm-integration-settings__field">
           <TextControl
@@ -244,6 +245,7 @@ export default function EmailNotificationGlobalSettings({
             </div>
           </BaseControl>
         </div>
+      </div>
       </div>
     </div>
   );

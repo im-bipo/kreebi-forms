@@ -77,6 +77,7 @@ export default function WebhookGlobalSettings({ navigate }) {
         </p>
       </div>
 
+      <div className="krefrm-integration-settings__content">
       <div className="krefrm-integration-settings__body">
         <div className="krefrm-webhook-info">
           <h3>{__("What is a Webhook?", "kreebi-forms")}</h3>
@@ -121,6 +122,7 @@ export default function WebhookGlobalSettings({ navigate }) {
           onClear={handleClearLogs}
           title={__("All Webhook Logs", "kreebi-forms")}
         />
+      </div>
       </div>
     </div>
   );

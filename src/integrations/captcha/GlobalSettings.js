@@ -325,6 +325,7 @@ export default function CaptchaGlobalSettings({ navigate }) {
         )}
       </div>
 
+      <div className="krefrm-integration-settings__content">
       <div className="krefrm-integration-settings__body">
         <div className="krefrm-integration-settings__field">
           <ToggleControl
@@ -415,6 +416,7 @@ export default function CaptchaGlobalSettings({ navigate }) {
             </div>
           </>
         ) : null}
+      </div>
       </div>
     </div>
   );

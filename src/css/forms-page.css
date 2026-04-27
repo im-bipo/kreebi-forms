@@ -2,13 +2,45 @@
    Forms Page
    ============================================================ */
 
+.krefrm-forms-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  background: #fff;
+  padding: 22px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+.krefrm-forms-page__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 650;
+  color: #1d2327;
+  line-height: 1.2;
+}
+
+.krefrm-forms-page__subtitle {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: #646970;
+}
+
+.krefrm-forms-page__content {
+  padding: 22px;
+}
+
+.krefrm-forms-section--empty {
+  display: block;
+}
+
 /* ─── Create Section ─── */
 
 .krefrm-create-section {
   margin-bottom: 20px;
   background: #fff;
   border: 0;
-  border-radius: 16px;
+  border-radius: 0;
   padding: 22px;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
 }
@@ -150,22 +182,6 @@
 }
 
 /* ─── Forms Section ─── */
-
-.krefrm-forms-section {
-  margin-block: 4px;
-  background: #fff;
-  border: 0;
-  border-radius: 16px;
-  padding: 22px;
-  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-}
-
-.krefrm-forms-section--empty {
-  display: block;
-  background: #fff;
-  border-radius: 16px;
-  padding: 22px;
-}
 
 .krefrm-section-head--empty {
   margin-bottom: 22px;
@@ -1323,6 +1339,16 @@
 }
 
 @media (max-width: 600px) {
+  .krefrm-forms-page__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .krefrm-forms-page__header .krefrm-create-btn {
+    align-self: stretch;
+  }
+
   .krefrm-section-head h2 {
     font-size: 18px;
   }

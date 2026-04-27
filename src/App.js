@@ -57,10 +57,10 @@ export default function App() {
 
   return (
     <ToastProvider>
-      <div className="wrap krefrm-app">
+      <div className="krefrm-app">
         {showHeader && <PageHeader route={route} navigate={navigate} />}
 
-        <div id={pageId} className="krefrm-page-content">
+        <div id={pageId} className="krefrm-page-shell krefrm-page-content">
           {route === "dashboard" && <div id="krefrm-dashboard-root" />}
           {route.startsWith("form") && (
             <FormsPage route={route} navigate={navigate} />
