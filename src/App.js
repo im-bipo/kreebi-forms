@@ -1,10 +1,10 @@
 import { useState, useEffect } from "@wordpress/element";
-import FormsPage from "./pages/FormsPage";
-import SubmissionsPage from "./pages/SubmissionsPage";
-import StyleTemplatePage from "./pages/StyleTemplatePage";
-import IntegrationsPage from "./pages/IntegrationsPage";
-import AddonsPage from "./pages/AddonsPage";
-import UpgradePage from "./pages/UpgradePage";
+import FormsPage from "./pages/forms/FormsPage";
+import SubmissionsPage from "./pages/submissions/SubmissionsPage";
+import StyleTemplatePage from "./pages/styles/StyleTemplatePage";
+import IntegrationsPage from "./pages/integrations/IntegrationsPage";
+import AddonsPage from "./pages/addons/AddonsPage";
+import UpgradePage from "./pages/upgrade/UpgradePage";
 import PageHeader from "./components/header/PageHeader";
 import { ToastProvider } from "./components/Toast";
 import "./style.css";

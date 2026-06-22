@@ -323,22 +323,6 @@ export default function FormBuilder({
 
   return (
     <div className="krefrm-builder">
-      {view === "visual" && (
-        <div className="krefrm-builder-editor-header">
-          <div>
-            <h2 className="krefrm-builder-editor-header__title">
-              {__("Drag & Drop Editor", "kreebi-forms")}
-            </h2>
-            <p className="krefrm-builder-editor-header__subtitle">
-              {__(
-                "Build your form visually with full drag-and-drop control.",
-                "kreebi-forms",
-              )}
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* ─── Top bar ─── */}
       <div className="krefrm-builder__topbar">
         <div className="krefrm-builder__toggle">

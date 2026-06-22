@@ -5,9 +5,9 @@
 import { useState, useEffect } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { ToggleControl, Button } from "@wordpress/components";
-import ProTag from "../components/ProTag";
-import { getIntegration } from "../integrations/registry";
-import { INTEGRATIONS, DEFAULT_ENABLED } from "../integrations/definitions";
+import ProTag from "../../components/ProTag";
+import { getIntegration } from "../../integrations/registry";
+import { INTEGRATIONS, DEFAULT_ENABLED } from "../../integrations/definitions";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
 

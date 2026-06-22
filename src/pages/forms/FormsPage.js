@@ -2,18 +2,18 @@ import { useState, useEffect, useCallback, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
 import { Button, Spinner } from "@wordpress/components";
-import FormsTable from "../components/FormsTable";
-import FormsCreatePage from "./forms/components/FormsCreatePage";
-import FormsEditPage from "./forms/components/FormsEditPage";
-import TemplatePickerModal from "./forms/components/TemplatePickerModal";
-import DeleteFormModal from "./forms/components/DeleteFormModal";
+import FormsTable from "../../components/FormsTable";
+import FormsCreatePage from "./for../../components/FormsCreatePage";
+import FormsEditPage from "./for../../components/FormsEditPage";
+import TemplatePickerModal from "./for../../components/TemplatePickerModal";
+import DeleteFormModal from "./for../../components/DeleteFormModal";
 import {
   getPostIdFromRoute,
   getPublicFormIdFromRoute,
   getTabFromRoute,
   buildEditRouteForCreatedForm,
-} from "./forms/route-helpers";
-import { useToast } from "../components/Toast";
+} from "./route-helpers";
+import { useToast } from "../../components/Toast";
 
 export default function FormsPage({ route = "form", navigate = () => {} }) {
   const [forms, setForms] = useState([]);

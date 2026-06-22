@@ -7,14 +7,14 @@
 import { useState, useEffect, useRef } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import { Button } from "@wordpress/components";
-import ProTag from "../components/ProTag";
+import ProTag from "../../components/ProTag";
 import {
   STYLE_TEMPLATES,
   STYLE_CLASS_MAP,
   SHADOW_STYLES,
   DEFAULT_STYLE_TEMPLATE_ID,
   normalizeStyleTemplateId,
-} from "../components/StyleTemplate";
+} from "../../components/StyleTemplate";
 
 const { restUrl, nonce } = window.krefrmAdmin || {};
 

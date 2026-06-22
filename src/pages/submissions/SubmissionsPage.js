@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "@wordpress/element";
 import { __ } from "@wordpress/i18n";
 import apiFetch from "@wordpress/api-fetch";
 import { Button, Notice, Spinner, Modal } from "@wordpress/components";
-import ProTag from "../components/ProTag";
+import ProTag from "../../components/ProTag";
 
 // Helper to parse form ID from URL hash
 function getFormIdFromHash() {
